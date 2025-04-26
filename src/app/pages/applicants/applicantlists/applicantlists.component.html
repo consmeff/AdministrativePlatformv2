@@ -1,0 +1,121 @@
+<div class="layout d-flex flex-column vh-100">
+    <app-topbar></app-topbar>
+    <div class="main-content d-flex flex-grow-1" [ngStyle]="{ 'margin-left':sidebarVisible?'15rem':'0.5rem'}">
+        <app-sidebar class="sidebar"></app-sidebar>
+        <div class="center-pane flex-grow-1 p-4 overflow-auto">
+
+            <div class="row section3 mt-5">
+                <div class="col-6" style="position: relative;">
+
+                    <div class="input-container">
+
+                        <input type="text" [(ngModel)]="searchText" (ngModelChange)="onSearchTextChanged($event)"
+                            type="text" name="" id="" class="form-control" class="form-control"
+                            placeholder="Search by name, application no. or preferred programme"
+                            style="width: 480px; height: 52px; border-radius: 12px;" aria-describedby="helpId" />
+
+                        <img class="search-icon" src="assets/dashboard/search.png" alt="" srcset="">
+                    </div>
+
+                </div>
+                <div class="col-6 d-flex justify-content-end">
+                    <button type="button" class="btn btn-primary">
+                        Export Now <i class="bi bi-file-earmark-arrow-down text-white"></i>
+
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="row section3 mt-5">
+                <div class="d-flex justify-content-between">
+                    <div class="card-title">All Applications ({{total_record_count}})</div>
+                    <p-dropdown [options]="approval_status" [(ngModel)]="selectedStatus" optionLabel="name"
+                        placeholder="Select a status" />
+
+                </div>
+                <div class="summary-table">
+                    <p-table [columns]="cols" [value]="app_summ" [tableStyle]="{ 'min-width': '50rem' }"
+                        [paginator]="true" [rows]="rows" [first]="first" [showCurrentPageReport]="true"
+                        [totalRecords]="total_record_count"
+                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                        (onPage)="pageChange($event)" [rowsPerPageOptions]="[10,20,50,100, 150, 200]">
+                        <ng-template pTemplate="header" let-columns>
+                            <tr>
+                                <th *ngFor="let col of columns">
+                                    {{ col.header }}
+                                </th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-rowData let-columns="columns">
+                            <tr>
+                                <td *ngFor="let col of columns">
+                                    <span class="action-icon" *ngIf="col.field === 'action'"
+                                        (click)="showActionModal($event, rowData)"
+                                        [innerHTML]="rowData[col.field]"></span>
+                                    <span *ngIf="col.field !== 'action'">{{ rowData[col.field] }}</span>
+
+                                    <!-- Action Menu (positioned absolutely near the clicked icon) -->
+                                    <div class="action-menu"
+                                        *ngIf="selectedRowData?.id === rowData.id && showActionMenu"
+                                        [ngStyle]="{top: menuPosition.y + 'px', left: (menuPosition.x-10) + 'px'}">
+                                        <ul class="list-group">
+                                            <li class="list-group-item list-group-item-action eye"
+                                                (click)="handleAction('view profile', rowData)">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span>View Profile</span>
+                                                    <div
+                                                        style="padding: 3px;background-color:rgba(0, 0, 128, 0.06) ;padding: 2px 4px;border-radius: 3px ;">
+                                                        <i class="bi bi-eye" style="color: rgba(0, 0, 128, 1);;"></i>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item list-group-item-action x"
+                                                (click)="handleAction('reject candidate', rowData)">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span>Reject Candidate</span>
+                                                    <div
+                                                        style="padding: 3px;background-color:rgba(219, 66, 66, 0.104) ;padding: 2px 4px;border-radius: 3px ;">
+                                                        <i class="bi bi-x" style="color: rgb(219, 66, 66) ;;"></i>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item list-group-item-action check"
+                                                (click)="handleAction('shortlist candidate', rowData)">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span>Shortlist Candidate</span>
+                                                    <div
+                                                        style="padding: 3px;background-color:rgba(4, 250, 65, 0.104)  ;padding: 2px 4px;border-radius: 3px ;">
+                                                        <i class="bi bi-check" style="color: rgb(4, 250, 66) ;"></i>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item list-group-item-action excl"
+                                                (click)="handleAction('issue compliance directive', rowData)">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span>Issue Compliance Directive</span>
+                                                    <div
+                                                        style="padding: 3px;background-color:rgba(239, 153, 5, 0.055)  ;padding: 2px 4px;border-radius: 3px ;">
+                                                        <i class="bi bi-exclamation-triangle"
+                                                            style="color: rgb(239, 153, 5);"></i>
+                                                    </div>
+
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="paginatorleft">
+                            <p-button type="button" icon="pi pi-plus" styleClass="p-button-text" />
+                        </ng-template>
+                        <ng-template pTemplate="paginatorright">
+                            <p-button type="button" icon="pi pi-cloud" styleClass="p-button-text" />
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

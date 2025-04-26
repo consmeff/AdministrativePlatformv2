@@ -1,0 +1,88 @@
+
+
+
+
+.statcard {
+  height: 150px;
+}
+
+.first-cards img {
+  height: 28px;
+}
+
+.section2 .card {
+  height: 201px;
+}
+
+.center-pane {
+  z-index: 999999;
+}
+
+button {
+  width: 135px;
+  height: 44px;
+  gap: 8px;
+  border-radius: 8px;
+  // padding-top: 16px;
+  padding-right: 20px;
+  // padding-bottom: 16px;
+  padding-left: 20px;
+  background-color: rgba(0, 0, 128, 1);
+  color: #FAFAFC;
+
+}
+h6{
+  font-size: 14px;
+}
+
+.section2{
+  font-size: 14px;
+}
+.export-pane .tiny{
+  font-size: 12px;
+  
+}
+.card-title{
+  font-weight: bold;
+}
+.summary-table th{
+  font-size: 13px;
+  font-weight: 600px;
+}
+.summary-table tr{
+  font-size: 13px;
+  font-weight: 400px;
+}
+.viewall{
+  font-size: 13px;
+  font-weight: 400px;
+  cursor: pointer;
+  color: rgb(0, 0, 128) !important;
+}
+
+.metric .card-text{
+  font-family: Lato;
+font-weight: 700;
+font-size: 24px;
+line-height: 100%;
+letter-spacing: 0%;
+
+}
+
+.card-text .d-flex.justify-content-between span:last-child{
+  font-family: Lato;
+font-weight: 700;
+font-size: 14px;
+line-height: 150%;
+letter-spacing: 0%;
+
+}
+
+.last-sec{
+  font-family: Lato;
+font-weight: 700;
+font-size: 13px;
+line-height: 150%;
+letter-spacing: 0%;
+
+}

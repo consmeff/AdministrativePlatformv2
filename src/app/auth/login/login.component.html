@@ -1,0 +1,50 @@
+<simple-notifications (destroy)="destroyed($event)"></simple-notifications>
+<div class="login-container">
+  
+
+  
+    <div class="right-section">
+        <div class="form-content">
+            <!-- Logo -->
+            <div class="logo">
+                <img src="../../../assets/logo.png" alt="School Logo" />
+            </div>
+
+
+            <div class="admin-login my-4">Administrator Login</div>
+            <!-- Form -->
+            <form class="loginForm" [formGroup]="loginForm">
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control login-field" id="floatingInput"
+                    formControlName="email"
+                        placeholder="name@example.com">
+                    <label for="floatingInput">Email address</label>
+                </div>
+                <div class="form-floating" style="position: relative;">
+                    <input type="{{!passToggle?'password':'text'}}" class="form-control login-field" id="floatingPassword"
+                    formControlName="password"
+                        placeholder="Password">
+                    <label for="floatingPassword">Password</label>
+                    @if (!passToggle) {
+                        <i (click)="showToggle()" class="bi bi-eye-slash passToggle"></i>
+                    }@else {
+                        <i (click)="showToggle()" class="bi bi-eye passToggle"></i>
+                    }
+
+                </div>
+              
+                <div class="btn-section d-flex justify-content-center my-5">
+                    <button (click)="login()" type="button" class="btn btn-primary">
+                        Login
+                        <ngx-spinner   [fullScreen]="false" type="line-scale" size="small">
+                            <p class="loading"></p>
+                          </ngx-spinner>
+                    </button>
+
+                </div>
+            </form>
+           
+
+        </div>
+    </div>
+</div>

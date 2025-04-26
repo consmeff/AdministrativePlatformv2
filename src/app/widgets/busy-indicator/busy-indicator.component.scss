@@ -1,0 +1,28 @@
+.busy-indicator-container {
+    width: 100%;
+    overflow: hidden;
+    z-index: 9999;
+  }
+  
+  .busy-indicator-bar {
+    width: 50%;
+    animation: slideGradient 2s linear infinite, slideRight 1.5s ease-in-out infinite;
+  }
+  
+  @keyframes slideGradient {
+    0% {
+      background-position: 100% 0;
+    }
+    100% {
+      background-position: -100% 0;
+    }
+  }
+  
+  @keyframes slideRight {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(200%);
+    }
+  }

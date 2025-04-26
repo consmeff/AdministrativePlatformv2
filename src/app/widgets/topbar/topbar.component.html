@@ -1,0 +1,17 @@
+<div class="top-bar">
+
+    <div class="d-flex align-items-center">
+        <i class="bi bi-list burger-menu" (click)="toggleSidebar()"></i>
+    <div class="" [ngStyle]="{ 'margin-left':sidebarVisible?'12rem':'1rem'}">Current Session: {{dashinfo && dashinfo.academicsession !=null? dashinfo.academicsession.split(" ")[0]:""}}</div>
+    </div>
+    <div class="d-flex justify-content-end tb-icon">
+        <i class="bi bi-bell mx-3"></i>
+        <i class="bi bi-person-circle mx-3"></i>
+        <div class="d-flex flex-column">
+            <span>{{dashinfo?.username}}</span>
+            <span>Academic Officer</span>
+        </div>
+        
+        
+    </div>
+</div>

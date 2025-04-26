@@ -1,0 +1,36 @@
+button {
+    width: 145px;
+    height: 44px;
+    gap: 8px;
+    border-radius: 8px;
+    // padding-top: 16px;
+    padding-right: 20px;
+    // padding-bottom: 16px;
+    padding-left: 20px;
+    background-color: rgba(0, 0, 128, 1);
+    color: #FAFAFC;
+  
+  }
+
+  .search-icon{
+    position: absolute;
+    right: 15px;
+    top: 6px;
+  }
+
+  .summary-table th{
+    font-size: 13px;
+    font-weight: 600px;
+  }
+  .summary-table tr{
+    font-size: 13px;
+    font-weight: 400px;
+  }
+
+  ::ng-deep{
+    .p-datatable-table-container{
+      max-height: 300px !important;
+      overflow-y: scroll;
+    }
+  }
+

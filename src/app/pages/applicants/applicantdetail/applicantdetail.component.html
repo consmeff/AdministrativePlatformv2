@@ -1,0 +1,372 @@
+<div class="layout d-flex flex-column vh-100">
+    <app-topbar></app-topbar>
+    <div class="main-content d-flex flex-grow-1" [ngStyle]="{ 'margin-left':sidebarVisible?'15rem':'0.5rem'}">
+        <app-sidebar class="sidebar"></app-sidebar>
+        <div class="center-pane flex-grow-1 p-4 overflow-auto">
+            <div class="row g-4 mb-4 first-cards">
+                <!-- First Row - 4 Metric Cards -->
+                <div class="col-12">
+                    <!-- breadcrum -->
+                    <div class="d-flex flex-row breadcrum">
+                        <span [routerLink]="'/pages/applicants/applicantlist'">Applicants</span>
+                        <span class="mx-3"><img src="assets/dashboard/arrow-right.png" alt=""></span>
+                        <span>Adewale Soliu</span>
+                    </div>
+                </div>
+
+            </div>
+            <div class="row g-4 mb-4 sec-row">
+
+                <div class="col-6">
+                    <!-- breadcrum -->
+                    <div class="d-flex flex-column justify-content-start">
+                        <div class="b-name">
+                            {{application.first_name}}, {{application.last_name}} {{application.other_names}}
+                        </div>
+                        <div class="body-small" *ngIf="application.program">
+                            Preferred Programme:{{application.program.name}}
+                        </div>
+                        <div class="body-small">
+                            Status: <span style="color: rgba(199, 124, 39, 1);">{{application.approval_status}}</span>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-6">
+
+                    <div class="last-col">
+                        <div class="title-bold">
+                            <span style="color: rgba(165, 71, 134, 1);">{{application.application_no}}</span>
+                        </div>
+                        <div class="body-small" style="color: rgba(0, 0, 128, 1);">
+                            Download Profile <i class="bi bi-file-earmark-arrow-down"></i>
+                        </div>
+
+
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="row third-row mt-5">
+                <div class="col-12">
+
+                    <div class="tab-wrap">
+                        <p-tabView>
+                            <p-tabPanel header="Personal details">
+                                <div class="table-responsive-md">
+                                    <table class="table table-light table-borderless">
+
+                                        <tbody>
+                                            <tr class="">
+                                                <td>First Name</td>
+                                                <td>{{application.first_name}}</td>
+
+                                            </tr>
+                                            <tr class="">
+                                                <td>Last Name</td>
+                                                <td>{{application.last_name}}</td>
+                                            </tr>
+                                            <tr class="">
+                                                <td>Middle Name</td>
+                                                <td>{{application.other_names}}</td>
+                                            </tr>
+                                            <tr class="">
+                                                <td>Email Address</td>
+                                                <td>{{application.email}}</td>
+                                            </tr>
+                                            <tr class="">
+                                                <td>Phone Number</td>
+                                                <td>{{application.phone_number}}</td>
+                                            </tr>
+                                            <tr class="">
+                                                <td>Alternate Phone Number</td>
+                                                <td>{{application.alt_phone_number}}</td>
+                                            </tr>
+                                            <tr class="">
+                                                <td>Date of Birth</td>
+                                                <td>{{application.dob}}</td>
+                                            </tr>
+                                            <tr class="">
+                                                <td>Gender</td>
+                                                <td>{{application.gender}}</td>
+                                            </tr>
+                                            <tr class="">
+                                                <td>Marital Status</td>
+                                                <td>{{application.marital_status}}</td>
+                                            </tr>
+                                            <tr class="">
+                                                <td>Nationality</td>
+                                                <td>{{application.nationality}}</td>
+                                            </tr>
+                                            <tr class="">
+                                                <td>State of Origin</td>
+                                                <td>{{application.state_of_origin}}</td>
+                                            </tr>
+                                            <tr class="">
+                                                <td>Local Government Area</td>
+                                                <td>{{application.lga}}</td>
+                                            </tr>
+                                            <tr class="">
+                                                <td>Living with disability?</td>
+                                                <td>{{application.disability}}</td>
+                                            </tr>
+                                            <tr class="">
+                                                <td>Specified disability</td>
+                                                <td>{{application.disability}}</td>
+                                            </tr>
+                                            <tr class="">
+                                                <td>Address</td>
+                                                <td>{{application.residential_address?.address}}</td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </p-tabPanel>
+                            <p-tabPanel header="Next of Kin Details">
+                                <div class="table-responsive-md">
+                                    <table class="table table-light table-borderless">
+
+                                        <tbody>
+                                            <tr class="">
+                                                <td>Title</td>
+                                                <td>{{application.primary_parent_or_guardian?.title}}</td>
+
+                                            </tr>
+                                            <tr class="">
+                                                <td>First Name</td>
+                                                <td>{{application.primary_parent_or_guardian?.first_name}}</td>
+
+                                            </tr>
+                                            <tr class="">
+                                                <td>Last Name</td>
+                                                <td>{{application.primary_parent_or_guardian?.last_name}}</td>
+                                            </tr>
+                                            <tr class="">
+                                                <td>Middle Name</td>
+                                                <td>{{application.primary_parent_or_guardian?.other_names}}</td>
+                                            </tr>
+                                            <tr class="">
+                                                <td>Email Address</td>
+                                                <td>{{application.primary_parent_or_guardian?.email}}</td>
+                                            </tr>
+                                            <tr class="">
+                                                <td>Phone Number</td>
+                                                <td>{{application.primary_parent_or_guardian?.phone_number}}</td>
+                                            </tr>
+                                            <tr class="">
+                                                <td>Gender</td>
+                                                <td>{{application.primary_parent_or_guardian?.gender}}</td>
+                                            </tr>
+                                            <!-- <tr class="">
+                                                <td >Relationship</td>                                             
+                                                <td>{{application.primary_parent_or_guardian?.re}}</td>
+                                            </tr> -->
+                                            <tr class="">
+                                                <td>Occupation</td>
+                                                <td>{{application.primary_parent_or_guardian?.occupation}}</td>
+                                            </tr>
+
+                                            <tr class="">
+                                                <td>Nationality</td>
+                                                <td>{{application.primary_parent_or_guardian?.nationality}}</td>
+                                            </tr>
+                                            <tr class="">
+                                                <td>State of Origin</td>
+                                                <td>{{application.primary_parent_or_guardian?.state_of_origin}}</td>
+                                            </tr>
+                                            <tr class="">
+                                                <td>Local Government Area</td>
+                                                <td>{{application.primary_parent_or_guardian?.lga}}</td>
+                                            </tr>
+
+                                            <tr class="">
+                                                <td>Address</td>
+                                                <td>{{application.primary_parent_or_guardian?.residential_address}}</td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </p-tabPanel>
+                            <p-tabPanel header="Academic History">
+                                <div class="table-responsive-md">
+                                    <table class="table table-light table-borderless">
+
+                                        <tbody *ngIf="application && application.academic_history">
+                                            <tr class="">
+                                                <td>Primary School</td>
+                                                <td>{{application && application.academic_history.length>0?
+                                                    getAcademicHistory('primary')?.institution:"-----"}}</td>
+
+                                            </tr>
+                                            <tr class="">
+                                                <td>Duration</td>
+                                                <td>{{getAcademicHistory('primary')?.from_date}} &nbsp; to &nbsp;
+                                                    {{getAcademicHistory('primary')?.to_date}}</td>
+                                            </tr>
+                                            <tr class="">
+                                                <td>Secondary School</td>
+                                                <td>{{getAcademicHistory('secondary')?.institution}}</td>
+                                            </tr>
+                                            <tr class="">
+                                                <td>Duration</td>
+                                                <td>{{getAcademicHistory('secondary')?.from_date}} &nbsp; to &nbsp;
+                                                    {{getAcademicHistory('secondary')?.to_date}}</td>
+                                            </tr>
+                                            <tr class="">
+                                                <td>Qualification</td>
+                                                <td>{{getAcademicHistory('secondary')?.certificate_type??"-----"}}</td>
+                                            </tr>
+                                            <tr class="">
+                                                <td>Number of Attempts</td>
+                                                <td>{{getAttemptCount()}}</td>
+                                            </tr>
+                                            <tr class="">
+                                                <td>Examination Name</td>
+                                                <td>{{getExamName()}}</td>
+                                            </tr>
+                                            <tr class="">
+                                                <td>Examination Year</td>
+                                                @if (application.o_level_result && application.o_level_result.length>0)
+                                                {
+                                                <td>{{getYear()}}</td>
+                                                }@else {
+                                                <td>-----</td>
+                                                }
+                                            </tr>
+                                            <tr class="">
+                                                <td>Grades</td>
+                                                @if (application.o_level_result && application.o_level_result.length>0)
+                                                {
+                                                <td>{{getSubjects()}}</td>
+                                                }@else {
+                                                <td>-----</td>
+                                                }
+                                            </tr>
+                                            <!-- <tr class="">
+                                                <td >Qualification Name</td>                                             
+                                                <td>{{application.nationality}}</td>
+                                            </tr>
+                                            <tr class="">
+                                                <td >Qualification Type</td>                                             
+                                                <td>{{application.nationality}}</td>
+                                            </tr>
+                                            <tr class="">
+                                                <td >Duration</td>                                             
+                                                <td>{{application.state_of_origin}}</td>
+                                            </tr> -->
+
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </p-tabPanel>
+                            <p-tabPanel header="Documents">
+                                <div class="table-responsive-md">
+                                    <table class="table table-light table-borderless">
+
+                                        <tbody>
+                                            <tr class="">
+                                                <td>Cirtificate of Birth</td>
+                                                <td>
+                                                    <div class="d-flex flex-row"><img width="40" height="50"
+                                                            src="{{application.certificate_of_birth?.file_url}}" alt="">
+                                                        <div class="d-flex flex-column mx-3 row-gap-2">
+                                                            <span class="title-small">{{getfileName(application.certificate_of_birth!)}}</span>
+                                                            <span class="size-text">{{application.certificate_of_birth?.file_size}}</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="d-flex justify-content-end">
+                                                    <div class="d-flex flex-row action">
+                                                        <div class="">View <i class="bi bi-eye"></i></div>
+                                                        <div class="mx-3">Download <i class="bi bi-download"></i></div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr class="">
+                                                <td>O' Level</td>
+                                                <td>
+                                                    <div class="d-flex flex-row"><img width="40" height="50"
+                                                            src="{{application.certificate_of_birth?.file_url}}" alt="">
+                                                        <div class="d-flex flex-column mx-3  row-gap-2">
+                                                            <span class="title-small">{{getfileName(application.o_level_result![0].file)}}</span>
+                                                            <span class="size-text">{{formatFileSize(application.o_level_result![0].file.file_size)}}</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="d-flex justify-content-end">
+                                                    <div class="d-flex flex-row action">
+                                                        <div class="">View <i class="bi bi-eye"></i></div>
+                                                        <div class="mx-3">Download <i class="bi bi-download"></i></div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr class="">
+                                                <td>Passport Photograph</td>
+                                                <td>
+                                                    <div class="d-flex flex-row"><img width="40" height="50"
+                                                            src="{{application.certificate_of_birth?.file_url}}" alt="">
+                                                        <div class="d-flex flex-column mx-3  row-gap-2">
+                                                            <span class="title-small">{{getfileName(application.passport_photo!)}}</span>
+                                                            <span class="size-text">{{formatFileSize(application.passport_photo?.file_size!)}}</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="d-flex justify-content-end">
+                                                    <div class="d-flex flex-row action">
+                                                        <div class="">View <i class="bi bi-eye"></i></div>
+                                                        <div class="mx-3">Download <i class="bi bi-download"></i></div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr class="">
+                                                <td>UTME Result</td>
+                                                <td>
+                                                    <div class="d-flex flex-row"><img width="40" height="50"
+                                                            src="{{application.certificate_of_birth?.file_url}}" alt="">
+                                                        <div class="d-flex flex-column mx-3  row-gap-2">
+                                                            <span class="title-small">{{getfileName(application.utme_result?.file!)}}</span>
+                                                            <span class="size-text">{{formatFileSize(application.utme_result?.file?.file_size!)}}</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="d-flex justify-content-end">
+                                                    <div class="d-flex flex-row action">
+                                                        <div class="">View <i class="bi bi-eye"></i></div>
+                                                        <div class="mx-3">Download <i class="bi bi-download"></i></div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </p-tabPanel>
+                        </p-tabView>
+                    </div>
+                    <div class="h-divider"></div>
+                </div>
+
+
+            </div>
+
+            <div class="fourth-row my-5 d-flex justify-content-between flex-row">
+                <div class="compl d-flex justify-content-center align-content-center p-3">
+                    <i class="bi bi-exclamation-triangle mx-3 text-white"></i> <span>Issue Compliance Directive</span>
+                </div>
+                <div class="d-flex flex-row">
+                    <div class="reject p-3"> <i class="bi bi-x mx-3 text-white"></i> <span>Reject</span></div>
+                    <div class="mx-5 short p-3"> <i class="bi bi-check mx-3 text-white"></i> <span>Shortlist</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
