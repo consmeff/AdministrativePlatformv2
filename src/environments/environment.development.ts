@@ -1,6 +1,6 @@
 export const environment = {
     production: false,
    
-    apiURL:'https://activsims.activpulsespectra.com.ng'
+    apiURL:'https://apistaging.cnsportals.com.ng'
   };
   

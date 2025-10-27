@@ -22,12 +22,12 @@ export class ApplicationService {
 
   }
 
-  getapplications(keyword?: string, ordering?: string, page_size?: number,desc:boolean=true,page:number=1): Observable<ApplicationListResponse> {
+  getapplications(keyword?: string,  page_size?: number,  page: number = 1, sortField?: string | undefined, sortOrder?: number | undefined): Observable<ApplicationListResponse> {
     const baseUrl = `${this.apiRoot}/api/v1/applicants`;
     const params = new URLSearchParams();
   
     if (keyword) params.append('keyword', keyword);
-    if (ordering) params.append('ordering',desc? "-"+ordering:ordering);
+    if (sortField) params.append('ordering',sortOrder && sortOrder>0? "-"+sortField:sortField);
     if (page_size) params.append('page_size', page_size.toString());
     if (page) params.append('page', page.toString());
   

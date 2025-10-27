@@ -136,7 +136,7 @@ export class ApplicantdetailComponent implements OnInit {
   getfileName(fileobj: Certificate): string {
     let extension = '';
 
-
+    if(!fileobj) return "";
     if (fileobj.file_type) {
       const typeParts = fileobj.file_type.split('/');
       if (typeParts.length > 1) {

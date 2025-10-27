@@ -292,7 +292,7 @@
                                                 <td>O' Level</td>
                                                 <td>
                                                     <div class="d-flex flex-row"><img width="40" height="50"
-                                                            src="{{application.certificate_of_birth?.file_url}}" alt="">
+                                                            src="{{application.o_level_result![0].file.file_url}}" alt="">
                                                         <div class="d-flex flex-column mx-3  row-gap-2">
                                                             <span class="title-small">{{getfileName(application.o_level_result![0].file)}}</span>
                                                             <span class="size-text">{{formatFileSize(application.o_level_result![0].file.file_size)}}</span>
@@ -310,7 +310,7 @@
                                                 <td>Passport Photograph</td>
                                                 <td>
                                                     <div class="d-flex flex-row"><img width="40" height="50"
-                                                            src="{{application.certificate_of_birth?.file_url}}" alt="">
+                                                            src="{{application.passport_photo?.file_url}}" alt="">
                                                         <div class="d-flex flex-column mx-3  row-gap-2">
                                                             <span class="title-small">{{getfileName(application.passport_photo!)}}</span>
                                                             <span class="size-text">{{formatFileSize(application.passport_photo?.file_size!)}}</span>
@@ -328,7 +328,7 @@
                                                 <td>UTME Result</td>
                                                 <td>
                                                     <div class="d-flex flex-row"><img width="40" height="50"
-                                                            src="{{application.certificate_of_birth?.file_url}}" alt="">
+                                                            src="{{application.utme_result?.file?.file_url}}" alt="">
                                                         <div class="d-flex flex-column mx-3  row-gap-2">
                                                             <span class="title-small">{{getfileName(application.utme_result?.file!)}}</span>
                                                             <span class="size-text">{{formatFileSize(application.utme_result?.file?.file_size!)}}</span>

@@ -51,7 +51,7 @@ busyService = inject(BusyIndicatorService);
   ngOnInit(): void {
     this.busyService.show();
     this.subscriptions.add(
-      this._applicationService.getapplications(undefined,undefined,5,true,1).subscribe((data:ApplicationListResponse)=>{
+      this._applicationService.getapplications(undefined,5).subscribe((data:ApplicationListResponse)=>{
         if(data.data.length>0){
           this.applicationList=data.data;
           this.populateSummary();

@@ -32,12 +32,12 @@ export class ApplicantlistsComponent {
   sidebarVisible = false;
   _widgetService = inject(WidgetService)
   _applicationService = inject(ApplicationService);
-  cd =inject(ChangeDetectorRef);
+  cd = inject(ChangeDetectorRef);
   router = inject(Router);
   busyService = inject(BusyIndicatorService);
   application!: Application[];
   subscriptions = new Subscription();
-  selectedStatus: number = 1;
+  selectedStatus: appstatus = { name: "All", code: 0 };
   approval_status: appstatus[] = [];
   cols!: Column[];
   applicationList: Application[] = [];
@@ -50,7 +50,7 @@ export class ApplicantlistsComponent {
   actionModal: Modal | undefined;
   searchText: string = "";
   private searchTextChanged = new Subject<string>();
-  searchKeyword:string|undefined=undefined;
+  searchKeyword: string | undefined = undefined;
 
 
   constructor() {
@@ -62,7 +62,7 @@ export class ApplicantlistsComponent {
       debounceTime(2000),
       distinctUntilChanged(),
       switchMap(searchTerm => this.performSearch(searchTerm))
-    ).subscribe((data:any) => {
+    ).subscribe((data: any) => {
       if (data.data.length > 0) {
         this.total_record_count = data.total;
         this.applicationList = data.data;
@@ -71,10 +71,11 @@ export class ApplicantlistsComponent {
         this.cd.detectChanges()
       }
     });
-    
+
   }
-  performSearch(searchTerm: string): any {
-    this.searchKeyword=searchTerm;
+  performSearch(searchTerm: string): Observable<ApplicationListResponse> {
+    this.searchKeyword = searchTerm;
+    this.first = 0; // Reset pagination to the first page
     return this.fetchRecords();
   }
 
@@ -88,16 +89,15 @@ export class ApplicantlistsComponent {
   }
   ngOnInit(): void {
     this.busyService.show();
-    this.subscriptions.add(
-      this._applicationService.getapplications(this.searchKeyword, undefined, 10, true, this.first + 1).subscribe((data: ApplicationListResponse) => {
-        if (data.data.length > 0) {
-          this.total_record_count = data.total;
-          this.applicationList = data.data;
-          this.populateSummary();
-          this.busyService.hide();
-        }
-      })
-    );
+    this.fetchRecords().subscribe((data: ApplicationListResponse) => {
+      if (data.data.length > 0) {
+        this.total_record_count = data.total;
+        this.applicationList = data.data;
+        this.populateSummary();
+        this.busyService.hide();
+      }
+    });
+
     this.approval_status = [
       { name: "All", code: 0 },
       { name: "Pending", code: 1 },
@@ -105,9 +105,7 @@ export class ApplicantlistsComponent {
       { name: "Compliance", code: 3 },
       { name: "Rejected", code: 4 },
       { name: "Resolved", code: 5 }
-
     ];
-
 
     this.cols = [
       { field: 'application_no', header: 'Application Number' },
@@ -118,17 +116,64 @@ export class ApplicantlistsComponent {
       { field: 'approval_status', header: 'Status' },
       { field: 'action', header: 'Actions' }
     ];
-
   }
-  private fetchRecords() : Observable<ApplicationListResponse>{
-    return this._applicationService.getapplications(this.searchKeyword, undefined, 10, true, this.first + 1);
+  private fetchRecords(sortField?: string, sortOrder?: number): Observable<ApplicationListResponse> {
+    return this._applicationService.getapplications(
+      this.searchKeyword, // Search keyword
+      // Filters (if applicable)
+      this.rows,          // Rows per page
+      // Include additional data (if needed)
+      this.first + 1,     // First record index
+      sortField,          // Field to sort by
+      sortOrder           // Sort order (1 for ascending, -1 for descending)
+    );
+  }
+
+  onStatusChange(event: any) {
+    // Reset pagination to the first page when applying a new filter
+    this.first = 0;
+
+    // Use the selected status as part of the search/filter criteria
+    if (this.selectedStatus && this.selectedStatus.code !== undefined) {
+      this.searchKeyword = `${this.selectedStatus.name}`; // Format the search keyword for the backend
+    } else {
+      this.searchKeyword = undefined; // Clear the filter if "All" is selected
+    }
+
+    // Fetch data with the updated filter
+    this.fetchRecords("approval_status").subscribe((data: ApplicationListResponse) => {
+      if (data.data.length > 0) {
+        this.total_record_count = data.total;
+        this.applicationList = data.data;
+        this.populateSummary();
+      }
+    });
+  }
+
+  onLazyLoad(event: any) {
+    // Update pagination parameters
+    this.first = event.first || 0; // First record index
+    this.rows = event.rows || 10;  // Number of rows per page
+
+    // Get sorting parameters
+    const sortField = event.sortField; // Field to sort by
+    const sortOrder = event.sortOrder; // Sort order (1 for ascending, -1 for descending)
+
+    // Fetch data from the server
+    this.fetchRecords(sortField, sortOrder).subscribe((data: ApplicationListResponse) => {
+      if (data.data.length > 0) {
+        this.total_record_count = data.total;
+        this.applicationList = data.data;
+        this.populateSummary();
+      }
+    });
   }
 
   onSearchTextChanged(text: string) {
-    if(text !=undefined){
+    if (text != undefined) {
       this.searchTextChanged.next(text);
     }
-    }
+  }
 
   next() {
     this.first = this.first + this.rows;
@@ -145,6 +190,15 @@ export class ApplicantlistsComponent {
   pageChange(event: any) {
     this.first = event.first;
     this.rows = event.rows;
+
+    // Fetch new data based on updated pagination parameters
+    this.fetchRecords().subscribe((data: ApplicationListResponse) => {
+      if (data.data.length > 0) {
+        this.total_record_count = data.total;
+        this.applicationList = data.data;
+        this.populateSummary();
+      }
+    });
   }
 
   isLastPage(): boolean {
@@ -183,9 +237,9 @@ export class ApplicantlistsComponent {
 
   showActionModal(event: MouseEvent, rowData: any) {
     event.stopPropagation();
-
+    // console.log(rowData.id)
     // Toggle menu if clicking the same row's action icon
-    if (this.selectedRowData?.id === rowData.id && this.showActionMenu) {
+    if (this.selectedRowData?.application_no === rowData.application_no && this.showActionMenu) {
       this.showActionMenu = false;
       return;
     }

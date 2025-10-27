@@ -12,10 +12,30 @@ button {
   
   }
 
-  .search-icon{
-    position: absolute;
-    right: 15px;
-    top: 6px;
+  .input-container {
+    position: relative; /* Establishes a positioning context for child elements */
+    display: inline-block; /* Ensures the container wraps around the input */
+  }
+  
+  .form-control {
+    width: 480px;
+    height: 52px;
+    border-radius: 12px;
+    padding-right: 40px; /* Add padding to prevent text from overlapping the icon */
+    box-sizing: border-box; /* Ensures padding is included in the width/height */
+  }
+  
+  .search-icon {
+    position: absolute; /* Position the icon absolutely within the container */
+    top: 50%; /* Center vertically */
+    right: 12px; /* Align to the right edge with some spacing */
+    transform: translateY(-50%); /* Fine-tune vertical centering */
+    width: 24px; /* Adjust size of the icon as needed */
+    height: 24px; /* Adjust size of the icon as needed */
+    pointer-events: none; /* Prevent the icon from interfering with input interactions */
+  }
+  .search-icon :hover{
+    cursor: pointer;
   }
 
   .summary-table th{
