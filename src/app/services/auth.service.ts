@@ -6,92 +6,131 @@ import { ProfilePayload, ProfileSuccessResponse } from '../model/auth.dto';
 import { DashboardinformationService } from './dashboardinformation.service';
 import { DashboardInfo } from '../model/dashboard/information.dto';
 
+interface LoginResponse {
+  access_token: string;
+  refresh_token: string;
+  user_type: string;
+  application_no?: string;
+  matriculation_no?: string;
+}
+
+interface OtpTokenResponse {
+  jwt: string;
+  refreshToken: string;
+}
+
+interface RefreshTokenResponse {
+  jwt: string;
+}
+
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
+  private readonly http = inject(HttpClient);
   apiRoot = environment.apiURL;
   headers = new HttpHeaders({
     'Content-Type': 'application/json',
-    'Accept': 'application/json'
+    Accept: 'application/json',
   });
   private readonly JWT_TOKEN = 'JWT_TOKEN';
   private readonly REFRESH_TOKEN = 'REFRESH_TOKEN';
   private loggedUser: string | null | undefined;
-  dashInfoService=inject(DashboardinformationService);
-  _dash:DashboardInfo= {} as DashboardInfo;
-  constructor(private http: HttpClient) { 
-
-    this.dashInfoService.dashInfo$.subscribe(val=>{
-      this._dash=val;
-    })
+  dashInfoService = inject(DashboardinformationService);
+  _dash: DashboardInfo = {} as DashboardInfo;
+  constructor() {
+    this.dashInfoService.dashInfo$.subscribe((val) => {
+      this._dash = val;
+    });
   }
 
-  login(user: { username: string, password: string }): Observable<any> {
-    return this.http.post<any>(`${this.apiRoot}/api/v1/auth/login`, user)
-    .pipe(
-      tap(tokens => {
-        this.doLoginUser(user.username, tokens);
-        console.log(tokens);
-      }),
-      // mapTo(true),
-      map(()=>true),
-      catchError(error => {
-        throw error;
-        return of(false);
-      }));
-
+  login(user: { username: string; password: string }): Observable<boolean> {
+    return this.http
+      .post<LoginResponse>(`${this.apiRoot}/api/v1/auth/login`, user)
+      .pipe(
+        tap((tokens) => {
+          this.doLoginUser(user.username, tokens);
+        }),
+        map(() => true),
+        catchError((error) => {
+          throw error;
+        }),
+      );
   }
 
   create(payload: ProfilePayload): Observable<ProfileSuccessResponse> {
-    return this.http.post<ProfileSuccessResponse>(`${this.apiRoot}/api/v1/auth/signup`, payload, { headers: this.headers });
+    return this.http.post<ProfileSuccessResponse>(
+      `${this.apiRoot}/api/v1/auth/signup`,
+      payload,
+      { headers: this.headers },
+    );
   }
 
-  verifyOtp(otpObj: any): Observable<boolean> {
-    return this.http.post<any>(`${this.apiRoot}/api/v1/auth/signup/verify-otp`, otpObj)
+  verifyOtp(otpObj: Record<string, unknown>): Observable<boolean> {
+    return this.http
+      .post<OtpTokenResponse>(
+        `${this.apiRoot}/api/v1/auth/signup/verify-otp`,
+        otpObj,
+      )
       .pipe(
-        tap(responseObj => { let username = sessionStorage.getItem("profile_email"); this.storeTokenFromOTP(username!, responseObj) }),
+        tap((responseObj) => {
+          const username = sessionStorage.getItem('profile_email');
+          this.storeTokenFromOTP(username!, responseObj);
+        }),
         map(() => true),
-        catchError(error => {
-          // alert(error.error);
+        catchError(() => {
           return of(false);
-        }));
+        }),
+      );
   }
 
-  verifyEmail(emailObj: any): Observable<boolean> {
-    return this.http.post<any>(`${this.apiRoot}/api/v1/auth/password/forgot`, emailObj)
-
+  verifyEmail(emailObj: Record<string, unknown>): Observable<boolean> {
+    return this.http
+      .post(`${this.apiRoot}/api/v1/auth/password/forgot`, emailObj)
+      .pipe(
+        map(() => true),
+        catchError(() => of(false)),
+      );
   }
 
-  updatePassword(otpObj: any): Observable<boolean> {
-
-    return this.http.post<any>(`${this.apiRoot}/api/v1/auth/password/reset`, otpObj, { headers: this.headers })
-
+  updatePassword(otpObj: Record<string, unknown>): Observable<boolean> {
+    return this.http
+      .post(`${this.apiRoot}/api/v1/auth/password/reset`, otpObj, {
+        headers: this.headers,
+      })
+      .pipe(
+        map(() => true),
+        catchError(() => of(false)),
+      );
   }
 
-  storeTokenFromOTP(username: string, token: any) {
+  storeTokenFromOTP(username: string, token: OtpTokenResponse) {
     this.loggedUser = username;
     sessionStorage.setItem(this.JWT_TOKEN, token.jwt);
     sessionStorage.setItem(this.REFRESH_TOKEN, token.refreshToken);
   }
 
   storeAppNo(application_no: string) {
-    sessionStorage.setItem("APP_NO", application_no);
+    sessionStorage.setItem('APP_NO', application_no);
   }
   storeMatricNo(matric_no: string) {
-    sessionStorage.setItem("MATRIC_NO", matric_no);
+    sessionStorage.setItem('MATRIC_NO', matric_no);
   }
 
   storeRole(user_type: string) {
-    sessionStorage.setItem("USER_TYPE", user_type);
+    sessionStorage.setItem('USER_TYPE', user_type);
   }
 
   refreshToken() {
-    return this.http.post<any>(`${this.apiRoot}/refresh`, {
-      'refreshToken': this.getRefreshToken()
-    }).pipe(tap((tokens: any) => {
-      this.storeJwtToken(tokens.jwt);
-    }));
+    return this.http
+      .post<RefreshTokenResponse>(`${this.apiRoot}/refresh`, {
+        refreshToken: this.getRefreshToken(),
+      })
+      .pipe(
+        tap((tokens: RefreshTokenResponse) => {
+          this.storeJwtToken(tokens.jwt);
+        }),
+      );
   }
 
   private getRefreshToken() {
@@ -106,7 +145,7 @@ export class AuthService {
     return sessionStorage.getItem(this.JWT_TOKEN);
   }
 
-  private storeTokens(tokens: any) {
+  private storeTokens(tokens: LoginResponse) {
     sessionStorage.setItem(this.JWT_TOKEN, tokens.access_token);
     sessionStorage.setItem(this.REFRESH_TOKEN, tokens.refresh_token);
   }
@@ -116,10 +155,9 @@ export class AuthService {
     sessionStorage.removeItem(this.REFRESH_TOKEN);
   }
 
-  private doLoginUser(username: string, tokens: any) {
-    
-    if(username !=""){
-      this._dash.username=username;
+  private doLoginUser(username: string, tokens: LoginResponse) {
+    if (username != '') {
+      this._dash.username = username;
       this.dashInfoService.setdashInfo(this._dash);
     }
     this.loggedUser = username;
@@ -131,6 +169,5 @@ export class AuthService {
     if (tokens.matriculation_no) {
       this.storeMatricNo(tokens.matriculation_no);
     }
-
   }
 }

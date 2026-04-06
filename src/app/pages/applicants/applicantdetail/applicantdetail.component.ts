@@ -6,82 +6,95 @@ import { WidgetService } from '../../../services/widget.service';
 import { sidebarStateDTO } from '../../../model/page.dto';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ApplicationService } from '../../../services/application.service';
-import { AcademicHistory, Application, ApplicationListResponse, Certificate } from '../../../model/dashboard/applicant';
+import {
+  AcademicHistory,
+  Application,
+  ApplicationListResponse,
+  Certificate,
+} from '../../../model/dashboard/applicant';
 import { TabViewModule } from 'primeng/tabview';
-import { BusyIndicatorService } from '../../../services/busy-indicator.service';
 
 @Component({
   selector: 'app-applicantdetail',
-  imports: [CommonModule, SidebarComponent, TopbarComponent, RouterModule, TabViewModule],
+  imports: [
+    CommonModule,
+    SidebarComponent,
+    TopbarComponent,
+    RouterModule,
+    TabViewModule,
+  ],
   templateUrl: './applicantdetail.component.html',
-  styleUrl: './applicantdetail.component.scss'
+  styleUrl: './applicantdetail.component.scss',
 })
 export class ApplicantdetailComponent implements OnInit {
-
   sidebarVisible = false;
-  _widgetService = inject(WidgetService)
+  _widgetService = inject(WidgetService);
   _applicationservice = inject(ApplicationService);
   application: Application = {} as Application;
   route = inject(ActivatedRoute);
-  
-  app_no: string | null = "";
+
+  app_no: string | null = '';
 
   constructor() {
     this._widgetService.sidebarState$.subscribe((state: sidebarStateDTO) => {
       this.sidebarVisible = state.isvisible;
-    })
+    });
 
     this.app_no = this.route.snapshot.paramMap.get('appno');
-
-
   }
   ngOnInit(): void {
-    
-    this.app_no = this.app_no!.replaceAll("_", "/");
+    this.app_no = this.app_no!.replaceAll('_', '/');
 
-    this._applicationservice.getapplication(this.app_no!).subscribe((data: ApplicationListResponse) => {
-
-      if (data.data.length > 0) {
-        this.application = data.data[0];
-        
-      }
-
-    })
+    this._applicationservice
+      .getapplication(this.app_no!)
+      .subscribe((data: ApplicationListResponse) => {
+        if (data.data.length > 0) {
+          this.application = data.data[0];
+        }
+      });
   }
 
   getAcademicHistory(name: string): AcademicHistory | undefined {
-    if (name == "primary") {
-      return this.application.academic_history.filter(f => f.certificate_type == 'Primary School Leaving Certificate')[0]
-    } else if (name == "secondary") {
-      return this.application.academic_history.filter(f => f.certificate_type == 'SSSCE')[0]
+    if (name == 'primary') {
+      return this.application.academic_history.filter(
+        (f) => f.certificate_type == 'Primary School Leaving Certificate',
+      )[0];
+    } else if (name == 'secondary') {
+      return this.application.academic_history.filter(
+        (f) => f.certificate_type == 'SSSCE',
+      )[0];
     } else {
       return undefined;
     }
   }
   getAttemptCount(): number {
-    return this.application.academic_history.filter(f => f.certificate_type == 'SSSCE').length
+    return this.application.academic_history.filter(
+      (f) => f.certificate_type == 'SSSCE',
+    ).length;
   }
 
   getSubjects(): string {
-    let subjects = this.application.o_level_result![0].subjects;
+    const subjects = this.application.o_level_result![0].subjects;
     const subjectFormats: Record<string, string> = {
-      english: "English Language",
-      math: "Mathematics",
-      physics: "Physics",
-      chemistry: "Chemistry",
-      biology: "Biology"
+      english: 'English Language',
+      math: 'Mathematics',
+      physics: 'Physics',
+      chemistry: 'Chemistry',
+      biology: 'Biology',
     };
 
-    return subjects.map(item => {
-      const formattedSubject = subjectFormats[item.subject.toLowerCase()] ||
-        item.subject.charAt(0).toUpperCase() + item.subject.slice(1);
-      return `${formattedSubject} - ${item.grade.toUpperCase()}`;
-    }).join(", ");
+    return subjects
+      .map((item) => {
+        const formattedSubject =
+          subjectFormats[item.subject.toLowerCase()] ||
+          item.subject.charAt(0).toUpperCase() + item.subject.slice(1);
+        return `${formattedSubject} - ${item.grade.toUpperCase()}`;
+      })
+      .join(', ');
   }
 
-
   getYear(): number | null {
-    let input = this.application.o_level_result![0].name;
+    const input = this.application.o_level_result![0].name;
     const yearMatches = input.match(/\b(20\d{2}|19\d{2})\b/g);
 
     if (!yearMatches || yearMatches.length === 0) {
@@ -96,23 +109,25 @@ export class ApplicantdetailComponent implements OnInit {
     }
 
     // Convert all matches to numbers and return the largest (most recent) one
-    const years = yearMatches.map(match => parseInt(match));
+    const years = yearMatches.map((match) => parseInt(match));
     return Math.max(...years);
   }
 
   getExamName(): string {
-    let input = this.application.o_level_result![0].name;
-    let text = input.replace(/\s*\b(20\d{2}|19\d{2})\b\s*/g, ' ') // Remove 4-digit years
-      .replace(/\s*\b\d{2}\b\s*/g, ' ')             // Remove 2-digit years
-      .replace(/\s*\/\s*\d+\s*/g, ' ')               // Remove /2025, /23, etc.
+    const input = this.application.o_level_result![0].name;
+    let text = input
+      .replace(/\s*\b(20\d{2}|19\d{2})\b\s*/g, ' ') // Remove 4-digit years
+      .replace(/\s*\b\d{2}\b\s*/g, ' ') // Remove 2-digit years
+      .replace(/\s*\/\s*\d+\s*/g, ' ') // Remove /2025, /23, etc.
       .trim();
 
     // Step 2: Clean up extra spaces and dangling punctuation
-    text = text.replace(/\s+/g, ' ')          // Collapse multiple spaces
-      .replace(/\s*-\s*/g, ' ')      // Remove standalone hyphens
-      .replace(/\s*,\s*$/, '')       // Remove trailing commas
-      .replace(/\s*\)\s*/g, ' ')     // Remove standalone closing parentheses
-      .replace(/\s*\(\s*/g, ' ')     // Remove standalone opening parentheses
+    text = text
+      .replace(/\s+/g, ' ') // Collapse multiple spaces
+      .replace(/\s*-\s*/g, ' ') // Remove standalone hyphens
+      .replace(/\s*,\s*$/, '') // Remove trailing commas
+      .replace(/\s*\)\s*/g, ' ') // Remove standalone closing parentheses
+      .replace(/\s*\(\s*/g, ' ') // Remove standalone opening parentheses
       .trim();
 
     // Step 3: Preserve acronyms in parentheses (e.g., "(WASSCE)") but clean the rest
@@ -126,24 +141,22 @@ export class ApplicantdetailComponent implements OnInit {
     // Reattach acronyms if they existed (e.g., "WEST AFRICAN... (WASSCE)")
     if (acronyms.length > 0) {
       text = text.replace(/\s*\([^)]*\)\s*/g, ''); // Remove all parentheses content
-      text = `${text} (${acronyms.join(') (')})`;  // Re-add only the acronyms
+      text = `${text} (${acronyms.join(') (')})`; // Re-add only the acronyms
     }
 
     return text || input; // Fallback to original if empty
   }
 
-
   getfileName(fileobj: Certificate): string {
     let extension = '';
 
-    if(!fileobj) return "";
+    if (!fileobj) return '';
     if (fileobj.file_type) {
       const typeParts = fileobj.file_type.split('/');
       if (typeParts.length > 1) {
         extension = typeParts[1];
       }
     }
-
 
     if (!extension && fileobj.file_url) {
       const urlParts = fileobj.file_url.split('.');
@@ -152,18 +165,17 @@ export class ApplicantdetailComponent implements OnInit {
       }
     }
 
-
     let fileName = fileobj.file_name.trim();
     const lastDotIndex = fileName.lastIndexOf('.');
-    if (lastDotIndex > 0) { // Remove existing extension if present
+    if (lastDotIndex > 0) {
+      // Remove existing extension if present
       fileName = fileName.substring(0, lastDotIndex);
     }
-
 
     return extension ? `${fileName}.${extension}` : fileName;
   }
 
-  formatFileSize(bytes: number, decimals: number = 2): string {
+  formatFileSize(bytes: number, decimals = 2): string {
     if (bytes === 0) return '0 Bytes';
 
     const k = 1024;
@@ -175,7 +187,4 @@ export class ApplicantdetailComponent implements OnInit {
 
     return `${value} ${sizes[i]}`;
   }
-
-
-
 }

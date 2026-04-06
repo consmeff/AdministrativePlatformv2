@@ -1,8 +1,12 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { BehaviorSubject, throwError } from 'rxjs';
 import { catchError, filter, switchMap, take } from 'rxjs/operators';
 import { AuthService } from './auth.service';
+
+interface RefreshTokenResponse {
+  jwt: string;
+}
 
 export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
@@ -26,7 +30,7 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
       refreshTokenSubject.next(null);
 
       return authService.refreshToken().pipe(
-        switchMap((token: any) => {
+        switchMap((token: RefreshTokenResponse) => {
           isRefreshing = false;
           refreshTokenSubject.next(token.jwt);
           return next(addToken(request, token.jwt));
@@ -34,7 +38,7 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
         catchError((error) => {
           isRefreshing = false;
           return throwError(() => error);
-        })
+        }),
       );
     } else {
       return refreshTokenSubject.pipe(
@@ -42,7 +46,7 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
         take(1),
         switchMap((jwt) => {
           return next(addToken(request, jwt));
-        })
+        }),
       );
     }
   };
@@ -58,6 +62,6 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
         return handle401Error(modifiedReq);
       }
       return throwError(() => error);
-    })
+    }),
   );
 };
