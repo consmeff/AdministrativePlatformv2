@@ -1,6 +1,5 @@
 export const environment = {
-    production: false,
-   
-    apiURL:'https://apistaging.cnsportals.com.ng'
-  };
-  
+  production: false,
+
+  apiURL: 'https://consmmefapi.labyeducation.com',
+};
