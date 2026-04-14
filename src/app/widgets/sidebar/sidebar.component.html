@@ -1,51 +1,39 @@
-<p-sidebar (onHide)="onSidebarHide()" [(visible)]="sidebarVisible" [baseZIndex]="10000" [dismissible]="false" [modal]="false" [showCloseIcon]="false"  [style]="{'overflow': 'hidden'}">
-    <i (click)="close()" class="bi bi-box-arrow-left fs-2" style="position: absolute;top: 0px;right: 20px;cursor: pointer;"></i>
-    
-  
-    <div class="container menu" style="display: flex; flex-direction: column; height: 100%; overflow: hidden;">
-        <div class="d-flex justify-content-center my-4">
-            <img src="../../../assets/sblogo.png" alt="" srcset="">
-        </div>
-        <div style="flex: 1; overflow: hidden; display: flex; flex-direction: column;">
-            <a routerLink="/pages/dashboard" style="text-decoration: none;">
-                <p-panel [toggleable]="false">
-                    <ng-template pTemplate="header">
-                        <i class="bi bi-grid mx-3"></i>
-                        Dashboard
-                    </ng-template>
-                </p-panel>
-            </a>
-        
-            <a routerLink="/pages/applicants" style="text-decoration: none;">
-                <p-panel [toggleable]="false">
-                    <ng-template pTemplate="header">
-                        <i class="bi bi-people mx-3"></i>
-                       Applicants 
-                    </ng-template>
-                </p-panel>
-            </a>
-            <a routerLink="/pages/payment" style="text-decoration: none;">
-                <p-panel [toggleable]="false">
-                    <ng-template pTemplate="header">
-                        <i class="bi bi-journals mx-3"></i>
-                        Exam Management
-                    </ng-template>
-                </p-panel>
-            </a>
-            <a routerLink="/pages/admissions" style="text-decoration: none;">
-                <p-panel [toggleable]="false">
-                    <ng-template pTemplate="header">
-                        <i class="bi bi-mortarboard mx-3"></i>
-                        Admissions
-                    </ng-template>
-                </p-panel>
-            </a>
-        </div>
-    
-        <div class="container" style="display: flex; flex-direction: column;">
-            <div (click)="logOut()" style="cursor: pointer;;">
-                <i class="bi bi-box-arrow-left text-danger fw-bold mx-2"></i> <span class="text-danger fw-bold">LogOut</span> 
-            </div>
-        </div>
+@if (sidebarVisible) {
+  <div class="sidebar-shell">
+    <button type="button" class="collapse-btn" (click)="close()">
+      <i class="bi bi-chevron-left"></i>
+    </button>
+
+    <div class="brand-wrap">
+      <img src="../../../assets/sblogo.png" alt="School Logo" />
     </div>
-</p-sidebar>
+
+    <nav class="menu-list">
+      <a
+        routerLink="/pages/dashboard"
+        routerLinkActive="active-link"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <i class="bi bi-house"></i>
+        <span>Dashboard</span>
+      </a>
+      <a routerLink="/pages/applicants" routerLinkActive="active-link">
+        <i class="bi bi-people"></i>
+        <span>Applicants</span>
+      </a>
+      <a routerLink="/pages/payment" routerLinkActive="active-link">
+        <i class="bi bi-journal-text"></i>
+        <span>Exam Management</span>
+      </a>
+      <a routerLink="/pages/admissions" routerLinkActive="active-link">
+        <i class="bi bi-mortarboard"></i>
+        <span>Admissions</span>
+      </a>
+    </nav>
+
+    <button type="button" class="logout-btn" (click)="logOut()">
+      <i class="bi bi-box-arrow-left"></i>
+      <span>LogOut</span>
+    </button>
+  </div>
+}
