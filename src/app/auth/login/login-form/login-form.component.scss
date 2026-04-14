@@ -1,0 +1,78 @@
+.form-shell {
+  width: 100%;
+  max-width: 430px;
+  text-align: center;
+}
+
+.brand-logo {
+  width: min(390px, 100%);
+  margin: 0 auto 1rem;
+}
+
+.title {
+  font-size: 2rem;
+  line-height: 1.1;
+  font-weight: 700;
+  margin: 0.5rem 0 1.5rem;
+  color: #0f172a;
+}
+
+.form-stack {
+  display: grid;
+  gap: 1rem;
+}
+
+.error-text {
+  display: block;
+  text-align: left;
+  margin-top: -0.5rem;
+  color: #b91c1c;
+  font-size: 0.78rem;
+}
+
+.action-btn {
+  width: 100%;
+  border-radius: 0.65rem;
+  background: #000080;
+  border-color: #000080;
+  margin-top: 0.5rem;
+}
+
+.action-btn:disabled {
+  opacity: 0.8;
+}
+
+.text-link {
+  border: none;
+  background: none;
+  color: #000080;
+  font-weight: 700;
+  margin-top: 0.9rem;
+}
+
+.switch-text {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  color: #475569;
+}
+
+.inline-link {
+  border: none;
+  background: none;
+  color: #000080;
+  font-weight: 700;
+  padding: 0;
+  margin-left: 0.25rem;
+}
+
+:host ::ng-deep .p-floatlabel {
+  width: 100%;
+}
+
+:host ::ng-deep .p-inputtext,
+:host ::ng-deep .p-password-input {
+  width: 100%;
+  border-radius: 0.6rem;
+  background: #f8fafc;
+  border-color: #dbeafe;
+}

@@ -1,128 +1,82 @@
-.login-container {
-    display: flex;
-    justify-content: center;
-    grid-template-columns: 1fr 1fr;
-    height: 100vh;
-  }
-  
- 
-  
-  .right-section {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    // background-color: #f4f4f4;
-  }
-  
-  .form-content {
-    width: 100%;
-    max-width: 400px;
-    text-align: center;
-  }
-  
-  .logo img {
-    width: 120px;
-    margin-bottom: 20px;
-  }
-  
-  .school-name h2 {
-    margin: 10px 0;
-  }
-  
-  .login-form {
-    margin: 20px 0;
-  }
-  
-
-  
-  .actions {
-    display: flex;
-    justify-content: space-between;
-  }
-  
-  .create-account p {
-    margin-top: 20px;
-  }
-  .form-floating .form-control:focus ~ label {
-    top: -15px;
-    font-size: 0.85rem;
-    color: #c4c4c4; /* Change this to your desired focus color */
-    background-color: none;
-
-  }
-  
-  .form-control:focus {
-    color: var(--bs-body-color);
-    // background-color: var(--bs-body-bg);
-    border-color: #86b7fe;
-    outline: 0;
-    box-shadow: none
+.auth-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
 }
 
-.login-field{
-    width: 100%;
-    height: 48px;
-    border-radius: 8px;
-    border-width: 1px;
-    padding: 12px;
-    gap: 8px;
-    background-color: #F8FAFC;
-    border-color: #E2E8F0;
-}
-.logo img{
-    width: 393px;
-    height: 171px;
-    top: 56px;
-    left: 764px;
-    gap: 12px;
-}
-.f-pass span{
-    font-size: 14px;
-    font-weight: 700;
-    line-height: 16.8px;
-    color: #000080;
-    // font-family: Lato;
-}
-.btn-section button{
-    background-color: #000080;
-    width: 200px;
-    height: 48px;
-    border-radius: 8px;
-    padding: 8px;
-    gap: 8px;
-    position: relative;
+.left-panel {
+  min-height: 100vh;
 }
 
-.create-account{
-   
-    font-size: 14px;
-   
-    .que{
-        font-weight: 400;
-        line-height: 21px;
-    }
-    .action{
-        font-weight: 700;
-        line-height: 16.8px;
-        color: #000080;
-    }
+.left-panel ::ng-deep .p-carousel,
+.left-panel ::ng-deep .p-carousel-content,
+.left-panel ::ng-deep .p-carousel-container,
+.left-panel ::ng-deep .p-carousel-items-content,
+.left-panel ::ng-deep .p-carousel-item {
+  height: 100%;
 }
 
-.passToggle{
+.left-panel ::ng-deep .p-carousel-indicator-list {
   position: absolute;
-  right: 10px;
-    top: 13px;
-    font-size: 20px;
-    cursor: pointer;
+  bottom: 1.75rem;
+  width: 100%;
+  justify-content: center;
 }
 
-.admin-login{
-    font-family: Lato;
-font-weight: 600;
-font-size: 24px;
-line-height: 100%;
-letter-spacing: 0%;
-text-align: center;
+.slide-item {
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
 
+.slide-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 3.5rem;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0) 52%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
+}
+
+.slide-overlay h2 {
+  color: #ffffff;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.right-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: #ffffff;
+}
+
+@media (max-width: 1024px) {
+  .auth-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .left-panel {
+    min-height: 300px;
+  }
+
+  .slide-item {
+    height: 320px;
+  }
+
+  .slide-overlay h2 {
+    font-size: 1.5rem;
+  }
+
+  .right-panel {
+    padding: 1.5rem 1rem 2rem;
+  }
 }

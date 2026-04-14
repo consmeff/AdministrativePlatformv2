@@ -1,0 +1,38 @@
+<p-dialog
+  [visible]="visible"
+  [modal]="true"
+  [closable]="false"
+  [draggable]="false"
+  [resizable]="false"
+  [closeOnEscape]="closeOnEscape"
+  [showHeader]="showHeader"
+  [style]="{ width: 'min(95vw, 520px)' }"
+  [contentStyle]="{ overflow: 'visible' }"
+  (onHide)="onHide()"
+>
+  <div class="modal-body">
+    @if (title) {
+      <h3 class="modal-title">{{ title }}</h3>
+    }
+    @if (message) {
+      <p class="modal-message">{{ message }}</p>
+    }
+    <ng-content></ng-content>
+    <div class="modal-actions">
+      <button pButton type="button" class="primary" (click)="onPrimaryAction()">
+        {{ primaryLabel }}
+      </button>
+      @if (secondaryLabel) {
+        <button
+          pButton
+          type="button"
+          severity="secondary"
+          outlined
+          (click)="onSecondaryAction()"
+        >
+          {{ secondaryLabel }}
+        </button>
+      }
+    </div>
+  </div>
+</p-dialog>

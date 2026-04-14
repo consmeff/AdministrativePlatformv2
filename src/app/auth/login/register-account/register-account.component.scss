@@ -1,0 +1,113 @@
+.single-auth-view {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem 1rem;
+  background: #ffffff;
+}
+
+.single-form-shell {
+  width: 100%;
+  max-width: 520px;
+  text-align: center;
+}
+
+.single-form-shell.large {
+  max-width: 620px;
+}
+
+.brand-logo.small {
+  width: min(310px, 100%);
+}
+
+.title {
+  font-size: 2rem;
+  line-height: 1.1;
+  font-weight: 700;
+  margin: 0.5rem 0 1.5rem;
+  color: #0f172a;
+}
+
+.form-stack {
+  display: grid;
+  gap: 1rem;
+}
+
+.password-checklist {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.6rem;
+  padding: 0.75rem;
+  text-align: left;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.password-checklist p {
+  margin: 0;
+  font-size: 0.83rem;
+  color: #94a3b8;
+}
+
+.password-checklist p.valid {
+  color: #0f172a;
+}
+
+.error-text {
+  display: block;
+  text-align: left;
+  margin-top: -0.5rem;
+  color: #b91c1c;
+  font-size: 0.78rem;
+}
+
+.action-btn {
+  width: 100%;
+  border-radius: 0.65rem;
+  background: #000080;
+  border-color: #000080;
+  margin-top: 0.5rem;
+}
+
+.switch-text {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  color: #475569;
+}
+
+.inline-link {
+  border: none;
+  background: none;
+  color: #000080;
+  font-weight: 700;
+  padding: 0;
+  margin-left: 0.25rem;
+}
+
+.helper-text {
+  margin-top: -0.4rem;
+  margin-bottom: 1rem;
+  color: #64748b;
+  font-size: 0.92rem;
+}
+
+.text-link {
+  border: none;
+  background: none;
+  color: #000080;
+  font-weight: 700;
+  margin-top: 0.9rem;
+}
+
+:host ::ng-deep .p-floatlabel {
+  width: 100%;
+}
+
+:host ::ng-deep .p-inputtext,
+:host ::ng-deep .p-password-input {
+  width: 100%;
+  border-radius: 0.6rem;
+  background: #f8fafc;
+  border-color: #dbeafe;
+}

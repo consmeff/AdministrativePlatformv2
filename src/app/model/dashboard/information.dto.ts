@@ -1,5 +1,5 @@
-export interface DashboardInfo{
-    username:string;
-    role:string;
-    academicsession:string;
+export interface DashboardInfo {
+  username: string;
+  role: string;
+  academicsession: string;
 }

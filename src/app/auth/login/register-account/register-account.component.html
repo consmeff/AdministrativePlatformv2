@@ -1,0 +1,151 @@
+@if (view === "form") {
+  <div class="single-auth-view">
+    <div class="single-form-shell large">
+      <img class="brand-logo small" src="/assets/logo.png" alt="School Logo" />
+      <h2 class="title">New Account Registration</h2>
+      <form [formGroup]="registerForm" class="form-stack">
+        <p-floatlabel variant="on">
+          <input
+            pInputText
+            id="firstName"
+            formControlName="first_name"
+            class="w-full"
+          />
+          <label for="firstName">First Name</label>
+        </p-floatlabel>
+        <p-floatlabel variant="on">
+          <input
+            pInputText
+            id="middleName"
+            formControlName="other_names"
+            class="w-full"
+          />
+          <label for="middleName">Middle Name</label>
+        </p-floatlabel>
+        <p-floatlabel variant="on">
+          <input
+            pInputText
+            id="lastName"
+            formControlName="last_name"
+            class="w-full"
+          />
+          <label for="lastName">Last Name</label>
+        </p-floatlabel>
+        <p-floatlabel variant="on">
+          <input
+            pInputText
+            id="regEmail"
+            formControlName="email"
+            class="w-full"
+          />
+          <label for="regEmail">Email Address</label>
+        </p-floatlabel>
+        <p-floatlabel variant="on">
+          <p-password
+            inputId="regPassword"
+            formControlName="password"
+            [feedback]="false"
+            [toggleMask]="true"
+            [fluid]="true"
+            [inputStyle]="{ width: '100%' }"
+          ></p-password>
+          <label for="regPassword">Password</label>
+        </p-floatlabel>
+        <div class="password-checklist">
+          <p [class.valid]="registerPasswordChecks.minLength">
+            Minimum of 8 characters
+          </p>
+          <p [class.valid]="registerPasswordChecks.special">
+            At least one special character
+          </p>
+          <p [class.valid]="registerPasswordChecks.upper">
+            At least one uppercase letter
+          </p>
+          <p [class.valid]="registerPasswordChecks.lower">
+            At least one lowercase letter
+          </p>
+          <p [class.valid]="registerPasswordChecks.digit">
+            At least one number
+          </p>
+        </div>
+        <p-floatlabel variant="on">
+          <p-password
+            inputId="confirmPassword"
+            formControlName="confirmPassword"
+            [feedback]="false"
+            [toggleMask]="true"
+            [fluid]="true"
+            [inputStyle]="{ width: '100%' }"
+          ></p-password>
+          <label for="confirmPassword">Confirm Password</label>
+        </p-floatlabel>
+        @if (
+          registerForm.errors?.["passwordMismatch"] &&
+          registerForm.controls["confirmPassword"].touched
+        ) {
+          <small class="error-text">Passwords do not match.</small>
+        }
+        <p-floatlabel variant="on">
+          <input
+            pInputText
+            id="phoneNumber"
+            formControlName="phone_number"
+            class="w-full"
+          />
+          <label for="phoneNumber">Phone Number</label>
+        </p-floatlabel>
+        <p-floatlabel variant="on">
+          <input
+            pInputText
+            id="altPhoneNumber"
+            formControlName="alt_phone_number"
+            class="w-full"
+          />
+          <label for="altPhoneNumber">Alternate Phone Number (optional)</label>
+        </p-floatlabel>
+        <button
+          pButton
+          type="button"
+          class="action-btn"
+          [disabled]="creatingAccount"
+          (click)="createAccount()"
+        >
+          {{ creatingAccount ? "Creating..." : "Create Account" }}
+        </button>
+      </form>
+      <p class="switch-text">
+        Already have an account?
+        <button type="button" class="inline-link" (click)="goToLogin()">
+          Login
+        </button>
+      </p>
+    </div>
+  </div>
+} @else {
+  <div class="single-auth-view">
+    <div class="single-form-shell">
+      <img class="brand-logo small" src="/assets/logo.png" alt="School Logo" />
+      <h2 class="title">Verify Account OTP</h2>
+      <p class="helper-text">
+        A verification code was sent to {{ registerEmail }}.
+      </p>
+      <app-otp-input
+        idPrefix="register-otp"
+        [digits]="registerOtpDigits"
+        (digitsChange)="registerOtpDigits = $event"
+      ></app-otp-input>
+      <button
+        pButton
+        type="button"
+        class="action-btn"
+        [disabled]="verifyingRegisterOtp"
+        (click)="verifyRegistrationOtp()"
+      >
+        {{ verifyingRegisterOtp ? "Verifying..." : "Verify OTP" }}
+      </button>
+      <button type="button" class="text-link" (click)="backToRegistration()">
+        Back to Registration
+      </button>
+    </div>
+  </div>
+}

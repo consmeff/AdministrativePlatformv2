@@ -1,14 +1,11 @@
-import { CommonModule } from "@angular/common";
-import { Component } from "@angular/core";
-import { RouterModule } from "@angular/router";
-
+import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-applicants',
-  imports: [CommonModule,RouterModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './applicants.component.html',
-  styleUrl: './applicants.component.scss'
+  styleUrl: './applicants.component.scss',
 })
-export class ApplicantsComponent{
-
-}
+export class ApplicantsComponent {}

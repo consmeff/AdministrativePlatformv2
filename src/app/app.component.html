@@ -1,9 +1,10 @@
-<app-busy-indicator 
+<app-busy-indicator
   [isActive]="(isLoading$ | async) ?? false"
   [colorStart]="'#4f46e5'"
   [colorMiddle]="'#ec4899'"
   [colorEnd]="'#4f46e5'"
   [height]="'3px'"
-  [position]="'fixed'">
+  [position]="'fixed'"
+>
 </app-busy-indicator>
 <router-outlet></router-outlet>

@@ -3,7 +3,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.5rem 1rem;
-  background-color: #FAFAFC !important;
+  background-color: #fafafc !important;
   // color: white;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
@@ -19,22 +19,20 @@
   color: rgba(71, 85, 105, 1);
 }
 
-.flex-column span:first-child{
+.flex-column span:first-child {
   font-family: Lato;
   font-weight: 600;
   font-size: 14px;
   line-height: 100%;
   letter-spacing: 0%;
-
 }
-.flex-column span:last-child{
+.flex-column span:last-child {
   font-family: Lato;
-font-weight: 400;
-font-size: 13px;
-line-height: 150%;
-letter-spacing: 0%;
-
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 150%;
+  letter-spacing: 0%;
 }
-.tb-icon .bi{
+.tb-icon .bi {
   font-size: 24px;
 }

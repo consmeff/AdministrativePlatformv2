@@ -1,0 +1,58 @@
+<div class="form-shell">
+  <img class="brand-logo" src="/assets/logo.png" alt="School Logo" />
+  <h2 class="title">Admission Portal</h2>
+  <form [formGroup]="loginForm" class="form-stack">
+    <p-floatlabel variant="on">
+      <input
+        pInputText
+        id="loginEmail"
+        formControlName="email"
+        class="w-full"
+        autocomplete="email"
+      />
+      <label for="loginEmail">Email Address</label>
+    </p-floatlabel>
+    @if (
+      loginForm.controls["email"].invalid && loginForm.controls["email"].touched
+    ) {
+      <small class="error-text">Enter a valid email address.</small>
+    }
+
+    <p-floatlabel variant="on">
+      <p-password
+        inputId="loginPassword"
+        formControlName="password"
+        [feedback]="false"
+        [toggleMask]="true"
+        [fluid]="true"
+        [inputStyle]="{ width: '100%' }"
+      ></p-password>
+      <label for="loginPassword">Password</label>
+    </p-floatlabel>
+    @if (
+      loginForm.controls["password"].invalid &&
+      loginForm.controls["password"].touched
+    ) {
+      <small class="error-text">Password is required.</small>
+    }
+
+    <button
+      pButton
+      type="button"
+      class="action-btn"
+      [disabled]="logginIn"
+      (click)="login()"
+    >
+      {{ logginIn ? "Signing In..." : "Login" }}
+    </button>
+  </form>
+  <button type="button" class="text-link" (click)="goToForgotPassword()">
+    Forgot Password?
+  </button>
+  <p class="switch-text">
+    Are you a new applicant?
+    <button type="button" class="inline-link" (click)="goToCreateAccount()">
+      Create account
+    </button>
+  </p>
+</div>

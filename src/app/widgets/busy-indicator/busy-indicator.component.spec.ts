@@ -8,9 +8,8 @@ describe('BusyIndicatorComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BusyIndicatorComponent]
-    })
-    .compileComponents();
+      imports: [BusyIndicatorComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(BusyIndicatorComponent);
     component = fixture.componentInstance;

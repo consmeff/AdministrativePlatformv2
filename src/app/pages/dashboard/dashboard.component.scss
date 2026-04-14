@@ -1,7 +1,3 @@
-
-
-
-
 .statcard {
   height: 150px;
 }
@@ -28,61 +24,56 @@ button {
   // padding-bottom: 16px;
   padding-left: 20px;
   background-color: rgba(0, 0, 128, 1);
-  color: #FAFAFC;
-
+  color: #fafafc;
 }
-h6{
+h6 {
   font-size: 14px;
 }
 
-.section2{
+.section2 {
   font-size: 14px;
 }
-.export-pane .tiny{
+.export-pane .tiny {
   font-size: 12px;
-  
 }
-.card-title{
+.card-title {
   font-weight: bold;
 }
-.summary-table th{
+.summary-table th {
   font-size: 13px;
   font-weight: 600px;
 }
-.summary-table tr{
+.summary-table tr {
   font-size: 13px;
   font-weight: 400px;
 }
-.viewall{
+.viewall {
   font-size: 13px;
   font-weight: 400px;
   cursor: pointer;
   color: rgb(0, 0, 128) !important;
 }
 
-.metric .card-text{
+.metric .card-text {
   font-family: Lato;
-font-weight: 700;
-font-size: 24px;
-line-height: 100%;
-letter-spacing: 0%;
-
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 100%;
+  letter-spacing: 0%;
 }
 
-.card-text .d-flex.justify-content-between span:last-child{
+.card-text .d-flex.justify-content-between span:last-child {
   font-family: Lato;
-font-weight: 700;
-font-size: 14px;
-line-height: 150%;
-letter-spacing: 0%;
-
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 150%;
+  letter-spacing: 0%;
 }
 
-.last-sec{
+.last-sec {
   font-family: Lato;
-font-weight: 700;
-font-size: 13px;
-line-height: 150%;
-letter-spacing: 0%;
-
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 150%;
+  letter-spacing: 0%;
 }

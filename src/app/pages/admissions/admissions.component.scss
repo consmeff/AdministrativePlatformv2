@@ -1,56 +1,54 @@
 button {
-    width: 145px;
-    height: 44px;
-    gap: 8px;
-    border-radius: 8px;
-    // padding-top: 16px;
-    padding-right: 20px;
-    // padding-bottom: 16px;
-    padding-left: 20px;
-    background-color: rgba(0, 0, 128, 1);
-    color: #FAFAFC;
-  
-  }
+  width: 145px;
+  height: 44px;
+  gap: 8px;
+  border-radius: 8px;
+  // padding-top: 16px;
+  padding-right: 20px;
+  // padding-bottom: 16px;
+  padding-left: 20px;
+  background-color: rgba(0, 0, 128, 1);
+  color: #fafafc;
+}
 
-  .input-container {
-    position: relative; /* Establishes a positioning context for child elements */
-    display: inline-block; /* Ensures the container wraps around the input */
-  }
-  
-  .form-control {
-    width: 480px;
-    height: 52px;
-    border-radius: 12px;
-    padding-right: 40px; /* Add padding to prevent text from overlapping the icon */
-    box-sizing: border-box; /* Ensures padding is included in the width/height */
-  }
-  
-  .search-icon {
-    position: absolute; /* Position the icon absolutely within the container */
-    top: 50%; /* Center vertically */
-    right: 12px; /* Align to the right edge with some spacing */
-    transform: translateY(-50%); /* Fine-tune vertical centering */
-    width: 24px; /* Adjust size of the icon as needed */
-    height: 24px; /* Adjust size of the icon as needed */
-    pointer-events: none; /* Prevent the icon from interfering with input interactions */
-  }
-  .search-icon :hover{
-    cursor: pointer;
-  }
+.input-container {
+  position: relative; /* Establishes a positioning context for child elements */
+  display: inline-block; /* Ensures the container wraps around the input */
+}
 
-  .summary-table th{
-    font-size: 13px;
-    font-weight: 600px;
-  }
-  .summary-table tr{
-    font-size: 13px;
-    font-weight: 400px;
-  }
+.form-control {
+  width: 480px;
+  height: 52px;
+  border-radius: 12px;
+  padding-right: 40px; /* Add padding to prevent text from overlapping the icon */
+  box-sizing: border-box; /* Ensures padding is included in the width/height */
+}
 
-  ::ng-deep{
-    .p-datatable-table-container{
-      max-height: 300px !important;
-      overflow-y: scroll;
-    }
-  }
+.search-icon {
+  position: absolute; /* Position the icon absolutely within the container */
+  top: 50%; /* Center vertically */
+  right: 12px; /* Align to the right edge with some spacing */
+  transform: translateY(-50%); /* Fine-tune vertical centering */
+  width: 24px; /* Adjust size of the icon as needed */
+  height: 24px; /* Adjust size of the icon as needed */
+  pointer-events: none; /* Prevent the icon from interfering with input interactions */
+}
+.search-icon :hover {
+  cursor: pointer;
+}
 
+.summary-table th {
+  font-size: 13px;
+  font-weight: 600px;
+}
+.summary-table tr {
+  font-size: 13px;
+  font-weight: 400px;
+}
+
+::ng-deep {
+  .p-datatable-table-container {
+    max-height: 300px !important;
+    overflow-y: scroll;
+  }
+}

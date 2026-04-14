@@ -1,160 +1,149 @@
 .breadcrum span {
-    font-family: Lato;
-    font-weight: 400;
-    font-size: 12px;
-    line-height: 150%;
-    letter-spacing: 0%;
-    color: rgba(148, 163, 184, 1);
-
-
+  font-family: Lato;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 150%;
+  letter-spacing: 0%;
+  color: rgba(148, 163, 184, 1);
 }
 
 .breadcrum span:first-child:hover {
-    cursor: pointer;
-    text-decoration: underline;
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 .breadcrum span:last-child {
-    color: rgba(30, 41, 59, 1);
+  color: rgba(30, 41, 59, 1);
 }
 
 .last-col div {
-    display: flex;
-    justify-content: end;
+  display: flex;
+  justify-content: end;
 }
 
 .b-name {
-    font-family: Lato;
-    font-weight: 700;
-    font-size: 18px;
-    line-height: 100%;
-
+  font-family: Lato;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 100%;
 }
-
-
 
 .title-bold {
-    font-family: Lato;
-    font-weight: 700;
-    font-size: 18px;
-    line-height: 100%;
-    letter-spacing: 0%;
-
+  font-family: Lato;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 100%;
+  letter-spacing: 0%;
 }
 
-::ng-deep{
-    .p-tab-active {
-        color: rgba(0, 0, 128, 1) !important;
-        // background-color: rgba(0, 0, 128, 1);
-        border-color: rgba(0, 0, 128, 1) !important;
-        font-weight: bold !important;
-    }
-    .p-tablist-active-bar{
-        background-color: rgba(0, 0, 128, 1) !important;
-      
-    }
-    .p-tab{
-        font-family: Lato;
-        font-weight: 400;
-        font-size: 14px;
-        line-height: 150%;
-        gap: 4px;
-        letter-spacing: 0%;
-    }
-}
-
-table td:first-child{
+::ng-deep {
+  .p-tab-active {
+    color: rgba(0, 0, 128, 1) !important;
+    // background-color: rgba(0, 0, 128, 1);
+    border-color: rgba(0, 0, 128, 1) !important;
+    font-weight: bold !important;
+  }
+  .p-tablist-active-bar {
+    background-color: rgba(0, 0, 128, 1) !important;
+  }
+  .p-tab {
     font-family: Lato;
     font-weight: 400;
     font-size: 14px;
     line-height: 150%;
     gap: 4px;
     letter-spacing: 0%;
-    color: rgba(100, 116, 139, 1) !important;
-}
-table td:last-child{
-    font-family: Lato;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 150%;
-    gap: 4px;
-    letter-spacing: 0%;
-    color: rgba(15, 23, 42, 1) !important;
-}
-.h-divider{
-    width: 100%;
-    background-color: rgba(226, 232, 240, 1);
-    height: 1px;
+  }
 }
 
-.compl{
-    color: rgba(0, 0, 128, 1);
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
+table td:first-child {
+  font-family: Lato;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 150%;
+  gap: 4px;
+  letter-spacing: 0%;
+  color: rgba(100, 116, 139, 1) !important;
 }
-.compl:hover{
-    color: rgba(199, 124, 39, 1);
-    border: 2px solid rgba(199, 124, 39, 1);
-    border-radius: 8px;
-    font-weight: bold;
-
-    .bi{
-        color: rgba(199, 124, 39, 1) !important;
-    }
-
+table td:last-child {
+  font-family: Lato;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 150%;
+  gap: 4px;
+  letter-spacing: 0%;
+  color: rgba(15, 23, 42, 1) !important;
 }
-
-.short{
-    color: rgba(0, 0, 128, 1);
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-}
-.short:hover{
-    color: rgb(39, 172, 6);
-    border: 2px solid rgb(39, 172, 6);
-    border-radius: 8px;
-    font-weight: bold;
-
-    .bi{
-        color: rgb(39, 172, 6) !important;
-    }
-
-}
-.reject{
-    color: rgba(0, 0, 128, 1);
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-}
-.reject:hover{
-    color: rgb(167, 14, 14);
-    border: 2px solid rgb(167, 14, 14);
-    border-radius: 8px;
-    font-weight: bold;
-
-    .bi{
-        color: rgb(167, 14, 14) !important;
-    }
-
+.h-divider {
+  width: 100%;
+  background-color: rgba(226, 232, 240, 1);
+  height: 1px;
 }
 
-.action div:hover{
-cursor: pointer;
+.compl {
+  color: rgba(0, 0, 128, 1);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+.compl:hover {
+  color: rgba(199, 124, 39, 1);
+  border: 2px solid rgba(199, 124, 39, 1);
+  border-radius: 8px;
+  font-weight: bold;
+
+  .bi {
+    color: rgba(199, 124, 39, 1) !important;
+  }
 }
 
-.title-small{
-    font-family: Lato;
-font-weight: 600;
-font-size: 14px;
-line-height: 100%;
-color: rgba(15, 23, 42, 1);
+.short {
+  color: rgba(0, 0, 128, 1);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+.short:hover {
+  color: rgb(39, 172, 6);
+  border: 2px solid rgb(39, 172, 6);
+  border-radius: 8px;
+  font-weight: bold;
 
+  .bi {
+    color: rgb(39, 172, 6) !important;
+  }
+}
+.reject {
+  color: rgba(0, 0, 128, 1);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+.reject:hover {
+  color: rgb(167, 14, 14);
+  border: 2px solid rgb(167, 14, 14);
+  border-radius: 8px;
+  font-weight: bold;
+
+  .bi {
+    color: rgb(167, 14, 14) !important;
+  }
 }
 
-.size-text{
-    font-family: Lato;
-font-weight: 400;
-font-size: 13px;
-line-height: 100%;
-letter-spacing: 0%;
-color: rgba(100, 116, 139, 1);
+.action div:hover {
+  cursor: pointer;
+}
+
+.title-small {
+  font-family: Lato;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 100%;
+  color: rgba(15, 23, 42, 1);
+}
+
+.size-text {
+  font-family: Lato;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 100%;
+  letter-spacing: 0%;
+  color: rgba(100, 116, 139, 1);
 }

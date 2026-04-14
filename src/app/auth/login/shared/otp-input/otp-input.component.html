@@ -1,0 +1,16 @@
+@if (label) {
+  <p class="otp-label">{{ label }}</p>
+}
+<div class="otp-grid">
+  @for (digit of digits; track $index) {
+    <input
+      pInputText
+      [id]="idPrefix + '-' + $index"
+      [value]="digit"
+      maxlength="1"
+      class="otp-input"
+      (input)="onInput($event, $index)"
+      (keydown)="onBackspace($event, $index)"
+    />
+  }
+</div>
