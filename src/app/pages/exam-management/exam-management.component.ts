@@ -1,13 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { SelectModule } from 'primeng/select';
 import { PaginatorModule } from 'primeng/paginator';
-import { SidebarComponent } from '../../widgets/sidebar/sidebar.component';
-import { TopbarComponent } from '../../widgets/topbar/topbar.component';
-import { WidgetService } from '../../services/widget.service';
-import { sidebarStateDTO } from '../../model/page.dto';
 
 interface ExamStatusOption {
   label: string;
@@ -35,14 +31,11 @@ interface ExamResultRow {
     TableModule,
     SelectModule,
     PaginatorModule,
-    SidebarComponent,
-    TopbarComponent,
   ],
   templateUrl: './exam-management.component.html',
   styleUrl: './exam-management.component.scss',
 })
 export class ExamManagementComponent implements OnInit {
-  sidebarVisible = false;
   searchText = '';
 
   readonly statusOptions: ExamStatusOption[] = [
@@ -69,14 +62,6 @@ export class ExamManagementComponent implements OnInit {
     { field: 'obtained', header: 'Obtained' },
     { field: 'statusLabel', header: 'Status' },
   ];
-
-  private readonly widgetService = inject(WidgetService);
-
-  constructor() {
-    this.widgetService.sidebarState$.subscribe((state: sidebarStateDTO) => {
-      this.sidebarVisible = state.isvisible;
-    });
-  }
 
   ngOnInit(): void {
     this.allResults = this.buildMockResults();

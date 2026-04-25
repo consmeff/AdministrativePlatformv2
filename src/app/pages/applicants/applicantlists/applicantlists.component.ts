@@ -22,16 +22,13 @@ import {
   ApplicationSummary,
   ApplicationListResponse,
 } from '../../../model/dashboard/applicant';
-import { appstatus, Column, sidebarStateDTO } from '../../../model/page.dto';
+import { appstatus, Column } from '../../../model/page.dto';
 import {
   ApplicationService,
   ComplianceDirectivePayload,
   RejectApplicantPayload,
 } from '../../../services/application.service';
-import { WidgetService } from '../../../services/widget.service';
 import { ShareModule } from '../../../shared/share/share.module';
-import { SidebarComponent } from '../../../widgets/sidebar/sidebar.component';
-import { TopbarComponent } from '../../../widgets/topbar/topbar.component';
 import { Router } from '@angular/router';
 import { BusyIndicatorService } from '../../../services/busy-indicator.service';
 import { FormsModule } from '@angular/forms';
@@ -53,9 +50,7 @@ interface LazyLoadEvent {
   selector: 'app-applicantlists',
   imports: [
     ShareModule,
-    TopbarComponent,
     SelectModule,
-    SidebarComponent,
     TableModule,
     FormsModule,
     ActionNoteModalComponent,
@@ -69,8 +64,6 @@ export class ApplicantlistsComponent implements OnInit {
   selectedRowData?: ApplicationSummary;
   showActionMenu = false;
   menuPosition = { x: 0, y: 0 };
-  sidebarVisible = false;
-  _widgetService = inject(WidgetService);
   _applicationService = inject(ApplicationService);
   cd = inject(ChangeDetectorRef);
   router = inject(Router);
@@ -100,10 +93,6 @@ export class ApplicantlistsComponent implements OnInit {
   pendingReasonApplicant?: ApplicationSummary;
 
   constructor() {
-    this._widgetService.sidebarState$.subscribe((state: sidebarStateDTO) => {
-      this.sidebarVisible = state.isvisible;
-    });
-
     this.searchTextChanged
       .pipe(
         debounceTime(2000),
@@ -286,14 +275,6 @@ export class ApplicantlistsComponent implements OnInit {
     });
     this.app_summ = newSummary;
     this.cd.detectChanges();
-  }
-
-  toggleSidebar() {
-    this.sidebarVisible = !this.sidebarVisible;
-  }
-
-  onSidebarHide() {
-    this.sidebarVisible = false;
   }
 
   showActionModal(event: MouseEvent, rowData: ApplicationSummary) {

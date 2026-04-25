@@ -1,9 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
-import { TopbarComponent } from '../../widgets/topbar/topbar.component';
-import { SidebarComponent } from '../../widgets/sidebar/sidebar.component';
-import { WidgetService } from '../../services/widget.service';
-import { appstatus, Column, sidebarStateDTO } from '../../model/page.dto';
+import { appstatus, Column } from '../../model/page.dto';
 import { TableModule } from 'primeng/table';
 import { ApplicationService } from '../../services/application.service';
 import { Router } from '@angular/router';
@@ -40,21 +37,11 @@ interface LazyLoadEvent {
 @Component({
   selector: 'app-admissions',
 
-  imports: [
-    CommonModule,
-    TopbarComponent,
-    SidebarComponent,
-    FormsModule,
-    TableModule,
-    ButtonModule,
-    SelectModule,
-  ],
+  imports: [CommonModule, FormsModule, TableModule, ButtonModule, SelectModule],
   templateUrl: './admissions.component.html',
   styleUrl: './admissions.component.scss',
 })
 export class AdmissionsComponent implements OnInit {
-  sidebarVisible = false;
-  _widgetService = inject(WidgetService);
   _applicationService = inject(ApplicationService);
   router = inject(Router);
   busyService = inject(BusyIndicatorService);
@@ -76,10 +63,6 @@ export class AdmissionsComponent implements OnInit {
   searchKeyword: string | undefined = undefined;
 
   constructor() {
-    this._widgetService.sidebarState$.subscribe((state: sidebarStateDTO) => {
-      this.sidebarVisible = state.isvisible;
-    });
-
     this.searchTextChanged
       .pipe(
         debounceTime(2000),
@@ -249,13 +232,5 @@ export class AdmissionsComponent implements OnInit {
     });
     this.app_summ = newSummary;
     this.cd.detectChanges();
-  }
-
-  toggleSidebar() {
-    this.sidebarVisible = !this.sidebarVisible;
-  }
-
-  onSidebarHide() {
-    this.sidebarVisible = false;
   }
 }

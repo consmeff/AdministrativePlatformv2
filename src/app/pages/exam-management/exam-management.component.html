@@ -1,75 +1,60 @@
-<div class="layout d-flex flex-column vh-100">
-  <app-topbar></app-topbar>
-  <div class="main-content d-flex flex-grow-1">
-    <app-sidebar class="sidebar"></app-sidebar>
-    <div class="center-pane flex-grow-1 p-4 overflow-auto">
-      <div class="session-text mb-4">Current Session: 2024 / 25</div>
+<section class="exam-card">
+  <div class="exam-title mb-3">Applicants Examination Result</div>
 
-      <section class="exam-card">
-        <div class="exam-title mb-3">Applicants Examination Result</div>
-
-        <div
-          class="d-flex justify-content-between align-items-center mb-4 gap-3"
-        >
-          <div class="input-container">
-            <input
-              type="text"
-              class="form-control exam-search"
-              [(ngModel)]="searchText"
-              (ngModelChange)="onSearchChange()"
-              placeholder="Search by name, application no. or preferred programme"
-            />
-            <i class="bi bi-search search-icon"></i>
-          </div>
-
-          <p-select
-            [options]="statusOptions"
-            [(ngModel)]="selectedStatus"
-            optionLabel="label"
-            class="status-filter"
-            (onChange)="onStatusChange()"
-          />
-        </div>
-
-        <p-table [value]="pagedResults" [tableStyle]="{ 'min-width': '60rem' }">
-          <ng-template pTemplate="header">
-            <tr>
-              <th *ngFor="let col of columns">{{ col.header }}</th>
-            </tr>
-          </ng-template>
-
-          <ng-template pTemplate="body" let-row>
-            <tr>
-              <td>{{ row.applicationNo }}</td>
-              <td>{{ row.fullName }}</td>
-              <td>{{ row.submittedAt }}</td>
-              <td>{{ row.programme }}</td>
-              <td>{{ row.obtainable }}</td>
-              <td>{{ row.cutOff }}</td>
-              <td>{{ row.obtained }}</td>
-              <td>
-                <span
-                  class="status-pill"
-                  [ngClass]="getStatusClass(row.statusCode)"
-                >
-                  <i class="bi bi-circle-fill"></i>
-                  {{ row.statusLabel }}
-                </span>
-              </td>
-            </tr>
-          </ng-template>
-        </p-table>
-
-        <p-paginator
-          [first]="first"
-          [rows]="rows"
-          [totalRecords]="filteredResults.length"
-          [showCurrentPageReport]="true"
-          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} items"
-          [rowsPerPageOptions]="[10]"
-          (onPageChange)="onPageChange($event)"
-        />
-      </section>
+  <div class="d-flex justify-content-between align-items-center mb-4 gap-3">
+    <div class="input-container">
+      <input
+        type="text"
+        class="form-control exam-search"
+        [(ngModel)]="searchText"
+        (ngModelChange)="onSearchChange()"
+        placeholder="Search by name, application no. or preferred programme"
+      />
+      <i class="bi bi-search search-icon"></i>
     </div>
+
+    <p-select
+      [options]="statusOptions"
+      [(ngModel)]="selectedStatus"
+      optionLabel="label"
+      class="status-filter"
+      (onChange)="onStatusChange()"
+    />
   </div>
-</div>
+
+  <p-table [value]="pagedResults" [tableStyle]="{ 'min-width': '60rem' }">
+    <ng-template pTemplate="header">
+      <tr>
+        <th *ngFor="let col of columns">{{ col.header }}</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-row>
+      <tr>
+        <td>{{ row.applicationNo }}</td>
+        <td>{{ row.fullName }}</td>
+        <td>{{ row.submittedAt }}</td>
+        <td>{{ row.programme }}</td>
+        <td>{{ row.obtainable }}</td>
+        <td>{{ row.cutOff }}</td>
+        <td>{{ row.obtained }}</td>
+        <td>
+          <span class="status-pill" [ngClass]="getStatusClass(row.statusCode)">
+            <i class="bi bi-circle-fill"></i>
+            {{ row.statusLabel }}
+          </span>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <p-paginator
+    [first]="first"
+    [rows]="rows"
+    [totalRecords]="filteredResults.length"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} items"
+    [rowsPerPageOptions]="[10]"
+    (onPageChange)="onPageChange($event)"
+  />
+</section>

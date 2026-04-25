@@ -1,9 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
-import { SidebarComponent } from '../../../widgets/sidebar/sidebar.component';
-import { TopbarComponent } from '../../../widgets/topbar/topbar.component';
-import { WidgetService } from '../../../services/widget.service';
-import { sidebarStateDTO } from '../../../model/page.dto';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import {
   ApplicationService,
@@ -29,8 +25,6 @@ import { ButtonComponent } from '../../../widgets/button/button.component';
   selector: 'app-applicantdetail',
   imports: [
     CommonModule,
-    SidebarComponent,
-    TopbarComponent,
     RouterModule,
     TabViewModule,
     ReusableTableComponent,
@@ -43,8 +37,6 @@ import { ButtonComponent } from '../../../widgets/button/button.component';
 export class ApplicantdetailComponent implements OnInit {
   private readonly rejectAction = 'reject';
   private readonly complianceAction = 'compliance';
-  sidebarVisible = false;
-  _widgetService = inject(WidgetService);
   _applicationservice = inject(ApplicationService);
   application: Application = {} as Application;
   route = inject(ActivatedRoute);
@@ -75,10 +67,6 @@ export class ApplicantdetailComponent implements OnInit {
   documentRows: Record<string, unknown>[] = [];
 
   constructor() {
-    this._widgetService.sidebarState$.subscribe((state: sidebarStateDTO) => {
-      this.sidebarVisible = state.isvisible;
-    });
-
     this.app_no = this.route.snapshot.paramMap.get('appno');
   }
   ngOnInit(): void {

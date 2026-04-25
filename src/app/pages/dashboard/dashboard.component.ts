@@ -5,11 +5,8 @@ import {
   OnInit,
   OnDestroy,
 } from '@angular/core';
-import { SidebarComponent } from '../../widgets/sidebar/sidebar.component';
-import { TopbarComponent } from '../../widgets/topbar/topbar.component';
-import { WidgetService } from '../../services/widget.service';
 import { CommonModule } from '@angular/common';
-import { role, sidebarStateDTO } from '../../model/page.dto';
+import { role } from '../../model/page.dto';
 import { DoughnutComponent } from '../../widgets/doughnut/doughnut.component';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
@@ -37,8 +34,6 @@ import { ActionNoteModalComponent } from '../../widgets/action-note-modal/action
   imports: [
     CommonModule,
     RouterModule,
-    SidebarComponent,
-    TopbarComponent,
     DoughnutComponent,
     SelectModule,
     FormsModule,
@@ -54,8 +49,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   selectedRowData?: ApplicationSummary;
   showActionMenu = false;
   menuPosition = { x: 0, y: 0 };
-  sidebarVisible = false;
-  _widgetService = inject(WidgetService);
   _applicationService = inject(ApplicationService);
   router = inject(Router);
   dashInfoService = inject(DashboardinformationService);
@@ -103,10 +96,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   pendingReasonApplicant?: ApplicationSummary;
 
   constructor() {
-    this._widgetService.sidebarState$.subscribe((state: sidebarStateDTO) => {
-      this.sidebarVisible = state.isvisible;
-    });
-
     this.dashInfoService.dashInfo$.subscribe((val) => {
       this._dash = val;
     });
@@ -177,14 +166,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       };
       this.app_summ.push(_summ);
     });
-  }
-
-  toggleSidebar() {
-    this.sidebarVisible = !this.sidebarVisible;
-  }
-
-  onSidebarHide() {
-    this.sidebarVisible = false;
   }
 
   showActionModal(event: MouseEvent, rowData: ApplicationSummary) {
