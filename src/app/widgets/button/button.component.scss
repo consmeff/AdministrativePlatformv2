@@ -1,0 +1,80 @@
+.app-btn {
+  --btn-bg: var(--app-primary);
+  --btn-fg: #ffffff;
+  --btn-border: var(--btn-bg);
+  --btn-outline-fg: var(--btn-bg);
+  --btn-outline-border: var(--btn-bg);
+  height: 52px;
+  padding: 0 1rem;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  font-size: 1.75rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  transition: opacity 0.2s ease;
+}
+
+.btn--full {
+  width: 100%;
+}
+
+.btn--solid {
+  background-color: var(--btn-bg);
+  color: var(--btn-fg);
+  border-color: var(--btn-border);
+}
+
+.btn--outline {
+  background-color: transparent;
+  color: var(--btn-outline-fg);
+  border-color: var(--btn-outline-border);
+}
+
+.btn--primary {
+  --btn-bg: var(--app-primary);
+  --btn-fg: #ffffff;
+}
+
+.btn--secondary {
+  --btn-bg: var(--app-success);
+  --btn-fg: #ffffff;
+}
+
+.btn--info {
+  --btn-bg: var(--app-info);
+  --btn-fg: #ffffff;
+}
+
+.btn--danger {
+  --btn-bg: var(--app-danger);
+  --btn-fg: #ffffff;
+}
+
+.btn--neutral {
+  --btn-bg: var(--app-surface);
+  --btn-fg: var(--app-primary);
+  --btn-border: var(--app-surface);
+  --btn-outline-fg: var(--app-primary);
+  --btn-outline-border: var(--app-primary);
+}
+
+.btn--muted {
+  --btn-bg: var(--app-surface-alt);
+  --btn-fg: var(--app-text-secondary);
+  --btn-border: var(--app-surface-alt);
+  --btn-outline-fg: var(--app-text-secondary);
+  --btn-outline-border: var(--app-text-secondary);
+}
+
+.btn-label {
+  line-height: 1;
+}
+
+.btn--disabled,
+.app-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}

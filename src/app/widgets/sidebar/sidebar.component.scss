@@ -1,74 +1,81 @@
-::ng-deep {
-    .p-drawer {
-      background-color: #F8FAFC !important;
-      width: 15rem !important;
-      transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
-    }
-  
-    .p-drawer-content {
-      padding-left: 0px;
-      padding-right: 0px;
-    }
-  
-    .p-panel {
-      border: none !important;
-      background-color: #FAFAFC !important;
-    }
-  
-    .p-panel-header {
-      border-bottom: 1px solid #e4e4e4 !important;
-      justify-content: start !important;
-      padding-top: 0px !important;
-      padding-bottom: 0px !important;
-      transition: all .2s ease-in;
-      cursor: pointer;
-  
-      
-        font-size: 14px;
-      
-  
-  
-    }
-  
-    .p-panel-content li {
-      border-bottom: 1px solid #f1f1f1 !important;
-    }
-  
-    .p-panel-header:hover {
-      // background-color: #ecedef !important;
-      color: rgb(104, 104, 105);
-      font-weight: bold;
-    }
-  }
-  p-sidebar {
-    pointer-events: auto; /* Allow interactions with the sidebar */
-  }
-  .menu {
-    overflow: auto; /* Ensure content inside the sidebar is scrollable */
-  }
+.sidebar-shell {
+  width: 15rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--app-surface);
+  border-right: 1px solid var(--app-border);
+  padding: 0.75rem 0 1rem;
+}
 
-  /* Animation for sidebar */
+.collapse-btn {
+  align-self: flex-end;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-right: 0.75rem;
+  border: 1px solid var(--app-border);
+  border-radius: 0.45rem;
+  background: var(--app-surface);
+  color: var(--app-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
 
-    p-sidebar {
-        transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
-      }
+.brand-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 0.75rem 0 1.2rem;
+}
 
- 
-  
-  /* Animation when sidebar is on the left */
-  .p-sidebar-left {
-    transform: translateX(-100%);
-  }
-  
-  .p-sidebar-left.p-sidebar-active {
-    transform: translateX(0);
-  }
-  
-  /* Animation when sidebar is on the right */
-  .p-sidebar-right {
-    transform: translateX(100%);
-  }
-  
-  .p-sidebar-right.p-sidebar-active {
-    transform: translateX(0);
-  }
+.brand-wrap img {
+  width: 86px;
+  height: auto;
+}
+
+.menu-list {
+  display: grid;
+  gap: 0.4rem;
+  padding: 0 0.9rem;
+}
+
+.menu-list a {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  text-decoration: none;
+  color: var(--app-text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 0.8rem 0.25rem;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.menu-list a i {
+  font-size: 1.1rem;
+}
+
+.menu-list a span {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.menu-list a.active-link {
+  color: var(--app-primary);
+  font-weight: 700;
+}
+
+.logout-btn {
+  margin-top: auto;
+  margin-left: 0.95rem;
+  margin-bottom: 0.25rem;
+  border: none;
+  background: transparent;
+  color: #f43f5e;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}

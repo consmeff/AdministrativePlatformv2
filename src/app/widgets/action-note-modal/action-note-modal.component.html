@@ -1,0 +1,45 @@
+@if (visible) {
+  <div class="action-modal-backdrop" (click)="close()">
+    <div class="action-modal-card" (click)="$event.stopPropagation()">
+      <button
+        type="button"
+        class="close-btn"
+        [disabled]="loading"
+        (click)="close()"
+      >
+        <i class="bi bi-x-lg"></i>
+      </button>
+
+      <h2 class="modal-title">{{ title }}</h2>
+      <p class="modal-prompt">{{ prompt }}</p>
+
+      <label class="modal-label" for="action-note-reason">{{ label }}</label>
+      <textarea
+        id="action-note-reason"
+        [(ngModel)]="note"
+        [placeholder]="placeholder"
+        [disabled]="loading"
+        rows="8"
+      ></textarea>
+
+      <div class="modal-actions">
+        <app-button
+          variant="muted"
+          [fullWidth]="true"
+          [disabled]="loading"
+          (buttonClick)="close()"
+        >
+          {{ cancelLabel }}
+        </app-button>
+        <app-button
+          variant="primary"
+          [fullWidth]="true"
+          [disabled]="loading"
+          (buttonClick)="submit()"
+        >
+          {{ loading ? "Submitting..." : confirmLabel }}
+        </app-button>
+      </div>
+    </div>
+  </div>
+}

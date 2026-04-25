@@ -1,189 +1,315 @@
-<div class="layout d-flex flex-column vh-100">
-    <app-topbar></app-topbar>
-    <div class="main-content d-flex flex-grow-1" [ngStyle]="{ 'margin-left':sidebarVisible?'15rem':'0.5rem'}">
-        <app-sidebar class="sidebar"></app-sidebar>
-        <div class="center-pane flex-grow-1 p-4 overflow-auto">
-            <div class="row g-4 mb-4 first-cards">
-                <!-- First Row - 4 Metric Cards -->
-                <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="card h-100">
-                        <div class="card-body metric">
-                            <div class="d-flex justify-content-between">
-                                <span class="card-title text-muted">
-                                    <h6>Total Applications</h6>
-                                </span>
-                                <img src="assets/dashboard/Capa_1.png" alt="" srcset="">
-
-                            </div>
-                            <h5 class="card-text">1,254</h5>
-                            <!-- <p class="text-success small mb-0">
-                                <i class="bi bi-arrow-up"></i> 12% from last month
-                            </p> -->
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="card h-100">
-                        <div class="card-body metric">
-                            <div class="d-flex justify-content-between">
-                                <span class="card-title text-muted">
-                                    <h6>Shortlisted Applications</h6>
-                                </span>
-                                <img src="assets/dashboard/Layer_1.png" alt="" srcset="">
-
-                            </div>
-                            <h5 class="card-text">1,254</h5>
-                            <!-- <p class="text-success small mb-0">
-                                <i class="bi bi-arrow-up"></i> 12% from last month
-                            </p> -->
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="card h-100">
-                        <div class="card-body metric">
-                            <div class="d-flex justify-content-between">
-                                <span class="card-title text-muted">
-                                    <h6>Pending Review</h6>
-                                </span>
-                                <img src="assets/dashboard/Layer_2.png" alt="" srcset="">
-
-                            </div>
-                            <h5 class="card-text">1,254</h5>
-                            <!-- <p class="text-success small mb-0">
-                                <i class="bi bi-arrow-up"></i> 12% from last month
-                            </p> -->
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="card h-100">
-                        <div class="card-body metric">
-                            <div class="d-flex justify-content-between">
-                                <span class="card-title text-muted">
-                                    <h6>Rejected Applications</h6>
-                                </span>
-                                <img src="assets/dashboard/Layer_3.png" alt="" srcset="">
-
-                            </div>
-                            <h5 class="card-text">1,254</h5>
-                            <!-- <p class="text-success small mb-0">
-                                <i class="bi bi-arrow-up"></i> 12% from last month
-                            </p> -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Additional dashboard content can go here -->
-            <div class="row section2 mt-5">
-                <div class="col-4">
-                    <div class="card border-0 h-100"
-                        style="background: linear-gradient(to right, transparent 99.8%, #eaecee 1%);">
-                        <div class="card-body first-sec" style="padding: 0px 10px;">
-                            <h6 class="card-title">Most Preferred Courses</h6>
-                            <div class="card-text d-flex flex-column">
-                                <div class="d-flex justify-content-between mb-3">
-                                    <span>Nursing</span>
-                                    <span>693</span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-3">
-                                    <span>Medical Science</span>
-                                    <span>302</span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-3">
-                                    <span>Midwifery</span>
-                                    <span>200</span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-3">
-                                    <span>Health Education</span>
-                                    <span>20</span>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <span>Laboratory Technology</span>
-                                    <span>5</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-4">
-                    <div class="card border-0 h-100"
-                        style="background: linear-gradient(to right, transparent 99.8%, #eff0f1 1%);">
-                        <div class="card-body" style="padding:0px 10px;">
-                            <div class="d-flex justify-content-between mb-4">
-                                <h6 class="card-title">Application Status</h6>
-                                <p-dropdown [options]="staffs" [(ngModel)]="selectedstaff" optionLabel="name"
-                                    placeholder="Select a staff" />
-                            </div>
-                            <div class="card-text d-flex flex-column">
-                                <app-doughnut [chartData]="{
-                                        pending: 134,
-                                        shortlisted: 892,
-                                        compliance: 5,
-                                        rejected: 57
-                                    }">
-                                </app-doughnut>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-4">
-                    <div class="card border-0 h-100">
-                        <div class="card-body export-pane" style="padding: 0px 10px;">
-                            <div class="d-flex flex-row justify-content-between mb-5">
-                                <img src="assets/dashboard/export1.png" style="height: 40px;" alt="" srcset="">
-                                <div class="d-flex flex-column">
-                                    <h6 class="card-title"><span>Export Candidate Shortlist</span></h6>
-                                    <span class="tiny">Generate CSV file for CBT exam provisioning.</span>
-                                </div>
-                            </div>
-                            <div class="d-flex justify-content-between my-2">
-                                <span>Shortlisted Candidates:</span>
-                                <span class="last-sec">134</span>
-                            </div>
-                            <div class="d-flex justify-content-between my-2">
-                                <span>Last Export Date:</span>
-                                <span class="last-sec">24/01/2025</span>
-                            </div>
-                            <div>
-                                <button  type="button" class="btn btn-primary">
-                                    Export Now
-                                   
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row section3 mt-5">
-                <div class="d-flex justify-content-between">
-                    <div class="card-title">Recent Applications</div> 
-                    <span [routerLink]="['/pages/applicants/applicantlist']" class="fw-bold text-primary viewall">view all</span>
-
-                </div>
-                <div class="summary-table">
-                    <p-table [columns]="cols" [value]="app_summ" [tableStyle]="{ 'min-width': '50rem' }">
-                        <ng-template pTemplate="header" let-columns>
-                            <tr>
-                                <th *ngFor="let col of columns">
-                                    {{ col.header }}
-                                </th>
-                            </tr>
-                        </ng-template>
-                        <ng-template pTemplate="body" let-rowData let-columns="columns">
-                            <tr>
-                                <td *ngFor="let col of columns">
-                                    <!-- {{ rowData[col.field] }} -->
-                                    <span *ngIf="col.field === 'action'" [innerHTML]="rowData[col.field]"></span>
-                                    <span *ngIf="col.field !== 'action'">{{ rowData[col.field] }}</span>
-                                </td>
-                            </tr>
-                        </ng-template>
-                    </p-table>
-                </div>
-            </div>
+<div class="row g-4 mb-4 first-cards">
+  <!-- First Row - 4 Metric Cards -->
+  <div class="col-12 col-sm-6 col-lg-3">
+    <div class="card h-100">
+      <div class="card-body metric">
+        <div class="d-flex justify-content-between">
+          <span class="card-title text-muted">
+            <h6>Total Applications</h6>
+          </span>
+          <img src="assets/dashboard/Capa_1.png" alt="" srcset="" />
         </div>
+        <h5 class="card-text">{{ metrics.total_applicants }}</h5>
+        <!-- <p class="text-success small mb-0">
+                                <i class="bi bi-arrow-up"></i> 12% from last month
+                            </p> -->
+      </div>
     </div>
+  </div>
+  <div class="col-12 col-sm-6 col-lg-3">
+    <div class="card h-100">
+      <div class="card-body metric">
+        <div class="d-flex justify-content-between">
+          <span class="card-title text-muted">
+            <h6>Shortlisted Applications</h6>
+          </span>
+          <img src="assets/dashboard/Layer_1.png" alt="" srcset="" />
+        </div>
+        <h5 class="card-text">
+          {{ metrics.approval_status_breakdown.total_shortlisted }}
+        </h5>
+        <!-- <p class="text-success small mb-0">
+                                <i class="bi bi-arrow-up"></i> 12% from last month
+                            </p> -->
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-sm-6 col-lg-3">
+    <div class="card h-100">
+      <div class="card-body metric">
+        <div class="d-flex justify-content-between">
+          <span class="card-title text-muted">
+            <h6>Pending Review</h6>
+          </span>
+          <img src="assets/dashboard/Layer_2.png" alt="" srcset="" />
+        </div>
+        <h5 class="card-text">
+          {{ metrics.approval_status_breakdown.total_pending }}
+        </h5>
+        <!-- <p class="text-success small mb-0">
+                                <i class="bi bi-arrow-up"></i> 12% from last month
+                            </p> -->
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-sm-6 col-lg-3">
+    <div class="card h-100">
+      <div class="card-body metric">
+        <div class="d-flex justify-content-between">
+          <span class="card-title text-muted">
+            <h6>Rejected Applications</h6>
+          </span>
+          <img src="assets/dashboard/Layer_3.png" alt="" srcset="" />
+        </div>
+        <h5 class="card-text">
+          {{ metrics.approval_status_breakdown.total_rejected }}
+        </h5>
+        <!-- <p class="text-success small mb-0">
+                                <i class="bi bi-arrow-up"></i> 12% from last month
+                            </p> -->
+      </div>
+    </div>
+  </div>
 </div>
+
+<!-- Additional dashboard content can go here -->
+<div class="row section2 mt-5">
+  <div class="col-4">
+    <div
+      class="card border-0 h-100"
+      style="
+        background: linear-gradient(to right, transparent 99.8%, #eaecee 1%);
+      "
+    >
+      <div class="card-body first-sec" style="padding: 0px 10px">
+        <h6 class="card-title">Most Preferred Courses</h6>
+        <div class="card-text d-flex flex-column">
+          <div
+            class="d-flex justify-content-between mb-3"
+            *ngFor="let course of metrics.top_5_courses"
+          >
+            <span>{{ course.department__name }}</span>
+            <span>{{ course.applicant_count }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-4">
+    <div
+      class="card border-0 h-100"
+      style="
+        background: linear-gradient(to right, transparent 99.8%, #eff0f1 1%);
+      "
+    >
+      <div class="card-body" style="padding: 0px 10px">
+        <div class="d-flex justify-content-between mb-4">
+          <h6 class="card-title">Application Status</h6>
+          <p-select
+            [options]="staffs"
+            [(ngModel)]="selectedstaff"
+            optionLabel="name"
+            placeholder="Select a staff"
+          />
+        </div>
+        <div class="card-text d-flex flex-column">
+          <app-doughnut [chartData]="chartData"> </app-doughnut>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-4">
+    <div class="card border-0 h-100">
+      <div class="card-body export-pane" style="padding: 0px 10px">
+        <div class="d-flex flex-row justify-content-between mb-5">
+          <img
+            src="assets/dashboard/export1.png"
+            style="height: 40px"
+            alt=""
+            srcset=""
+          />
+          <div class="d-flex flex-column">
+            <h6 class="card-title">
+              <span>Export Candidate Shortlist</span>
+            </h6>
+            <span class="tiny"
+              >Generate CSV file for CBT exam provisioning.</span
+            >
+          </div>
+        </div>
+        <div class="d-flex justify-content-between my-2">
+          <span>Shortlisted Candidates:</span>
+          <span class="last-sec">{{
+            metrics.approval_status_breakdown.total_shortlisted
+          }}</span>
+        </div>
+        <div class="d-flex justify-content-between my-2">
+          <span>Payment Initiated:</span>
+          <span class="last-sec">{{ paymentCounts["initiated"] }}</span>
+        </div>
+        <div>
+          <button type="button" class="btn btn-primary">Export Now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row section3 mt-5">
+  <div class="d-flex justify-content-between">
+    <div class="card-title">Recent Applications</div>
+    <span
+      [routerLink]="['/pages/applicants/applicantlist']"
+      class="fw-bold text-primary viewall"
+      >view all</span
+    >
+  </div>
+  <div class="summary-table">
+    <p-table
+      [columns]="cols"
+      [value]="app_summ"
+      [tableStyle]="{ 'min-width': '50rem' }"
+      [paginator]="true"
+      [rows]="5"
+      [totalRecords]="app_summ.length"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+      [rowsPerPageOptions]="[5, 10, 20, 50]"
+    >
+      <ng-template pTemplate="header" let-columns>
+        <tr>
+          <th *ngFor="let col of columns" [pSortableColumn]="col.field">
+            {{ col.header }}
+            <p-sortIcon [field]="col.field"></p-sortIcon>
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-rowData let-columns="columns">
+        <tr>
+          <td *ngFor="let col of columns">
+            <span
+              class="action-icon"
+              *ngIf="col.field === 'action'"
+              (click)="showActionModal($event, rowData)"
+              [innerHTML]="rowData[col.field]"
+            ></span>
+            <span *ngIf="col.field !== 'action'">{{ rowData[col.field] }}</span>
+
+            <div
+              class="action-menu"
+              *ngIf="
+                selectedRowData?.application_no === rowData.application_no &&
+                showActionMenu
+              "
+              [ngStyle]="{
+                top: menuPosition.y + 'px',
+                left: menuPosition.x - 10 + 'px',
+              }"
+            >
+              <ul class="list-group">
+                <li
+                  class="list-group-item list-group-item-action eye"
+                  (click)="handleAction('view profile', rowData)"
+                >
+                  <div
+                    class="d-flex justify-content-between align-items-center"
+                  >
+                    <span>View Profile</span>
+                    <div
+                      style="
+                        padding: 3px;
+                        background-color: rgba(0, 0, 128, 0.06);
+                        padding: 2px 4px;
+                        border-radius: 3px;
+                      "
+                    >
+                      <i
+                        class="bi bi-eye"
+                        style="color: rgba(0, 0, 128, 1)"
+                      ></i>
+                    </div>
+                  </div>
+                </li>
+                <li
+                  class="list-group-item list-group-item-action x"
+                  (click)="handleAction('reject candidate', rowData)"
+                >
+                  <div
+                    class="d-flex justify-content-between align-items-center"
+                  >
+                    <span>Reject Candidate</span>
+                    <div
+                      style="
+                        padding: 3px;
+                        background-color: rgba(219, 66, 66, 0.104);
+                        padding: 2px 4px;
+                        border-radius: 3px;
+                      "
+                    >
+                      <i class="bi bi-x" style="color: rgb(219, 66, 66)"></i>
+                    </div>
+                  </div>
+                </li>
+                <li
+                  class="list-group-item list-group-item-action check"
+                  (click)="handleAction('shortlist candidate', rowData)"
+                >
+                  <div
+                    class="d-flex justify-content-between align-items-center"
+                  >
+                    <span>Shortlist Candidate</span>
+                    <div
+                      style="
+                        padding: 3px;
+                        background-color: rgba(4, 250, 65, 0.104);
+                        padding: 2px 4px;
+                        border-radius: 3px;
+                      "
+                    >
+                      <i class="bi bi-check" style="color: rgb(4, 250, 66)"></i>
+                    </div>
+                  </div>
+                </li>
+                <li
+                  class="list-group-item list-group-item-action excl"
+                  (click)="handleAction('issue compliance directive', rowData)"
+                >
+                  <div
+                    class="d-flex justify-content-between align-items-center"
+                  >
+                    <span>Issue Compliance Directive</span>
+                    <div
+                      style="
+                        padding: 3px;
+                        background-color: rgba(239, 153, 5, 0.055);
+                        padding: 2px 4px;
+                        border-radius: 3px;
+                      "
+                    >
+                      <i
+                        class="bi bi-exclamation-triangle"
+                        style="color: rgb(239, 153, 5)"
+                      ></i>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<app-action-note-modal
+  [visible]="isReasonModalVisible"
+  [title]="reasonModalTitle"
+  [prompt]="reasonModalPrompt"
+  [confirmLabel]="reasonModalConfirmLabel"
+  [initialNote]="reasonModalInitialNote"
+  [loading]="isReasonActionLoading"
+  label="Reason:"
+  (closed)="closeReasonModal()"
+  (submitted)="submitReasonModal($event)"
+></app-action-note-modal>

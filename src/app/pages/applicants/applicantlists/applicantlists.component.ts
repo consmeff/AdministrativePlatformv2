@@ -1,43 +1,76 @@
-import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, HostListener, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  HostListener,
+  inject,
+  OnInit,
+} from '@angular/core';
 
-import { debounceTime, distinctUntilChanged, Observable, Subject, Subscription, switchMap } from 'rxjs';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  Observable,
+  Subject,
+  Subscription,
+  switchMap,
+} from 'rxjs';
 import { TableModule } from 'primeng/table';
 
-import { DropdownModule } from 'primeng/dropdown';
-import { Button } from 'primeng/button';
-import { Modal } from 'bootstrap';
-import { Application, ApplicationSummary, ApplicationListResponse } from '../../../model/dashboard/applicant';
-import { appstatus, Column, sidebarStateDTO } from '../../../model/page.dto';
-import { ApplicationService } from '../../../services/application.service';
-import { WidgetService } from '../../../services/widget.service';
+import { SelectModule } from 'primeng/select';
+import {
+  Application,
+  ApplicationSummary,
+  ApplicationListResponse,
+} from '../../../model/dashboard/applicant';
+import { appstatus, Column } from '../../../model/page.dto';
+import {
+  ApplicationService,
+  ComplianceDirectivePayload,
+  RejectApplicantPayload,
+} from '../../../services/application.service';
 import { ShareModule } from '../../../shared/share/share.module';
-import { SidebarComponent } from '../../../widgets/sidebar/sidebar.component';
-import { TopbarComponent } from '../../../widgets/topbar/topbar.component';
 import { Router } from '@angular/router';
 import { BusyIndicatorService } from '../../../services/busy-indicator.service';
 import { FormsModule } from '@angular/forms';
+import { ActionNoteModalComponent } from '../../../widgets/action-note-modal/action-note-modal.component';
+
+interface PagingEvent {
+  first: number;
+  rows: number;
+}
+
+interface LazyLoadEvent {
+  first?: number | null;
+  rows?: number | null;
+  sortField?: string | string[] | null;
+  sortOrder?: number | null;
+}
 
 @Component({
   selector: 'app-applicantlists',
-  imports: [ShareModule, TopbarComponent, DropdownModule, SidebarComponent, TableModule, Button, FormsModule],
+  imports: [
+    ShareModule,
+    SelectModule,
+    TableModule,
+    FormsModule,
+    ActionNoteModalComponent,
+  ],
   templateUrl: './applicantlists.component.html',
-  styleUrl: './applicantlists.component.scss'
+  styleUrl: './applicantlists.component.scss',
 })
-export class ApplicantlistsComponent {
-
-  selectedRowData: any;
+export class ApplicantlistsComponent implements OnInit {
+  private readonly rejectAction = 'reject';
+  private readonly complianceAction = 'compliance';
+  selectedRowData?: ApplicationSummary;
   showActionMenu = false;
   menuPosition = { x: 0, y: 0 };
-  sidebarVisible = false;
-  _widgetService = inject(WidgetService)
   _applicationService = inject(ApplicationService);
   cd = inject(ChangeDetectorRef);
   router = inject(Router);
   busyService = inject(BusyIndicatorService);
   application!: Application[];
   subscriptions = new Subscription();
-  selectedStatus: appstatus = { name: "All", code: 0 };
+  selectedStatus: appstatus = { name: 'All', code: 0 };
   approval_status: appstatus[] = [];
   cols!: Column[];
   applicationList: Application[] = [];
@@ -47,31 +80,34 @@ export class ApplicantlistsComponent {
 
   rows = 10;
 
-  actionModal: Modal | undefined;
-  searchText: string = "";
+  searchText = '';
   private searchTextChanged = new Subject<string>();
   searchKeyword: string | undefined = undefined;
-
+  isReasonModalVisible = false;
+  isReasonActionLoading = false;
+  reasonModalTitle = '';
+  reasonModalPrompt = '';
+  reasonModalConfirmLabel = '';
+  reasonModalInitialNote = '';
+  pendingReasonAction: 'reject' | 'compliance' | null = null;
+  pendingReasonApplicant?: ApplicationSummary;
 
   constructor() {
-    this._widgetService.sidebarState$.subscribe((state: sidebarStateDTO) => {
-      this.sidebarVisible = state.isvisible;
-    })
-
-    this.searchTextChanged.pipe(
-      debounceTime(2000),
-      distinctUntilChanged(),
-      switchMap(searchTerm => this.performSearch(searchTerm))
-    ).subscribe((data: any) => {
-      if (data.data.length > 0) {
-        this.total_record_count = data.total;
-        this.applicationList = data.data;
-        this.populateSummary();
-        this.busyService.hide();
-        this.cd.detectChanges()
-      }
-    });
-
+    this.searchTextChanged
+      .pipe(
+        debounceTime(2000),
+        distinctUntilChanged(),
+        switchMap((searchTerm) => this.performSearch(searchTerm)),
+      )
+      .subscribe((data: ApplicationListResponse) => {
+        if (data.data.length > 0) {
+          this.total_record_count = data.total;
+          this.applicationList = data.data;
+          this.populateSummary();
+          this.busyService.hide();
+          this.cd.detectChanges();
+        }
+      });
   }
   performSearch(searchTerm: string): Observable<ApplicationListResponse> {
     this.searchKeyword = searchTerm;
@@ -82,8 +118,10 @@ export class ApplicantlistsComponent {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     // Close menu when clicking anywhere else
-    if (!(event.target as Element).closest('.action-icon') &&
-      !(event.target as Element).closest('.action-menu')) {
+    if (
+      !(event.target as Element).closest('.action-icon') &&
+      !(event.target as Element).closest('.action-menu')
+    ) {
       this.showActionMenu = false;
     }
   }
@@ -99,12 +137,12 @@ export class ApplicantlistsComponent {
     });
 
     this.approval_status = [
-      { name: "All", code: 0 },
-      { name: "Pending", code: 1 },
-      { name: "Shortlisted", code: 2 },
-      { name: "Compliance", code: 3 },
-      { name: "Rejected", code: 4 },
-      { name: "Resolved", code: 5 }
+      { name: 'All', code: 0 },
+      { name: 'Pending', code: 1 },
+      { name: 'Shortlisted', code: 2 },
+      { name: 'Compliance', code: 3 },
+      { name: 'Rejected', code: 4 },
+      { name: 'Resolved', code: 5 },
     ];
 
     this.cols = [
@@ -114,22 +152,26 @@ export class ApplicantlistsComponent {
       { field: 'created_at', header: 'Submission Date' },
       { field: 'program', header: 'Pref. Programme' },
       { field: 'approval_status', header: 'Status' },
-      { field: 'action', header: 'Actions' }
+      { field: 'action', header: 'Actions' },
     ];
   }
-  private fetchRecords(sortField?: string, sortOrder?: number): Observable<ApplicationListResponse> {
+  private fetchRecords(
+    sortField?: string,
+    sortOrder?: number,
+  ): Observable<ApplicationListResponse> {
     return this._applicationService.getapplications(
       this.searchKeyword, // Search keyword
       // Filters (if applicable)
-      this.rows,          // Rows per page
+      this.rows, // Rows per page
       // Include additional data (if needed)
-      this.first + 1,     // First record index
-      sortField,          // Field to sort by
-      sortOrder           // Sort order (1 for ascending, -1 for descending)
+      this.first + 1, // First record index
+      sortField, // Field to sort by
+      sortOrder, // Sort order (1 for ascending, -1 for descending)
     );
   }
 
-  onStatusChange(event: any) {
+  onStatusChange(event: unknown) {
+    void event;
     // Reset pagination to the first page when applying a new filter
     this.first = 0;
 
@@ -141,32 +183,37 @@ export class ApplicantlistsComponent {
     }
 
     // Fetch data with the updated filter
-    this.fetchRecords("approval_status").subscribe((data: ApplicationListResponse) => {
-      if (data.data.length > 0) {
-        this.total_record_count = data.total;
-        this.applicationList = data.data;
-        this.populateSummary();
-      }
-    });
+    this.fetchRecords('approval_status').subscribe(
+      (data: ApplicationListResponse) => {
+        if (data.data.length > 0) {
+          this.total_record_count = data.total;
+          this.applicationList = data.data;
+          this.populateSummary();
+        }
+      },
+    );
   }
 
-  onLazyLoad(event: any) {
+  onLazyLoad(event: LazyLoadEvent) {
     // Update pagination parameters
     this.first = event.first || 0; // First record index
-    this.rows = event.rows || 10;  // Number of rows per page
+    this.rows = event.rows || 10; // Number of rows per page
 
     // Get sorting parameters
-    const sortField = event.sortField; // Field to sort by
-    const sortOrder = event.sortOrder; // Sort order (1 for ascending, -1 for descending)
+    const sortField =
+      typeof event.sortField === 'string' ? event.sortField : undefined;
+    const sortOrder = event.sortOrder ?? undefined;
 
     // Fetch data from the server
-    this.fetchRecords(sortField, sortOrder).subscribe((data: ApplicationListResponse) => {
-      if (data.data.length > 0) {
-        this.total_record_count = data.total;
-        this.applicationList = data.data;
-        this.populateSummary();
-      }
-    });
+    this.fetchRecords(sortField, sortOrder).subscribe(
+      (data: ApplicationListResponse) => {
+        if (data.data.length > 0) {
+          this.total_record_count = data.total;
+          this.applicationList = data.data;
+          this.populateSummary();
+        }
+      },
+    );
   }
 
   onSearchTextChanged(text: string) {
@@ -187,7 +234,7 @@ export class ApplicantlistsComponent {
     this.first = 0;
   }
 
-  pageChange(event: any) {
+  pageChange(event: PagingEvent) {
     this.first = event.first;
     this.rows = event.rows;
 
@@ -202,44 +249,42 @@ export class ApplicantlistsComponent {
   }
 
   isLastPage(): boolean {
-    return this.app_summ ? this.first === this.app_summ.length - this.rows : true;
+    return this.app_summ
+      ? this.first === this.app_summ.length - this.rows
+      : true;
   }
 
   isFirstPage(): boolean {
     return this.app_summ ? this.first === 0 : true;
   }
   populateSummary() {
-    let newSummary: ApplicationSummary[] = [];
-    let batch = this.applicationList;
-    batch.forEach((v, i) => {
-      let _summ: ApplicationSummary = {
+    const newSummary: ApplicationSummary[] = [];
+    const batch = this.applicationList;
+    batch.forEach((v) => {
+      const _summ: ApplicationSummary = {
+        id: v.id,
         application_no: v.application_no,
         first_name: v.first_name,
         last_name: v.last_name,
         created_at: v.created_at.toString(),
         program: v.program.name,
         approval_status: v.approval_status,
-        action: '<i class="bi bi-three-dots"></i>'
+        action: '<i class="bi bi-three-dots"></i>',
       };
       newSummary.push(_summ);
-    })
+    });
     this.app_summ = newSummary;
     this.cd.detectChanges();
   }
 
-  toggleSidebar() {
-    this.sidebarVisible = !this.sidebarVisible;
-  }
-
-  onSidebarHide() {
-    this.sidebarVisible = false;
-  }
-
-  showActionModal(event: MouseEvent, rowData: any) {
+  showActionModal(event: MouseEvent, rowData: ApplicationSummary) {
     event.stopPropagation();
     // console.log(rowData.id)
     // Toggle menu if clicking the same row's action icon
-    if (this.selectedRowData?.application_no === rowData.application_no && this.showActionMenu) {
+    if (
+      this.selectedRowData?.application_no === rowData.application_no &&
+      this.showActionMenu
+    ) {
       this.showActionMenu = false;
       return;
     }
@@ -249,8 +294,8 @@ export class ApplicantlistsComponent {
 
     // Position the menu near the clicked icon
     this.menuPosition = {
-      x: event.clientX - 10,  // 10px left offset
-      y: event.clientY + 10   // 10px below the icon
+      x: event.clientX - 10, // 10px left offset
+      y: event.clientY + 10, // 10px below the icon
     };
 
     // Adjust position if near window edges
@@ -266,19 +311,129 @@ export class ApplicantlistsComponent {
     }
   }
 
-  handleAction(action: string, rowData: any) {
-    const firstColumnValue: string = rowData['application_no']; // Adjust to your first column field
-
-    // alert(`Action: ${action}\nRow ID: ${firstColumnValue}`);
+  handleAction(action: string, rowData: ApplicationSummary) {
+    const applicationNo = rowData.application_no;
+    const applicantId = rowData.id;
     this.showActionMenu = false;
 
-    // Handle specific actions as needed
+    if (!applicantId) {
+      window.alert('Applicant ID not found for this action.');
+      return;
+    }
+
     switch (action.toLowerCase()) {
       case 'view profile':
-        this.router.navigateByUrl(`/pages/applicants/applicantdetail/${firstColumnValue.replaceAll("/", "_")}`)
+        this.router.navigateByUrl(
+          `/pages/applicants/applicantdetail/${applicationNo.replaceAll('/', '_')}`,
+        );
         break;
-      // ... other cases
+      case 'reject candidate': {
+        this.openReasonModal(this.rejectAction, rowData);
+        break;
+      }
+      case 'shortlist candidate':
+        this.performApplicantAction(
+          this._applicationService.shortlistApplicants({
+            applicant_ids: [applicantId],
+          }),
+          'Candidate shortlisted successfully.',
+        );
+        break;
+      case 'issue compliance directive': {
+        this.openReasonModal(this.complianceAction, rowData);
+        break;
+      }
     }
   }
 
+  openReasonModal(
+    action: 'reject' | 'compliance',
+    rowData: ApplicationSummary,
+  ) {
+    const fullName = `${rowData.first_name} ${rowData.last_name}`.trim();
+    this.pendingReasonAction = action;
+    this.pendingReasonApplicant = rowData;
+    this.reasonModalTitle =
+      action === this.complianceAction
+        ? 'Issue Compliance Directive'
+        : 'Reject Candidate';
+    this.reasonModalPrompt =
+      action === this.complianceAction
+        ? `Do you want to issue compliance directive to ${fullName}?`
+        : `Do you want to reject ${fullName}?`;
+    this.reasonModalConfirmLabel =
+      action === this.complianceAction ? 'Issue Directive' : 'Reject Candidate';
+    this.reasonModalInitialNote = '';
+    this.isReasonModalVisible = true;
+  }
+
+  closeReasonModal() {
+    this.isReasonModalVisible = false;
+    this.pendingReasonAction = null;
+    this.pendingReasonApplicant = undefined;
+    this.reasonModalInitialNote = '';
+  }
+
+  submitReasonModal(note: string) {
+    const applicantId = this.pendingReasonApplicant?.id;
+    if (!applicantId || !this.pendingReasonAction) {
+      window.alert('Applicant ID not found for this action.');
+      return;
+    }
+
+    this.isReasonActionLoading = true;
+
+    if (this.pendingReasonAction === this.complianceAction) {
+      const payload: ComplianceDirectivePayload = {
+        applicant_ids: [applicantId],
+        extra_note: note,
+      };
+      this.performApplicantAction(
+        this._applicationService.issueComplianceDirective(payload),
+        'Compliance directive issued successfully.',
+        () => this.closeReasonModal(),
+      );
+      return;
+    }
+
+    const payload: RejectApplicantPayload = {
+      applicant_ids: [applicantId],
+      extra_note: note,
+    };
+    this.performApplicantAction(
+      this._applicationService.rejectApplicants(payload),
+      'Candidate rejected successfully.',
+      () => this.closeReasonModal(),
+    );
+  }
+
+  private performApplicantAction(
+    request: Observable<unknown>,
+    successMessage: string,
+    onSuccess?: () => void,
+  ) {
+    this.busyService.show();
+    request.subscribe({
+      next: () => {
+        onSuccess?.();
+        window.alert(successMessage);
+        this.fetchRecords().subscribe((data: ApplicationListResponse) => {
+          if (data.data.length > 0) {
+            this.total_record_count = data.total;
+            this.applicationList = data.data;
+            this.populateSummary();
+          }
+        });
+      },
+      error: (err) => {
+        const message =
+          err?.error?.message || err?.error?.detail || 'Action failed.';
+        window.alert(message);
+      },
+      complete: () => {
+        this.isReasonActionLoading = false;
+        this.busyService.hide();
+      },
+    });
+  }
 }

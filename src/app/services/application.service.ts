@@ -1,43 +1,82 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApplicationListResponse } from '../model/dashboard/applicant';
+import { AdminDashboardMetrics } from '../model/dashboard/admin-dashboard.dto';
+
+export interface ComplianceDirectivePayload {
+  applicant_ids: number[];
+  extra_note: string;
+}
+
+export interface ApplicantActionPayload {
+  applicant_ids: number[];
+}
+
+export interface RejectApplicantPayload extends ApplicantActionPayload {
+  extra_note: string;
+}
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ApplicationService {
+  private readonly http = inject(HttpClient);
 
   apiRoot = environment.apiURL;
   headers = new HttpHeaders({
     'Content-Type': 'application/json',
-    'Accept': 'application/json'
+    Accept: 'application/json',
   });
 
-  constructor(private http: HttpClient) {
-
-   
-
-
-  }
-
-  getapplications(keyword?: string,  page_size?: number,  page: number = 1, sortField?: string | undefined, sortOrder?: number | undefined): Observable<ApplicationListResponse> {
+  getapplications(
+    keyword?: string,
+    page_size?: number,
+    page = 1,
+    sortField?: string | undefined,
+    sortOrder?: number | undefined,
+  ): Observable<ApplicationListResponse> {
     const baseUrl = `${this.apiRoot}/api/v1/applicants`;
     const params = new URLSearchParams();
-  
+
     if (keyword) params.append('keyword', keyword);
-    if (sortField) params.append('ordering',sortOrder && sortOrder>0? "-"+sortField:sortField);
+    if (sortField)
+      params.append(
+        'ordering',
+        sortOrder && sortOrder > 0 ? '-' + sortField : sortField,
+      );
     if (page_size) params.append('page_size', page_size.toString());
     if (page) params.append('page', page.toString());
-  
+
     const url = `${baseUrl}?${params.toString()}`;
     return this.http.get<ApplicationListResponse>(url);
   }
 
-  getapplication(app_no:string):Observable<ApplicationListResponse>{
-
+  getapplication(app_no: string): Observable<ApplicationListResponse> {
     const Url = `${this.apiRoot}/api/v1/applicants?application_no=${app_no}`;
     return this.http.get<ApplicationListResponse>(Url);
+  }
+
+  getAdminDashboardMetrics(): Observable<AdminDashboardMetrics> {
+    const url = `${this.apiRoot}/api/v1/applicants/admin-dashboard`;
+    return this.http.get<AdminDashboardMetrics>(url);
+  }
+
+  issueComplianceDirective(
+    payload: ComplianceDirectivePayload,
+  ): Observable<unknown> {
+    const url = `${this.apiRoot}/api/v1/applicants/compliance-directive`;
+    return this.http.post(url, payload);
+  }
+
+  shortlistApplicants(payload: ApplicantActionPayload): Observable<unknown> {
+    const url = `${this.apiRoot}/api/v1/applicants/shortlist-applicants`;
+    return this.http.post(url, payload);
+  }
+
+  rejectApplicants(payload: RejectApplicantPayload): Observable<unknown> {
+    const url = `${this.apiRoot}/api/v1/applicants/reject-applicants`;
+    return this.http.post(url, payload);
   }
 }

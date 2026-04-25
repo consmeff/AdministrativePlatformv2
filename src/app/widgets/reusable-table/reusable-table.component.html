@@ -1,0 +1,39 @@
+<p-table
+  [columns]="columns"
+  [value]="value"
+  [tableStyle]="tableStyle"
+  styleClass="reusable-table"
+>
+  @if (showHeader) {
+    <ng-template pTemplate="header" let-columns>
+      <tr>
+        <th
+          *ngFor="let col of columns"
+          [pSortableColumn]="col.sortable ? col.field : null"
+        >
+          {{ col.header }}
+          @if (col.sortable) {
+            <p-sortIcon [field]="col.field"></p-sortIcon>
+          }
+        </th>
+      </tr>
+    </ng-template>
+  }
+
+  <ng-template pTemplate="body" let-rowData let-columns="columns">
+    @if (rowTemplate) {
+      <ng-container
+        *ngTemplateOutlet="
+          rowTemplate;
+          context: { $implicit: rowData, columns: columns }
+        "
+      ></ng-container>
+    } @else {
+      <tr>
+        <td *ngFor="let col of columns" [class]="col.cellClass">
+          {{ getCellValue(rowData, col.field) }}
+        </td>
+      </tr>
+    }
+  </ng-template>
+</p-table>

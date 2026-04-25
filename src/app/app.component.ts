@@ -1,22 +1,28 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { BusyIndicatorComponent } from './widgets/busy-indicator/busy-indicator.component';
 import { BusyIndicatorService } from './services/busy-indicator.service';
 import { Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { AppStore } from './store/app.store';
+import { ThemeService } from './services/theme.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet,BusyIndicatorComponent,CommonModule],
+  imports: [RouterOutlet, BusyIndicatorComponent, CommonModule],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
 })
 export class AppComponent {
-  title = 'consmmefadmin';
+  readonly appStore = inject(AppStore);
+  private readonly busyIndicatorService = inject(BusyIndicatorService);
+  private readonly themeService = inject(ThemeService);
 
   isLoading$: Observable<boolean>;
 
-  constructor(private busyIndicatorService: BusyIndicatorService) {
+  constructor() {
+    this.themeService.initialize();
     this.isLoading$ = this.busyIndicatorService.isLoading$;
+    this.appStore.markInitialized();
   }
 }

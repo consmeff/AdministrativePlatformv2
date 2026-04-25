@@ -1,6 +1,5 @@
 export const environment = {
-    production: true,
-   
-    apiURL:'https://consmmefapi.labyeducation.com'
-  };
-  
+  production: true,
+
+  apiURL: 'https://consmmefapi.labyeducation.com',
+};
