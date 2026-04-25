@@ -1,0 +1,89 @@
+.session-text {
+  color: var(--app-text-secondary);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.exam-card {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.exam-title {
+  color: var(--app-text-primary);
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.input-container {
+  position: relative;
+  width: min(100%, 520px);
+}
+
+.exam-search {
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  color: var(--app-text-primary);
+  padding-right: 2.75rem;
+  min-height: 50px;
+}
+
+.exam-search::placeholder {
+  color: var(--app-text-muted);
+}
+
+.search-icon {
+  color: var(--app-text-muted);
+  font-size: 1rem;
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+:host ::ng-deep .status-filter {
+  min-width: 240px;
+}
+
+:host ::ng-deep .p-datatable th {
+  background: var(--app-surface);
+  border-bottom: 1px solid var(--app-border);
+  color: var(--app-text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+:host ::ng-deep .p-datatable td {
+  background: var(--app-surface);
+  border-bottom: 1px solid var(--app-border);
+  color: var(--app-text-primary);
+  font-size: 14px;
+}
+
+:host ::ng-deep .p-paginator {
+  background: var(--app-surface);
+  border: 0;
+  border-top: 1px solid var(--app-border);
+  margin-top: 0.75rem;
+}
+
+.status-pill {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.35rem;
+  font-weight: 600;
+}
+
+.status-qualified {
+  color: var(--app-success);
+}
+
+.status-unqualified {
+  color: var(--app-danger);
+}
+
+.status-absent {
+  color: var(--app-info);
+}
