@@ -16,7 +16,7 @@ import {
 } from 'rxjs';
 import { TableModule } from 'primeng/table';
 
-import { DropdownModule } from 'primeng/dropdown';
+import { SelectModule } from 'primeng/select';
 import { Modal } from 'bootstrap';
 import {
   Application,
@@ -24,7 +24,11 @@ import {
   ApplicationListResponse,
 } from '../../../model/dashboard/applicant';
 import { appstatus, Column, sidebarStateDTO } from '../../../model/page.dto';
-import { ApplicationService } from '../../../services/application.service';
+import {
+  ApplicationService,
+  ComplianceDirectivePayload,
+  RejectApplicantPayload,
+} from '../../../services/application.service';
 import { WidgetService } from '../../../services/widget.service';
 import { ShareModule } from '../../../shared/share/share.module';
 import { SidebarComponent } from '../../../widgets/sidebar/sidebar.component';
@@ -50,7 +54,7 @@ interface LazyLoadEvent {
   imports: [
     ShareModule,
     TopbarComponent,
-    DropdownModule,
+    SelectModule,
     SidebarComponent,
     TableModule,
     FormsModule,
@@ -259,6 +263,7 @@ export class ApplicantlistsComponent implements OnInit {
     const batch = this.applicationList;
     batch.forEach((v) => {
       const _summ: ApplicationSummary = {
+        id: v.id,
         application_no: v.application_no,
         first_name: v.first_name,
         last_name: v.last_name,
@@ -316,19 +321,82 @@ export class ApplicantlistsComponent implements OnInit {
   }
 
   handleAction(action: string, rowData: ApplicationSummary) {
-    const firstColumnValue = rowData.application_no;
-
-    // alert(`Action: ${action}\nRow ID: ${firstColumnValue}`);
+    const applicationNo = rowData.application_no;
+    const applicantId = rowData.id;
     this.showActionMenu = false;
 
-    // Handle specific actions as needed
+    if (!applicantId) {
+      window.alert('Applicant ID not found for this action.');
+      return;
+    }
+
     switch (action.toLowerCase()) {
       case 'view profile':
         this.router.navigateByUrl(
-          `/pages/applicants/applicantdetail/${firstColumnValue.replaceAll('/', '_')}`,
+          `/pages/applicants/applicantdetail/${applicationNo.replaceAll('/', '_')}`,
         );
         break;
-      // ... other cases
+      case 'reject candidate': {
+        const note = window.prompt('Enter rejection note:', '');
+        if (note === null) return;
+        const payload: RejectApplicantPayload = {
+          applicant_ids: [applicantId],
+          extra_note: note.trim(),
+        };
+        this.performApplicantAction(
+          this._applicationService.rejectApplicants(payload),
+          'Candidate rejected successfully.',
+        );
+        break;
+      }
+      case 'shortlist candidate':
+        this.performApplicantAction(
+          this._applicationService.shortlistApplicants({
+            applicant_ids: [applicantId],
+          }),
+          'Candidate shortlisted successfully.',
+        );
+        break;
+      case 'issue compliance directive': {
+        const note = window.prompt('Enter compliance directive note:', '');
+        if (note === null) return;
+        const payload: ComplianceDirectivePayload = {
+          applicant_ids: [applicantId],
+          extra_note: note.trim(),
+        };
+        this.performApplicantAction(
+          this._applicationService.issueComplianceDirective(payload),
+          'Compliance directive issued successfully.',
+        );
+        break;
+      }
     }
+  }
+
+  private performApplicantAction(
+    request: Observable<unknown>,
+    successMessage: string,
+  ) {
+    this.busyService.show();
+    request.subscribe({
+      next: () => {
+        window.alert(successMessage);
+        this.fetchRecords().subscribe((data: ApplicationListResponse) => {
+          if (data.data.length > 0) {
+            this.total_record_count = data.total;
+            this.applicationList = data.data;
+            this.populateSummary();
+          }
+        });
+      },
+      error: (err) => {
+        const message =
+          err?.error?.message || err?.error?.detail || 'Action failed.';
+        window.alert(message);
+      },
+      complete: () => {
+        this.busyService.hide();
+      },
+    });
   }
 }

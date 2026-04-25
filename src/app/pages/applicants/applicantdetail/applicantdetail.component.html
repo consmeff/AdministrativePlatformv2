@@ -57,403 +57,76 @@
             <p-tabView>
               <p-tabPanel header="Personal details">
                 <div class="table-responsive-md">
-                  <table class="table table-light table-borderless">
-                    <tbody>
-                      <tr class="">
-                        <td>First Name</td>
-                        <td>{{ application.first_name }}</td>
-                      </tr>
-                      <tr class="">
-                        <td>Last Name</td>
-                        <td>{{ application.last_name }}</td>
-                      </tr>
-                      <tr class="">
-                        <td>Middle Name</td>
-                        <td>{{ application.other_names }}</td>
-                      </tr>
-                      <tr class="">
-                        <td>Email Address</td>
-                        <td>{{ application.email }}</td>
-                      </tr>
-                      <tr class="">
-                        <td>Phone Number</td>
-                        <td>{{ application.phone_number }}</td>
-                      </tr>
-                      <tr class="">
-                        <td>Alternate Phone Number</td>
-                        <td>{{ application.alt_phone_number }}</td>
-                      </tr>
-                      <tr class="">
-                        <td>Date of Birth</td>
-                        <td>{{ application.dob }}</td>
-                      </tr>
-                      <tr class="">
-                        <td>Gender</td>
-                        <td>{{ application.gender }}</td>
-                      </tr>
-                      <tr class="">
-                        <td>Marital Status</td>
-                        <td>{{ application.marital_status }}</td>
-                      </tr>
-                      <tr class="">
-                        <td>Nationality</td>
-                        <td>{{ application.nationality }}</td>
-                      </tr>
-                      <tr class="">
-                        <td>State of Origin</td>
-                        <td>{{ application.state_of_origin }}</td>
-                      </tr>
-                      <tr class="">
-                        <td>Local Government Area</td>
-                        <td>{{ application.lga }}</td>
-                      </tr>
-                      <tr class="">
-                        <td>Living with disability?</td>
-                        <td>{{ application.disability }}</td>
-                      </tr>
-                      <tr class="">
-                        <td>Specified disability</td>
-                        <td>{{ application.disability }}</td>
-                      </tr>
-                      <tr class="">
-                        <td>Address</td>
-                        <td>{{ application.residential_address?.address }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                  <app-reusable-table
+                    [columns]="detailColumns"
+                    [value]="personalDetailRows"
+                    [showHeader]="false"
+                  ></app-reusable-table>
                 </div>
               </p-tabPanel>
               <p-tabPanel header="Next of Kin Details">
                 <div class="table-responsive-md">
-                  <table class="table table-light table-borderless">
-                    <tbody>
-                      <tr class="">
-                        <td>Title</td>
-                        <td>
-                          {{ application.primary_parent_or_guardian?.title }}
-                        </td>
-                      </tr>
-                      <tr class="">
-                        <td>First Name</td>
-                        <td>
-                          {{
-                            application.primary_parent_or_guardian?.first_name
-                          }}
-                        </td>
-                      </tr>
-                      <tr class="">
-                        <td>Last Name</td>
-                        <td>
-                          {{
-                            application.primary_parent_or_guardian?.last_name
-                          }}
-                        </td>
-                      </tr>
-                      <tr class="">
-                        <td>Middle Name</td>
-                        <td>
-                          {{
-                            application.primary_parent_or_guardian?.other_names
-                          }}
-                        </td>
-                      </tr>
-                      <tr class="">
-                        <td>Email Address</td>
-                        <td>
-                          {{ application.primary_parent_or_guardian?.email }}
-                        </td>
-                      </tr>
-                      <tr class="">
-                        <td>Phone Number</td>
-                        <td>
-                          {{
-                            application.primary_parent_or_guardian?.phone_number
-                          }}
-                        </td>
-                      </tr>
-                      <tr class="">
-                        <td>Gender</td>
-                        <td>
-                          {{ application.primary_parent_or_guardian?.gender }}
-                        </td>
-                      </tr>
-                      <!-- <tr class="">
-                                                <td >Relationship</td>                                             
-                                                <td>{{application.primary_parent_or_guardian?.re}}</td>
-                                            </tr> -->
-                      <tr class="">
-                        <td>Occupation</td>
-                        <td>
-                          {{
-                            application.primary_parent_or_guardian?.occupation
-                          }}
-                        </td>
-                      </tr>
-
-                      <tr class="">
-                        <td>Nationality</td>
-                        <td>
-                          {{
-                            application.primary_parent_or_guardian?.nationality
-                          }}
-                        </td>
-                      </tr>
-                      <tr class="">
-                        <td>State of Origin</td>
-                        <td>
-                          {{
-                            application.primary_parent_or_guardian
-                              ?.state_of_origin
-                          }}
-                        </td>
-                      </tr>
-                      <tr class="">
-                        <td>Local Government Area</td>
-                        <td>
-                          {{ application.primary_parent_or_guardian?.lga }}
-                        </td>
-                      </tr>
-
-                      <tr class="">
-                        <td>Address</td>
-                        <td>
-                          {{
-                            application.primary_parent_or_guardian
-                              ?.residential_address
-                          }}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                  <app-reusable-table
+                    [columns]="detailColumns"
+                    [value]="nextOfKinRows"
+                    [showHeader]="false"
+                  ></app-reusable-table>
                 </div>
               </p-tabPanel>
               <p-tabPanel header="Academic History">
                 <div class="table-responsive-md">
-                  <table class="table table-light table-borderless">
-                    <tbody *ngIf="application && application.academic_history">
-                      <tr class="">
-                        <td>Primary School</td>
-                        <td>
-                          {{
-                            application &&
-                            application.academic_history.length > 0
-                              ? getAcademicHistory("primary")?.institution
-                              : "-----"
-                          }}
-                        </td>
-                      </tr>
-                      <tr class="">
-                        <td>Duration</td>
-                        <td>
-                          {{ getAcademicHistory("primary")?.from_date }} &nbsp;
-                          to &nbsp; {{ getAcademicHistory("primary")?.to_date }}
-                        </td>
-                      </tr>
-                      <tr class="">
-                        <td>Secondary School</td>
-                        <td>
-                          {{ getAcademicHistory("secondary")?.institution }}
-                        </td>
-                      </tr>
-                      <tr class="">
-                        <td>Duration</td>
-                        <td>
-                          {{
-                            getAcademicHistory("secondary")?.from_date
-                          }}
-                          &nbsp; to &nbsp;
-                          {{ getAcademicHistory("secondary")?.to_date }}
-                        </td>
-                      </tr>
-                      <tr class="">
-                        <td>Qualification</td>
-                        <td>
-                          {{
-                            getAcademicHistory("secondary")?.certificate_type ??
-                              "-----"
-                          }}
-                        </td>
-                      </tr>
-                      <tr class="">
-                        <td>Number of Attempts</td>
-                        <td>{{ getAttemptCount() }}</td>
-                      </tr>
-                      <tr class="">
-                        <td>Examination Name</td>
-                        <td>{{ getExamName() }}</td>
-                      </tr>
-                      <tr class="">
-                        <td>Examination Year</td>
-                        @if (
-                          application.o_level_result &&
-                          application.o_level_result.length > 0
-                        ) {
-                          <td>{{ getYear() }}</td>
-                        } @else {
-                          <td>-----</td>
-                        }
-                      </tr>
-                      <tr class="">
-                        <td>Grades</td>
-                        @if (
-                          application.o_level_result &&
-                          application.o_level_result.length > 0
-                        ) {
-                          <td>{{ getSubjects() }}</td>
-                        } @else {
-                          <td>-----</td>
-                        }
-                      </tr>
-                      <!-- <tr class="">
-                                                <td >Qualification Name</td>                                             
-                                                <td>{{application.nationality}}</td>
-                                            </tr>
-                                            <tr class="">
-                                                <td >Qualification Type</td>                                             
-                                                <td>{{application.nationality}}</td>
-                                            </tr>
-                                            <tr class="">
-                                                <td >Duration</td>                                             
-                                                <td>{{application.state_of_origin}}</td>
-                                            </tr> -->
-                    </tbody>
-                  </table>
+                  <app-reusable-table
+                    [columns]="detailColumns"
+                    [value]="academicHistoryRows"
+                    [showHeader]="false"
+                  ></app-reusable-table>
                 </div>
               </p-tabPanel>
               <p-tabPanel header="Documents">
                 <div class="table-responsive-md">
-                  <table class="table table-light table-borderless">
-                    <tbody>
-                      <tr class="">
-                        <td>Cirtificate of Birth</td>
+                  <app-reusable-table
+                    [columns]="documentColumns"
+                    [value]="documentRows"
+                    [showHeader]="false"
+                  >
+                    <ng-template #rowTemplate let-rowData>
+                      <tr>
+                        <td class="fw-bold">{{ rowData["label"] }}</td>
                         <td>
-                          <div class="d-flex flex-row">
-                            <img
-                              width="40"
-                              height="50"
-                              src="{{
-                                application.certificate_of_birth?.file_url
-                              }}"
-                              alt=""
-                            />
-                            <div class="d-flex flex-column mx-3 row-gap-2">
-                              <span class="title-small">{{
-                                getfileName(application.certificate_of_birth!)
-                              }}</span>
-                              <span class="size-text">{{
-                                application.certificate_of_birth?.file_size
-                              }}</span>
+                          @if (getDocumentFile(rowData); as file) {
+                            <div class="d-flex flex-row">
+                              <img
+                                width="40"
+                                height="50"
+                                [src]="file.file_url"
+                                [alt]="getfileName(file)"
+                              />
+                              <div class="d-flex flex-column mx-3 row-gap-2">
+                                <span class="title-small">{{
+                                  getfileName(file)
+                                }}</span>
+                                <span class="size-text">{{
+                                  formatFileSize(file.file_size)
+                                }}</span>
+                              </div>
                             </div>
-                          </div>
+                          } @else {
+                            <span>-----</span>
+                          }
                         </td>
-                        <td class="d-flex justify-content-end">
-                          <div class="d-flex flex-row action">
-                            <div class="">View <i class="bi bi-eye"></i></div>
+                        <td>
+                          <div
+                            class="d-flex flex-row action justify-content-end"
+                          >
+                            <div>View <i class="bi bi-eye"></i></div>
                             <div class="mx-3">
                               Download <i class="bi bi-download"></i>
                             </div>
                           </div>
                         </td>
                       </tr>
-                      <tr class="">
-                        <td>O' Level</td>
-                        <td>
-                          <div class="d-flex flex-row">
-                            <img
-                              width="40"
-                              height="50"
-                              src="{{
-                                application.o_level_result![0].file.file_url
-                              }}"
-                              alt=""
-                            />
-                            <div class="d-flex flex-column mx-3 row-gap-2">
-                              <span class="title-small">{{
-                                getfileName(application.o_level_result![0].file)
-                              }}</span>
-                              <span class="size-text">{{
-                                formatFileSize(
-                                  application.o_level_result![0].file.file_size
-                                )
-                              }}</span>
-                            </div>
-                          </div>
-                        </td>
-                        <td class="d-flex justify-content-end">
-                          <div class="d-flex flex-row action">
-                            <div class="">View <i class="bi bi-eye"></i></div>
-                            <div class="mx-3">
-                              Download <i class="bi bi-download"></i>
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr class="">
-                        <td>Passport Photograph</td>
-                        <td>
-                          <div class="d-flex flex-row">
-                            <img
-                              width="40"
-                              height="50"
-                              src="{{ application.passport_photo?.file_url }}"
-                              alt=""
-                            />
-                            <div class="d-flex flex-column mx-3 row-gap-2">
-                              <span class="title-small">{{
-                                getfileName(application.passport_photo!)
-                              }}</span>
-                              <span class="size-text">{{
-                                formatFileSize(
-                                  application.passport_photo?.file_size!
-                                )
-                              }}</span>
-                            </div>
-                          </div>
-                        </td>
-                        <td class="d-flex justify-content-end">
-                          <div class="d-flex flex-row action">
-                            <div class="">View <i class="bi bi-eye"></i></div>
-                            <div class="mx-3">
-                              Download <i class="bi bi-download"></i>
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr class="">
-                        <td>UTME Result</td>
-                        <td>
-                          <div class="d-flex flex-row">
-                            <img
-                              width="40"
-                              height="50"
-                              src="{{
-                                application.utme_result?.file?.file_url
-                              }}"
-                              alt=""
-                            />
-                            <div class="d-flex flex-column mx-3 row-gap-2">
-                              <span class="title-small">{{
-                                getfileName(application.utme_result?.file!)
-                              }}</span>
-                              <span class="size-text">{{
-                                formatFileSize(
-                                  application.utme_result?.file?.file_size!
-                                )
-                              }}</span>
-                            </div>
-                          </div>
-                        </td>
-                        <td class="d-flex justify-content-end">
-                          <div class="d-flex flex-row action">
-                            <div class="">View <i class="bi bi-eye"></i></div>
-                            <div class="mx-3">
-                              Download <i class="bi bi-download"></i>
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                    </ng-template>
+                  </app-reusable-table>
                 </div>
               </p-tabPanel>
             </p-tabView>
@@ -463,19 +136,38 @@
       </div>
 
       <div class="fourth-row my-5 d-flex justify-content-between flex-row">
-        <div
+        <button
+          type="button"
           class="compl d-flex justify-content-center align-content-center p-3"
+          [disabled]="isIssuingCompliance || !application.id"
+          (click)="issueComplianceDirective()"
         >
           <i class="bi bi-exclamation-triangle mx-3 text-white"></i>
-          <span>Issue Compliance Directive</span>
-        </div>
+          <span>{{
+            isIssuingCompliance
+              ? "Issuing Compliance Directive..."
+              : "Issue Compliance Directive"
+          }}</span>
+        </button>
         <div class="d-flex flex-row">
-          <div class="reject p-3">
-            <i class="bi bi-x mx-3 text-white"></i> <span>Reject</span>
-          </div>
-          <div class="mx-5 short p-3">
-            <i class="bi bi-check mx-3 text-white"></i> <span>Shortlist</span>
-          </div>
+          <button
+            type="button"
+            class="reject p-3"
+            [disabled]="isRejecting || !application.id"
+            (click)="rejectApplicant()"
+          >
+            <i class="bi bi-x mx-3 text-white"></i>
+            <span>{{ isRejecting ? "Rejecting..." : "Reject" }}</span>
+          </button>
+          <button
+            type="button"
+            class="mx-5 short p-3"
+            [disabled]="isShortlisting || !application.id"
+            (click)="shortlistApplicant()"
+          >
+            <i class="bi bi-check mx-3 text-white"></i>
+            <span>{{ isShortlisting ? "Shortlisting..." : "Shortlist" }}</span>
+          </button>
         </div>
       </div>
     </div>

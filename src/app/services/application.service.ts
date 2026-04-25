@@ -3,6 +3,20 @@ import { environment } from '../../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApplicationListResponse } from '../model/dashboard/applicant';
+import { AdminDashboardMetrics } from '../model/dashboard/admin-dashboard.dto';
+
+export interface ComplianceDirectivePayload {
+  applicant_ids: number[];
+  extra_note: string;
+}
+
+export interface ApplicantActionPayload {
+  applicant_ids: number[];
+}
+
+export interface RejectApplicantPayload extends ApplicantActionPayload {
+  extra_note: string;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -42,5 +56,27 @@ export class ApplicationService {
   getapplication(app_no: string): Observable<ApplicationListResponse> {
     const Url = `${this.apiRoot}/api/v1/applicants?application_no=${app_no}`;
     return this.http.get<ApplicationListResponse>(Url);
+  }
+
+  getAdminDashboardMetrics(): Observable<AdminDashboardMetrics> {
+    const url = `${this.apiRoot}/api/v1/applicants/admin-dashboard`;
+    return this.http.get<AdminDashboardMetrics>(url);
+  }
+
+  issueComplianceDirective(
+    payload: ComplianceDirectivePayload,
+  ): Observable<unknown> {
+    const url = `${this.apiRoot}/api/v1/applicants/compliance-directive`;
+    return this.http.post(url, payload);
+  }
+
+  shortlistApplicants(payload: ApplicantActionPayload): Observable<unknown> {
+    const url = `${this.apiRoot}/api/v1/applicants/shortlist-applicants`;
+    return this.http.post(url, payload);
+  }
+
+  rejectApplicants(payload: RejectApplicantPayload): Observable<unknown> {
+    const url = `${this.apiRoot}/api/v1/applicants/reject-applicants`;
+    return this.http.post(url, payload);
   }
 }

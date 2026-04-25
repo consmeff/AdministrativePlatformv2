@@ -209,6 +209,7 @@ export interface Department {
 }
 
 export interface ApplicationSummary {
+  id: number;
   application_no: string;
   first_name: string;
   last_name: string;

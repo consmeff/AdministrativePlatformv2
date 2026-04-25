@@ -108,14 +108,14 @@
           <div class="card-title">
             All Applications ({{ total_record_count }})
           </div>
-          <p-dropdown
+          <p-select
             [options]="approval_status"
             [(ngModel)]="selectedStatus"
             optionLabel="name"
             placeholder="Select a status"
             (onChange)="onStatusChange($event)"
           >
-          </p-dropdown>
+          </p-select>
         </div>
         <div class="summary-table">
           <p-table

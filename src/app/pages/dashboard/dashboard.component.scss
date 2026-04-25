@@ -1,7 +1,3 @@
-
-
-
-
 .statcard {
   height: 150px;
 }
@@ -28,61 +24,105 @@ button {
   // padding-bottom: 16px;
   padding-left: 20px;
   background-color: rgba(0, 0, 128, 1);
-  color: #FAFAFC;
-
+  color: #fafafc;
 }
-h6{
+h6 {
   font-size: 14px;
 }
 
-.section2{
+.section2 {
   font-size: 14px;
 }
-.export-pane .tiny{
+.export-pane .tiny {
   font-size: 12px;
-  
 }
-.card-title{
+.card-title {
   font-weight: bold;
 }
-.summary-table th{
+.summary-table th {
   font-size: 13px;
   font-weight: 600px;
 }
-.summary-table tr{
+.summary-table tr {
   font-size: 13px;
   font-weight: 400px;
 }
-.viewall{
+.viewall {
   font-size: 13px;
   font-weight: 400px;
   cursor: pointer;
   color: rgb(0, 0, 128) !important;
 }
 
-.metric .card-text{
+.metric .card-text {
   font-family: Lato;
-font-weight: 700;
-font-size: 24px;
-line-height: 100%;
-letter-spacing: 0%;
-
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 100%;
+  letter-spacing: 0%;
 }
 
-.card-text .d-flex.justify-content-between span:last-child{
+.card-text .d-flex.justify-content-between span:last-child {
   font-family: Lato;
-font-weight: 700;
-font-size: 14px;
-line-height: 150%;
-letter-spacing: 0%;
-
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 150%;
+  letter-spacing: 0%;
 }
 
-.last-sec{
+.last-sec {
   font-family: Lato;
-font-weight: 700;
-font-size: 13px;
-line-height: 150%;
-letter-spacing: 0%;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 150%;
+  letter-spacing: 0%;
+}
 
+.action-icon {
+  cursor: pointer;
+  color: #0d6efd;
+}
+
+.action-icon:hover {
+  color: #0b5ed7;
+}
+
+.action-menu {
+  position: fixed;
+  z-index: 1050;
+  min-width: 250px;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+  box-shadow: 2px 2px 1px rgba(197, 196, 196, 0.15);
+}
+
+.action-menu .list-group-item {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.action-menu .list-group-item:last-child {
+  border-bottom: none;
+}
+
+.action-menu .list-group-item:hover {
+  cursor: pointer;
+}
+
+.action-menu .eye:hover {
+  background-color: rgba(0, 0, 128, 0.06);
+}
+
+.action-menu .x:hover {
+  background-color: rgba(219, 66, 66, 0.104);
+}
+
+.action-menu .check:hover {
+  background-color: rgba(4, 250, 65, 0.104);
+}
+
+.action-menu .excl:hover {
+  background-color: rgba(239, 153, 5, 0.055);
 }

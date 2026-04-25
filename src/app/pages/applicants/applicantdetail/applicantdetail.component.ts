@@ -5,7 +5,11 @@ import { TopbarComponent } from '../../../widgets/topbar/topbar.component';
 import { WidgetService } from '../../../services/widget.service';
 import { sidebarStateDTO } from '../../../model/page.dto';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { ApplicationService } from '../../../services/application.service';
+import {
+  ApplicationService,
+  ComplianceDirectivePayload,
+  RejectApplicantPayload,
+} from '../../../services/application.service';
 import {
   AcademicHistory,
   Application,
@@ -13,6 +17,11 @@ import {
   Certificate,
 } from '../../../model/dashboard/applicant';
 import { TabViewModule } from 'primeng/tabview';
+import {
+  ReusableTableColumn,
+  ReusableTableComponent,
+} from '../../../widgets/reusable-table/reusable-table.component';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-applicantdetail',
@@ -22,6 +31,7 @@ import { TabViewModule } from 'primeng/tabview';
     TopbarComponent,
     RouterModule,
     TabViewModule,
+    ReusableTableComponent,
   ],
   templateUrl: './applicantdetail.component.html',
   styleUrl: './applicantdetail.component.scss',
@@ -34,6 +44,22 @@ export class ApplicantdetailComponent implements OnInit {
   route = inject(ActivatedRoute);
 
   app_no: string | null = '';
+  isIssuingCompliance = false;
+  isRejecting = false;
+  isShortlisting = false;
+  detailColumns: ReusableTableColumn[] = [
+    { field: 'label', cellClass: 'fw-bold' },
+    { field: 'value' },
+  ];
+  documentColumns: ReusableTableColumn[] = [
+    { field: 'label', cellClass: 'fw-bold' },
+    { field: 'file' },
+    { field: 'actions' },
+  ];
+  personalDetailRows: Record<string, unknown>[] = [];
+  nextOfKinRows: Record<string, unknown>[] = [];
+  academicHistoryRows: Record<string, unknown>[] = [];
+  documentRows: Record<string, unknown>[] = [];
 
   constructor() {
     this._widgetService.sidebarState$.subscribe((state: sidebarStateDTO) => {
@@ -50,6 +76,7 @@ export class ApplicantdetailComponent implements OnInit {
       .subscribe((data: ApplicationListResponse) => {
         if (data.data.length > 0) {
           this.application = data.data[0];
+          this.buildDetailRows();
         }
       });
   }
@@ -147,7 +174,18 @@ export class ApplicantdetailComponent implements OnInit {
     return text || input; // Fallback to original if empty
   }
 
-  getfileName(fileobj: Certificate): string {
+  getfileName(
+    fileobj:
+      | Certificate
+      | {
+          file_url: string;
+          file_name: string;
+          file_size: number;
+          file_type: string;
+        }
+      | null
+      | undefined,
+  ): string {
     let extension = '';
 
     if (!fileobj) return '';
@@ -186,5 +224,262 @@ export class ApplicantdetailComponent implements OnInit {
     const value = parseFloat((bytes / Math.pow(k, i)).toFixed(decimals));
 
     return `${value} ${sizes[i]}`;
+  }
+
+  getDocumentFile(row: Record<string, unknown>) {
+    const file = row['file'] as
+      | Certificate
+      | {
+          file_url: string;
+          file_name: string;
+          file_size: number;
+          file_type: string;
+        }
+      | undefined;
+    return file ?? null;
+  }
+
+  issueComplianceDirective() {
+    if (!this.application?.id || this.isIssuingCompliance) {
+      return;
+    }
+
+    const note = window.prompt(
+      'Enter compliance directive note:',
+      this.application.compliance_directive ?? '',
+    );
+
+    if (note === null) {
+      return;
+    }
+
+    const payload: ComplianceDirectivePayload = {
+      applicant_ids: [this.application.id],
+      extra_note: note.trim(),
+    };
+
+    this.performApplicantAction(
+      this._applicationservice.issueComplianceDirective(payload),
+      'Compliance directive issued successfully.',
+      () => {
+        this.application.compliance_directive = payload.extra_note;
+      },
+      () => {
+        this.isIssuingCompliance = true;
+      },
+      () => {
+        this.isIssuingCompliance = false;
+      },
+    );
+  }
+
+  shortlistApplicant() {
+    if (!this.application?.id || this.isShortlisting) {
+      return;
+    }
+    this.performApplicantAction(
+      this._applicationservice.shortlistApplicants({
+        applicant_ids: [this.application.id],
+      }),
+      'Candidate shortlisted successfully.',
+      undefined,
+      () => {
+        this.isShortlisting = true;
+      },
+      () => {
+        this.isShortlisting = false;
+      },
+    );
+  }
+
+  rejectApplicant() {
+    if (!this.application?.id || this.isRejecting) {
+      return;
+    }
+
+    const note = window.prompt('Enter rejection note:', '');
+    if (note === null) {
+      return;
+    }
+
+    const payload: RejectApplicantPayload = {
+      applicant_ids: [this.application.id],
+      extra_note: note.trim(),
+    };
+
+    this.performApplicantAction(
+      this._applicationservice.rejectApplicants(payload),
+      'Candidate rejected successfully.',
+      undefined,
+      () => {
+        this.isRejecting = true;
+      },
+      () => {
+        this.isRejecting = false;
+      },
+    );
+  }
+
+  private performApplicantAction(
+    request: Observable<unknown>,
+    successMessage: string,
+    onSuccess?: () => void,
+    onStart?: () => void,
+    onComplete?: () => void,
+  ) {
+    onStart?.();
+    request.subscribe({
+      next: () => {
+        onSuccess?.();
+        window.alert(successMessage);
+      },
+      error: (err) => {
+        const message =
+          err?.error?.message || err?.error?.detail || 'Action failed.';
+        window.alert(message);
+      },
+      complete: () => {
+        onComplete?.();
+      },
+    });
+  }
+
+  private buildDetailRows() {
+    const primaryHistory = this.getAcademicHistory('primary');
+    const secondaryHistory = this.getAcademicHistory('secondary');
+    const hasOLevelResults =
+      Array.isArray(this.application.o_level_result) &&
+      this.application.o_level_result.length > 0;
+    const examinationYear = hasOLevelResults ? this.getYear() : null;
+
+    this.personalDetailRows = [
+      { label: 'First Name', value: this.application.first_name },
+      { label: 'Last Name', value: this.application.last_name },
+      { label: 'Middle Name', value: this.application.other_names },
+      { label: 'Email Address', value: this.application.email },
+      { label: 'Phone Number', value: this.application.phone_number },
+      {
+        label: 'Alternate Phone Number',
+        value: this.application.alt_phone_number,
+      },
+      { label: 'Date of Birth', value: this.application.dob },
+      { label: 'Gender', value: this.application.gender },
+      { label: 'Marital Status', value: this.application.marital_status },
+      { label: 'Nationality', value: this.application.nationality },
+      { label: 'State of Origin', value: this.application.state_of_origin },
+      { label: 'Local Government Area', value: this.application.lga },
+      { label: 'Living with disability?', value: this.application.disability },
+      { label: 'Specified disability', value: this.application.disability },
+      {
+        label: 'Address',
+        value: this.application.residential_address?.address,
+      },
+    ];
+
+    this.nextOfKinRows = [
+      {
+        label: 'Title',
+        value: this.application.primary_parent_or_guardian?.title,
+      },
+      {
+        label: 'First Name',
+        value: this.application.primary_parent_or_guardian?.first_name,
+      },
+      {
+        label: 'Last Name',
+        value: this.application.primary_parent_or_guardian?.last_name,
+      },
+      {
+        label: 'Middle Name',
+        value: this.application.primary_parent_or_guardian?.other_names,
+      },
+      {
+        label: 'Email Address',
+        value: this.application.primary_parent_or_guardian?.email,
+      },
+      {
+        label: 'Phone Number',
+        value: this.application.primary_parent_or_guardian?.phone_number,
+      },
+      {
+        label: 'Gender',
+        value: this.application.primary_parent_or_guardian?.gender,
+      },
+      {
+        label: 'Occupation',
+        value: this.application.primary_parent_or_guardian?.occupation,
+      },
+      {
+        label: 'Nationality',
+        value: this.application.primary_parent_or_guardian?.nationality,
+      },
+      {
+        label: 'State of Origin',
+        value: this.application.primary_parent_or_guardian?.state_of_origin,
+      },
+      {
+        label: 'Local Government Area',
+        value: this.application.primary_parent_or_guardian?.lga,
+      },
+      {
+        label: 'Address',
+        value: this.application.primary_parent_or_guardian?.residential_address,
+      },
+    ];
+
+    this.academicHistoryRows = [
+      { label: 'Primary School', value: primaryHistory?.institution },
+      {
+        label: 'Duration',
+        value: `${primaryHistory?.from_date ?? '-----'} to ${primaryHistory?.to_date ?? '-----'}`,
+      },
+      { label: 'Secondary School', value: secondaryHistory?.institution },
+      {
+        label: 'Duration',
+        value: `${secondaryHistory?.from_date ?? '-----'} to ${secondaryHistory?.to_date ?? '-----'}`,
+      },
+      {
+        label: 'Qualification',
+        value: secondaryHistory?.certificate_type ?? '-----',
+      },
+      { label: 'Number of Attempts', value: this.getAttemptCount() },
+      {
+        label: 'Examination Name',
+        value: hasOLevelResults ? this.getExamName() : '-----',
+      },
+      {
+        label: 'Examination Year',
+        value: examinationYear ?? '-----',
+      },
+      {
+        label: 'Grades',
+        value: hasOLevelResults ? this.getSubjects() : '-----',
+      },
+    ];
+
+    this.documentRows = [
+      {
+        label: 'Cirtificate of Birth',
+        file: this.application.certificate_of_birth ?? null,
+        actions: 'View, Download',
+      },
+      {
+        label: "O' Level",
+        file: hasOLevelResults
+          ? this.application.o_level_result?.[0]?.file
+          : null,
+        actions: 'View, Download',
+      },
+      {
+        label: 'Passport Photograph',
+        file: this.application.passport_photo ?? null,
+        actions: 'View, Download',
+      },
+      {
+        label: 'UTME Result',
+        file: this.application.utme_result?.file ?? null,
+        actions: 'View, Download',
+      },
+    ];
   }
 }

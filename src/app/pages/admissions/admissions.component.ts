@@ -21,7 +21,7 @@ import {
   switchMap,
 } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
-import { DropdownModule } from 'primeng/dropdown';
+import { SelectModule } from 'primeng/select';
 import { FormsModule } from '@angular/forms';
 import { BusyIndicatorService } from '../../services/busy-indicator.service';
 
@@ -47,7 +47,7 @@ interface LazyLoadEvent {
     FormsModule,
     TableModule,
     ButtonModule,
-    DropdownModule,
+    SelectModule,
   ],
   templateUrl: './admissions.component.html',
   styleUrl: './admissions.component.scss',
