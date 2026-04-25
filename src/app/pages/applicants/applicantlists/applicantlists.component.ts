@@ -17,7 +17,6 @@ import {
 import { TableModule } from 'primeng/table';
 
 import { SelectModule } from 'primeng/select';
-import { Modal } from 'bootstrap';
 import {
   Application,
   ApplicationSummary,
@@ -36,6 +35,7 @@ import { TopbarComponent } from '../../../widgets/topbar/topbar.component';
 import { Router } from '@angular/router';
 import { BusyIndicatorService } from '../../../services/busy-indicator.service';
 import { FormsModule } from '@angular/forms';
+import { ActionNoteModalComponent } from '../../../widgets/action-note-modal/action-note-modal.component';
 
 interface PagingEvent {
   first: number;
@@ -58,11 +58,14 @@ interface LazyLoadEvent {
     SidebarComponent,
     TableModule,
     FormsModule,
+    ActionNoteModalComponent,
   ],
   templateUrl: './applicantlists.component.html',
   styleUrl: './applicantlists.component.scss',
 })
 export class ApplicantlistsComponent implements OnInit {
+  private readonly rejectAction = 'reject';
+  private readonly complianceAction = 'compliance';
   selectedRowData?: ApplicationSummary;
   showActionMenu = false;
   menuPosition = { x: 0, y: 0 };
@@ -84,10 +87,17 @@ export class ApplicantlistsComponent implements OnInit {
 
   rows = 10;
 
-  actionModal: Modal | undefined;
   searchText = '';
   private searchTextChanged = new Subject<string>();
   searchKeyword: string | undefined = undefined;
+  isReasonModalVisible = false;
+  isReasonActionLoading = false;
+  reasonModalTitle = '';
+  reasonModalPrompt = '';
+  reasonModalConfirmLabel = '';
+  reasonModalInitialNote = '';
+  pendingReasonAction: 'reject' | 'compliance' | null = null;
+  pendingReasonApplicant?: ApplicationSummary;
 
   constructor() {
     this._widgetService.sidebarState$.subscribe((state: sidebarStateDTO) => {
@@ -337,16 +347,7 @@ export class ApplicantlistsComponent implements OnInit {
         );
         break;
       case 'reject candidate': {
-        const note = window.prompt('Enter rejection note:', '');
-        if (note === null) return;
-        const payload: RejectApplicantPayload = {
-          applicant_ids: [applicantId],
-          extra_note: note.trim(),
-        };
-        this.performApplicantAction(
-          this._applicationService.rejectApplicants(payload),
-          'Candidate rejected successfully.',
-        );
+        this.openReasonModal(this.rejectAction, rowData);
         break;
       }
       case 'shortlist candidate':
@@ -358,28 +359,82 @@ export class ApplicantlistsComponent implements OnInit {
         );
         break;
       case 'issue compliance directive': {
-        const note = window.prompt('Enter compliance directive note:', '');
-        if (note === null) return;
-        const payload: ComplianceDirectivePayload = {
-          applicant_ids: [applicantId],
-          extra_note: note.trim(),
-        };
-        this.performApplicantAction(
-          this._applicationService.issueComplianceDirective(payload),
-          'Compliance directive issued successfully.',
-        );
+        this.openReasonModal(this.complianceAction, rowData);
         break;
       }
     }
   }
 
+  openReasonModal(
+    action: 'reject' | 'compliance',
+    rowData: ApplicationSummary,
+  ) {
+    const fullName = `${rowData.first_name} ${rowData.last_name}`.trim();
+    this.pendingReasonAction = action;
+    this.pendingReasonApplicant = rowData;
+    this.reasonModalTitle =
+      action === this.complianceAction
+        ? 'Issue Compliance Directive'
+        : 'Reject Candidate';
+    this.reasonModalPrompt =
+      action === this.complianceAction
+        ? `Do you want to issue compliance directive to ${fullName}?`
+        : `Do you want to reject ${fullName}?`;
+    this.reasonModalConfirmLabel =
+      action === this.complianceAction ? 'Issue Directive' : 'Reject Candidate';
+    this.reasonModalInitialNote = '';
+    this.isReasonModalVisible = true;
+  }
+
+  closeReasonModal() {
+    this.isReasonModalVisible = false;
+    this.pendingReasonAction = null;
+    this.pendingReasonApplicant = undefined;
+    this.reasonModalInitialNote = '';
+  }
+
+  submitReasonModal(note: string) {
+    const applicantId = this.pendingReasonApplicant?.id;
+    if (!applicantId || !this.pendingReasonAction) {
+      window.alert('Applicant ID not found for this action.');
+      return;
+    }
+
+    this.isReasonActionLoading = true;
+
+    if (this.pendingReasonAction === this.complianceAction) {
+      const payload: ComplianceDirectivePayload = {
+        applicant_ids: [applicantId],
+        extra_note: note,
+      };
+      this.performApplicantAction(
+        this._applicationService.issueComplianceDirective(payload),
+        'Compliance directive issued successfully.',
+        () => this.closeReasonModal(),
+      );
+      return;
+    }
+
+    const payload: RejectApplicantPayload = {
+      applicant_ids: [applicantId],
+      extra_note: note,
+    };
+    this.performApplicantAction(
+      this._applicationService.rejectApplicants(payload),
+      'Candidate rejected successfully.',
+      () => this.closeReasonModal(),
+    );
+  }
+
   private performApplicantAction(
     request: Observable<unknown>,
     successMessage: string,
+    onSuccess?: () => void,
   ) {
     this.busyService.show();
     request.subscribe({
       next: () => {
+        onSuccess?.();
         window.alert(successMessage);
         this.fetchRecords().subscribe((data: ApplicationListResponse) => {
           if (data.data.length > 0) {
@@ -395,6 +450,7 @@ export class ApplicantlistsComponent implements OnInit {
         window.alert(message);
       },
       complete: () => {
+        this.isReasonActionLoading = false;
         this.busyService.hide();
       },
     });

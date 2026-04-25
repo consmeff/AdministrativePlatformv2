@@ -22,6 +22,7 @@ import {
   ReusableTableComponent,
 } from '../../../widgets/reusable-table/reusable-table.component';
 import { Observable } from 'rxjs';
+import { ActionNoteModalComponent } from '../../../widgets/action-note-modal/action-note-modal.component';
 
 @Component({
   selector: 'app-applicantdetail',
@@ -32,11 +33,14 @@ import { Observable } from 'rxjs';
     RouterModule,
     TabViewModule,
     ReusableTableComponent,
+    ActionNoteModalComponent,
   ],
   templateUrl: './applicantdetail.component.html',
   styleUrl: './applicantdetail.component.scss',
 })
 export class ApplicantdetailComponent implements OnInit {
+  private readonly rejectAction = 'reject';
+  private readonly complianceAction = 'compliance';
   sidebarVisible = false;
   _widgetService = inject(WidgetService);
   _applicationservice = inject(ApplicationService);
@@ -47,6 +51,13 @@ export class ApplicantdetailComponent implements OnInit {
   isIssuingCompliance = false;
   isRejecting = false;
   isShortlisting = false;
+  isReasonModalVisible = false;
+  isReasonActionLoading = false;
+  reasonModalTitle = '';
+  reasonModalPrompt = '';
+  reasonModalConfirmLabel = '';
+  reasonModalInitialNote = '';
+  pendingReasonAction: 'reject' | 'compliance' | null = null;
   detailColumns: ReusableTableColumn[] = [
     { field: 'label', cellClass: 'fw-bold' },
     { field: 'value' },
@@ -243,34 +254,7 @@ export class ApplicantdetailComponent implements OnInit {
     if (!this.application?.id || this.isIssuingCompliance) {
       return;
     }
-
-    const note = window.prompt(
-      'Enter compliance directive note:',
-      this.application.compliance_directive ?? '',
-    );
-
-    if (note === null) {
-      return;
-    }
-
-    const payload: ComplianceDirectivePayload = {
-      applicant_ids: [this.application.id],
-      extra_note: note.trim(),
-    };
-
-    this.performApplicantAction(
-      this._applicationservice.issueComplianceDirective(payload),
-      'Compliance directive issued successfully.',
-      () => {
-        this.application.compliance_directive = payload.extra_note;
-      },
-      () => {
-        this.isIssuingCompliance = true;
-      },
-      () => {
-        this.isIssuingCompliance = false;
-      },
-    );
+    this.openReasonModal(this.complianceAction);
   }
 
   shortlistApplicant() {
@@ -296,21 +280,75 @@ export class ApplicantdetailComponent implements OnInit {
     if (!this.application?.id || this.isRejecting) {
       return;
     }
+    this.openReasonModal(this.rejectAction);
+  }
 
-    const note = window.prompt('Enter rejection note:', '');
-    if (note === null) {
+  openReasonModal(action: 'reject' | 'compliance') {
+    const fullName =
+      `${this.application.first_name} ${this.application.last_name}`.trim();
+    this.pendingReasonAction = action;
+    this.reasonModalTitle =
+      action === this.complianceAction
+        ? 'Issue Compliance Directive'
+        : 'Reject Candidate';
+    this.reasonModalPrompt =
+      action === this.complianceAction
+        ? `Do you want to issue compliance directive to ${fullName}?`
+        : `Do you want to reject ${fullName}?`;
+    this.reasonModalConfirmLabel =
+      action === this.complianceAction ? 'Issue Directive' : 'Reject Candidate';
+    this.reasonModalInitialNote =
+      action === this.complianceAction
+        ? (this.application.compliance_directive ?? '')
+        : '';
+    this.isReasonModalVisible = true;
+  }
+
+  closeReasonModal() {
+    this.isReasonModalVisible = false;
+    this.pendingReasonAction = null;
+    this.reasonModalInitialNote = '';
+  }
+
+  submitReasonModal(note: string) {
+    if (!this.application?.id || !this.pendingReasonAction) {
+      window.alert('Applicant ID not found for this action.');
+      return;
+    }
+
+    this.isReasonActionLoading = true;
+
+    if (this.pendingReasonAction === this.complianceAction) {
+      const payload: ComplianceDirectivePayload = {
+        applicant_ids: [this.application.id],
+        extra_note: note,
+      };
+      this.performApplicantAction(
+        this._applicationservice.issueComplianceDirective(payload),
+        'Compliance directive issued successfully.',
+        () => {
+          this.application.compliance_directive = payload.extra_note;
+          this.closeReasonModal();
+        },
+        () => {
+          this.isIssuingCompliance = true;
+        },
+        () => {
+          this.isIssuingCompliance = false;
+        },
+      );
       return;
     }
 
     const payload: RejectApplicantPayload = {
       applicant_ids: [this.application.id],
-      extra_note: note.trim(),
+      extra_note: note,
     };
 
     this.performApplicantAction(
       this._applicationservice.rejectApplicants(payload),
       'Candidate rejected successfully.',
-      undefined,
+      () => this.closeReasonModal(),
       () => {
         this.isRejecting = true;
       },
@@ -339,6 +377,7 @@ export class ApplicantdetailComponent implements OnInit {
         window.alert(message);
       },
       complete: () => {
+        this.isReasonActionLoading = false;
         onComplete?.();
       },
     });

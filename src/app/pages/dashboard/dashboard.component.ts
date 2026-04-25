@@ -30,6 +30,7 @@ import { DashboardInfo } from '../../model/dashboard/information.dto';
 import { BusyIndicatorService } from '../../services/busy-indicator.service';
 import { Router, RouterModule } from '@angular/router';
 import { AdminDashboardMetrics } from '../../model/dashboard/admin-dashboard.dto';
+import { ActionNoteModalComponent } from '../../widgets/action-note-modal/action-note-modal.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -42,11 +43,14 @@ import { AdminDashboardMetrics } from '../../model/dashboard/admin-dashboard.dto
     SelectModule,
     FormsModule,
     TableModule,
+    ActionNoteModalComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
 export class DashboardComponent implements OnInit, OnDestroy {
+  private readonly rejectAction = 'reject';
+  private readonly complianceAction = 'compliance';
   selectedRowData?: ApplicationSummary;
   showActionMenu = false;
   menuPosition = { x: 0, y: 0 };
@@ -89,6 +93,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     compliance: 0,
     rejected: 0,
   };
+  isReasonModalVisible = false;
+  isReasonActionLoading = false;
+  reasonModalTitle = '';
+  reasonModalPrompt = '';
+  reasonModalConfirmLabel = '';
+  reasonModalInitialNote = '';
+  pendingReasonAction: 'reject' | 'compliance' | null = null;
+  pendingReasonApplicant?: ApplicationSummary;
 
   constructor() {
     this._widgetService.sidebarState$.subscribe((state: sidebarStateDTO) => {
@@ -222,16 +234,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         );
         break;
       case 'reject candidate': {
-        const note = window.prompt('Enter rejection note:', '');
-        if (note === null) return;
-        const payload: RejectApplicantPayload = {
-          applicant_ids: [applicantId],
-          extra_note: note.trim(),
-        };
-        this.performApplicantAction(
-          this._applicationService.rejectApplicants(payload),
-          'Candidate rejected successfully.',
-        );
+        this.openReasonModal(this.rejectAction, rowData);
         break;
       }
       case 'shortlist candidate':
@@ -243,28 +246,82 @@ export class DashboardComponent implements OnInit, OnDestroy {
         );
         break;
       case 'issue compliance directive': {
-        const note = window.prompt('Enter compliance directive note:', '');
-        if (note === null) return;
-        const payload: ComplianceDirectivePayload = {
-          applicant_ids: [applicantId],
-          extra_note: note.trim(),
-        };
-        this.performApplicantAction(
-          this._applicationService.issueComplianceDirective(payload),
-          'Compliance directive issued successfully.',
-        );
+        this.openReasonModal(this.complianceAction, rowData);
         break;
       }
     }
   }
 
+  openReasonModal(
+    action: 'reject' | 'compliance',
+    rowData: ApplicationSummary,
+  ) {
+    const fullName = `${rowData.first_name} ${rowData.last_name}`.trim();
+    this.pendingReasonAction = action;
+    this.pendingReasonApplicant = rowData;
+    this.reasonModalTitle =
+      action === this.complianceAction
+        ? 'Issue Compliance Directive'
+        : 'Reject Candidate';
+    this.reasonModalPrompt =
+      action === this.complianceAction
+        ? `Do you want to issue compliance directive to ${fullName}?`
+        : `Do you want to reject ${fullName}?`;
+    this.reasonModalConfirmLabel =
+      action === this.complianceAction ? 'Issue Directive' : 'Reject Candidate';
+    this.reasonModalInitialNote = '';
+    this.isReasonModalVisible = true;
+  }
+
+  closeReasonModal() {
+    this.isReasonModalVisible = false;
+    this.pendingReasonAction = null;
+    this.pendingReasonApplicant = undefined;
+    this.reasonModalInitialNote = '';
+  }
+
+  submitReasonModal(note: string) {
+    const applicantId = this.pendingReasonApplicant?.id;
+    if (!applicantId || !this.pendingReasonAction) {
+      window.alert('Applicant ID not found for this action.');
+      return;
+    }
+
+    this.isReasonActionLoading = true;
+
+    if (this.pendingReasonAction === this.complianceAction) {
+      const payload: ComplianceDirectivePayload = {
+        applicant_ids: [applicantId],
+        extra_note: note,
+      };
+      this.performApplicantAction(
+        this._applicationService.issueComplianceDirective(payload),
+        'Compliance directive issued successfully.',
+        () => this.closeReasonModal(),
+      );
+      return;
+    }
+
+    const payload: RejectApplicantPayload = {
+      applicant_ids: [applicantId],
+      extra_note: note,
+    };
+    this.performApplicantAction(
+      this._applicationService.rejectApplicants(payload),
+      'Candidate rejected successfully.',
+      () => this.closeReasonModal(),
+    );
+  }
+
   private performApplicantAction(
     request: Observable<unknown>,
     successMessage: string,
+    onSuccess?: () => void,
   ) {
     this.busyService.show();
     request.subscribe({
       next: () => {
+        onSuccess?.();
         window.alert(successMessage);
         this.loadDashboardData();
       },
@@ -274,6 +331,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         window.alert(message);
       },
       complete: () => {
+        this.isReasonActionLoading = false;
         this.busyService.hide();
       },
     });

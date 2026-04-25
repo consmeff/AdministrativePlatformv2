@@ -329,3 +329,15 @@
     </div>
   </div>
 </div>
+
+<app-action-note-modal
+  [visible]="isReasonModalVisible"
+  [title]="reasonModalTitle"
+  [prompt]="reasonModalPrompt"
+  [confirmLabel]="reasonModalConfirmLabel"
+  [initialNote]="reasonModalInitialNote"
+  [loading]="isReasonActionLoading"
+  label="Reason:"
+  (closed)="closeReasonModal()"
+  (submitted)="submitReasonModal($event)"
+></app-action-note-modal>

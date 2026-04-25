@@ -1,0 +1,17 @@
+<button
+  [attr.type]="type"
+  class="app-btn"
+  [class.btn--full]="fullWidth"
+  [class.btn--disabled]="disabled"
+  [class]="variantClass + ' ' + modeClass"
+  [disabled]="disabled"
+  (click)="handleClick($event)"
+>
+  @if (iconClass && iconPosition === "left") {
+    <i [class]="iconClass"></i>
+  }
+  <span class="btn-label"><ng-content></ng-content></span>
+  @if (iconClass && iconPosition === "right") {
+    <i [class]="iconClass"></i>
+  }
+</button>
