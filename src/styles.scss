@@ -1,12 +1,54 @@
 @use "tailwindcss";
 @import "../node_modules/tailwindcss-primeui/v4/index.css";
 
-body {
-  font-family: "Lato", sans-serif !important;
+:root,
+[data-theme="light"] {
+  --app-bg: #f8fafc;
+  --app-surface: #ffffff;
+  --app-surface-alt: #f8fafc;
+  --app-border: #e2e8f0;
+  --app-text-primary: #0f172a;
+  --app-text-secondary: #64748b;
+  --app-text-muted: #94a3b8;
+  --app-primary: #000080;
+  --app-success: #039855;
+  --app-danger: #d92d20;
+  --app-info: #c77c27;
+  --app-link: #0d6efd;
+  --app-shadow-sm: 0 2px 5px rgba(15, 23, 42, 0.08);
 }
+
+[data-theme="dark"] {
+  --app-bg: #0b1120;
+  --app-surface: #111827;
+  --app-surface-alt: #1f2937;
+  --app-border: #334155;
+  --app-text-primary: #e2e8f0;
+  --app-text-secondary: #94a3b8;
+  --app-text-muted: #64748b;
+  --app-primary: #818cf8;
+  --app-success: #34d399;
+  --app-danger: #f87171;
+  --app-info: #f59e0b;
+  --app-link: #60a5fa;
+  --app-shadow-sm: 0 2px 5px rgba(2, 6, 23, 0.45);
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background-color: var(--app-bg);
+  color: var(--app-text-primary);
+  font-family: "Lato", sans-serif;
+}
+
 .layout .content {
   position: relative;
-  z-index: 999999; /* Ensure main content is above the sidebar */
+  z-index: 999999;
 }
 
 .is-valid {
@@ -14,11 +56,13 @@ body {
 }
 
 .is-invalid {
-  border-color: red !important;
+  border-color: #ef4444 !important;
 }
+
 .center-pane {
   z-index: 999999;
 }
+
 .body-small {
   font-family: Lato;
   font-weight: 400;
@@ -27,11 +71,33 @@ body {
   gap: 4px;
   letter-spacing: 0%;
 }
-html,
-body {
-  height: 100%;
+
+.card,
+.table,
+.table-responsive,
+.table-responsive-md {
+  background-color: transparent;
+  color: var(--app-text-primary);
 }
-body {
-  margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+
+.p-component {
+  color: var(--app-text-primary);
+}
+
+.p-tab,
+.p-tablist-tab-list,
+.p-tabpanels,
+.p-datatable,
+.p-datatable-table-container {
+  background-color: var(--app-surface);
+  color: var(--app-text-primary);
+}
+
+.p-tabpanels {
+  border: 1px solid var(--app-border);
+  border-top: 0;
+}
+
+.p-tablist-tab-list {
+  border-color: var(--app-border);
 }

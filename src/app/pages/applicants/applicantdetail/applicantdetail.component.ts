@@ -23,6 +23,7 @@ import {
 } from '../../../widgets/reusable-table/reusable-table.component';
 import { Observable } from 'rxjs';
 import { ActionNoteModalComponent } from '../../../widgets/action-note-modal/action-note-modal.component';
+import { ButtonComponent } from '../../../widgets/button/button.component';
 
 @Component({
   selector: 'app-applicantdetail',
@@ -34,6 +35,7 @@ import { ActionNoteModalComponent } from '../../../widgets/action-note-modal/act
     TabViewModule,
     ReusableTableComponent,
     ActionNoteModalComponent,
+    ButtonComponent,
   ],
   templateUrl: './applicantdetail.component.html',
   styleUrl: './applicantdetail.component.scss',
@@ -251,14 +253,23 @@ export class ApplicantdetailComponent implements OnInit {
   }
 
   issueComplianceDirective() {
-    if (!this.application?.id || this.isIssuingCompliance) {
+    if (
+      !this.application?.id ||
+      this.isIssuingCompliance ||
+      this.isComplianceIssued()
+    ) {
       return;
     }
     this.openReasonModal(this.complianceAction);
   }
 
   shortlistApplicant() {
-    if (!this.application?.id || this.isShortlisting) {
+    if (
+      !this.application?.id ||
+      this.isShortlisting ||
+      this.isShortlistedForExam() ||
+      this.isComplianceStatus()
+    ) {
       return;
     }
     this.performApplicantAction(
@@ -266,7 +277,9 @@ export class ApplicantdetailComponent implements OnInit {
         applicant_ids: [this.application.id],
       }),
       'Candidate shortlisted successfully.',
-      undefined,
+      () => {
+        this.application.approval_status = 'Shortlisted';
+      },
       () => {
         this.isShortlisting = true;
       },
@@ -277,7 +290,7 @@ export class ApplicantdetailComponent implements OnInit {
   }
 
   rejectApplicant() {
-    if (!this.application?.id || this.isRejecting) {
+    if (!this.application?.id || this.isRejecting || this.isRejected()) {
       return;
     }
     this.openReasonModal(this.rejectAction);
@@ -327,6 +340,7 @@ export class ApplicantdetailComponent implements OnInit {
         this._applicationservice.issueComplianceDirective(payload),
         'Compliance directive issued successfully.',
         () => {
+          this.application.approval_status = 'Compliance';
           this.application.compliance_directive = payload.extra_note;
           this.closeReasonModal();
         },
@@ -348,7 +362,10 @@ export class ApplicantdetailComponent implements OnInit {
     this.performApplicantAction(
       this._applicationservice.rejectApplicants(payload),
       'Candidate rejected successfully.',
-      () => this.closeReasonModal(),
+      () => {
+        this.application.approval_status = 'Rejected';
+        this.closeReasonModal();
+      },
       () => {
         this.isRejecting = true;
       },
@@ -520,5 +537,65 @@ export class ApplicantdetailComponent implements OnInit {
         actions: 'View, Download',
       },
     ];
+  }
+
+  private getNormalizedApprovalStatus(): string {
+    return (this.application?.approval_status ?? '').toLowerCase();
+  }
+
+  isShortlistedForExam(): boolean {
+    return this.getNormalizedApprovalStatus().includes('shortlist');
+  }
+
+  isComplianceStatus(): boolean {
+    return this.getNormalizedApprovalStatus().includes('compliance');
+  }
+
+  isComplianceIssued(): boolean {
+    const status = this.getNormalizedApprovalStatus();
+    return (
+      status === 'issued compliance directive' ||
+      (this.isComplianceStatus() &&
+        (this.application?.compliance_directive ?? '').trim().length > 0)
+    );
+  }
+
+  isComplianceRequired(): boolean {
+    const status = this.getNormalizedApprovalStatus();
+    return status === 'complaince required' || status === 'compliance required';
+  }
+
+  isComplianceBaseState(): boolean {
+    return this.isComplianceRequired() || this.isComplianceIssued();
+  }
+
+  isRejected(): boolean {
+    return this.getNormalizedApprovalStatus().includes('reject');
+  }
+
+  getDisplayStatus(): string {
+    if (this.isComplianceRequired()) {
+      return 'Compliance required';
+    }
+    if (this.isComplianceIssued()) {
+      return 'Issued compliance directive';
+    }
+    if (this.isShortlistedForExam()) {
+      return 'Shortlisted for Exam';
+    }
+    return this.application.approval_status ?? 'Pending';
+  }
+
+  getStatusClassName(): string {
+    if (this.isComplianceBaseState()) {
+      return 'status-compliance';
+    }
+    if (this.isShortlistedForExam()) {
+      return 'status-shortlisted';
+    }
+    if (this.isRejected()) {
+      return 'status-rejected';
+    }
+    return 'status-default';
   }
 }

@@ -1,5 +1,5 @@
 .app-btn {
-  --btn-bg: #000080;
+  --btn-bg: var(--app-primary);
   --btn-fg: #ffffff;
   --btn-border: var(--btn-bg);
   --btn-outline-fg: var(--btn-bg);
@@ -34,39 +34,39 @@
 }
 
 .btn--primary {
-  --btn-bg: #000080;
+  --btn-bg: var(--app-primary);
   --btn-fg: #ffffff;
 }
 
 .btn--secondary {
-  --btn-bg: #039855;
+  --btn-bg: var(--app-success);
   --btn-fg: #ffffff;
 }
 
 .btn--info {
-  --btn-bg: #c77c27;
+  --btn-bg: var(--app-info);
   --btn-fg: #ffffff;
 }
 
 .btn--danger {
-  --btn-bg: #d92d20;
+  --btn-bg: var(--app-danger);
   --btn-fg: #ffffff;
 }
 
 .btn--neutral {
-  --btn-bg: #ffffff;
-  --btn-fg: #000080;
-  --btn-border: #ffffff;
-  --btn-outline-fg: #000080;
-  --btn-outline-border: #000080;
+  --btn-bg: var(--app-surface);
+  --btn-fg: var(--app-primary);
+  --btn-border: var(--app-surface);
+  --btn-outline-fg: var(--app-primary);
+  --btn-outline-border: var(--app-primary);
 }
 
 .btn--muted {
-  --btn-bg: #f8fafc;
-  --btn-fg: #667085;
-  --btn-border: #f8fafc;
-  --btn-outline-fg: #667085;
-  --btn-outline-border: #667085;
+  --btn-bg: var(--app-surface-alt);
+  --btn-fg: var(--app-text-secondary);
+  --btn-border: var(--app-surface-alt);
+  --btn-outline-fg: var(--app-text-secondary);
+  --btn-outline-border: var(--app-text-secondary);
 }
 
 .btn-label {

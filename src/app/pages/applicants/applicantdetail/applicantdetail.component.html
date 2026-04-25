@@ -31,8 +31,8 @@
             </div>
             <div class="body-small">
               Status:
-              <span style="color: rgba(199, 124, 39, 1)">{{
-                application.approval_status
+              <span [ngClass]="getStatusClassName()">{{
+                getDisplayStatus()
               }}</span>
             </div>
           </div>
@@ -136,39 +136,73 @@
       </div>
 
       <div class="fourth-row my-5 d-flex justify-content-between flex-row">
-        <button
-          type="button"
-          class="compl d-flex justify-content-center align-content-center p-3"
-          [disabled]="isIssuingCompliance || !application.id"
-          (click)="issueComplianceDirective()"
-        >
-          <i class="bi bi-exclamation-triangle mx-3 text-white"></i>
-          <span>{{
-            isIssuingCompliance
-              ? "Issuing Compliance Directive..."
-              : "Issue Compliance Directive"
-          }}</span>
-        </button>
-        <div class="d-flex flex-row">
-          <button
-            type="button"
-            class="reject p-3"
-            [disabled]="isRejecting || !application.id"
-            (click)="rejectApplicant()"
+        @if (isComplianceBaseState()) {
+          <div class="status-note compliance-note w-100 text-center">
+            {{
+              isComplianceIssued()
+                ? "Compliance Directive have been issued on this candidate."
+                : "Compliance is required on this candidate."
+            }}
+          </div>
+        } @else if (isShortlistedForExam()) {
+          <app-button
+            variant="info"
+            [outline]="true"
+            iconClass="bi bi-exclamation-triangle"
+            [disabled]="isIssuingCompliance || !application.id"
+            (buttonClick)="issueComplianceDirective()"
           >
-            <i class="bi bi-x mx-3 text-white"></i>
-            <span>{{ isRejecting ? "Rejecting..." : "Reject" }}</span>
-          </button>
-          <button
-            type="button"
-            class="mx-5 short p-3"
-            [disabled]="isShortlisting || !application.id"
-            (click)="shortlistApplicant()"
+            {{
+              isIssuingCompliance
+                ? "Issuing Compliance Directive..."
+                : "Issue Compliance Directive"
+            }}
+          </app-button>
+          <div class="status-note">
+            Candidate have already been Shortlisted. Do you want to
+            <button
+              type="button"
+              class="inline-link"
+              [disabled]="isRejecting || !application.id"
+              (click)="rejectApplicant()"
+            >
+              {{ isRejecting ? "Rejecting..." : "Reject Candidate?" }}
+            </button>
+          </div>
+        } @else {
+          <app-button
+            variant="info"
+            [outline]="true"
+            iconClass="bi bi-exclamation-triangle"
+            [disabled]="isIssuingCompliance || !application.id"
+            (buttonClick)="issueComplianceDirective()"
           >
-            <i class="bi bi-check mx-3 text-white"></i>
-            <span>{{ isShortlisting ? "Shortlisting..." : "Shortlist" }}</span>
-          </button>
-        </div>
+            {{
+              isIssuingCompliance
+                ? "Issuing Compliance Directive..."
+                : "Issue Compliance Directive"
+            }}
+          </app-button>
+          <div class="d-flex flex-row">
+            <app-button
+              variant="muted"
+              iconClass="bi bi-x"
+              [disabled]="isRejecting || !application.id"
+              (buttonClick)="rejectApplicant()"
+            >
+              {{ isRejecting ? "Rejecting..." : "Reject" }}
+            </app-button>
+            <app-button
+              class="mx-5"
+              variant="muted"
+              iconClass="bi bi-check"
+              [disabled]="isShortlisting || !application.id"
+              (buttonClick)="shortlistApplicant()"
+            >
+              {{ isShortlisting ? "Shortlisting..." : "Shortlist" }}
+            </app-button>
+          </div>
+        }
       </div>
     </div>
   </div>

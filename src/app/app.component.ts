@@ -5,6 +5,7 @@ import { BusyIndicatorService } from './services/busy-indicator.service';
 import { Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { AppStore } from './store/app.store';
+import { ThemeService } from './services/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -15,10 +16,12 @@ import { AppStore } from './store/app.store';
 export class AppComponent {
   readonly appStore = inject(AppStore);
   private readonly busyIndicatorService = inject(BusyIndicatorService);
+  private readonly themeService = inject(ThemeService);
 
   isLoading$: Observable<boolean>;
 
   constructor() {
+    this.themeService.initialize();
     this.isLoading$ = this.busyIndicatorService.isLoading$;
     this.appStore.markInitialized();
   }
