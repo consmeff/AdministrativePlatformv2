@@ -1,0 +1,49 @@
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--tone-color, var(--app-text-secondary));
+}
+
+.status-indicator.pill {
+  background: var(--tone-bg, rgba(148, 163, 184, 0.15));
+  color: var(--tone-color, var(--app-text-secondary));
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background-color: var(--tone-color, var(--app-text-secondary));
+}
+
+[data-tone="pending"] {
+  --tone-color: #f59e0b;
+  --tone-bg: rgba(245, 158, 11, 0.15);
+}
+
+[data-tone="shortlisted"] {
+  --tone-color: #039855;
+  --tone-bg: rgba(3, 152, 85, 0.15);
+}
+
+[data-tone="directive"] {
+  --tone-color: #ef4444;
+  --tone-bg: rgba(239, 68, 68, 0.15);
+}
+
+[data-tone="resubmitted"] {
+  --tone-color: #c026d3;
+  --tone-bg: rgba(192, 38, 211, 0.14);
+}
+
+[data-tone="rejected"] {
+  --tone-color: #d92d20;
+  --tone-bg: rgba(217, 45, 32, 0.14);
+}

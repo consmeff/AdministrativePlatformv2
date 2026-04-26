@@ -1,207 +1,159 @@
-<div class="row section3 mt-5">
-  <div class="col-6" style="position: relative">
-    <div class="input-container">
-      <input
-        type="text"
-        [(ngModel)]="searchText"
-        (ngModelChange)="onSearchTextChanged($event)"
-        type="text"
-        name=""
-        id=""
-        class="form-control"
-        class="form-control"
-        placeholder="Search by name, application no. or preferred programme"
-        style="width: 480px; height: 52px; border-radius: 12px"
-        aria-describedby="helpId"
-      />
+<section class="applications-page">
+  <header class="top-cards">
+    <app-metric-card
+      [active]="true"
+      title="All Applicants"
+      [value]="metrics.total_applicants || total_record_count"
+    />
+    <app-metric-card
+      title="Pending Review"
+      [value]="metrics.approval_status_breakdown.total_pending"
+    />
+    <app-metric-card
+      title="Shortlisted"
+      [value]="metrics.approval_status_breakdown.total_shortlisted"
+    />
+    <app-metric-card
+      title="Directive Issued"
+      [value]="metrics.approval_status_breakdown.total_compliance_required"
+    />
+    <app-metric-card title="Resubmitted" [value]="0" />
+  </header>
 
-      <img
-        class="search-icon"
-        src="assets/dashboard/search.png"
-        alt=""
-        srcset=""
+  <section class="bulk-actions">
+    <span class="selected-count"
+      >{{ selectedApplicantIds.length }} Candidates selected</span
+    >
+    <app-button
+      variant="outline"
+      iconClass="bi bi-exclamation-triangle"
+      (buttonClick)="openComplianceForSelected()"
+      [disabled]="selectedApplicantIds.length === 0"
+    >
+      Issue Compliance Directive
+    </app-button>
+    <app-button
+      variant="primary"
+      (buttonClick)="shortlistSelected()"
+      [disabled]="selectedApplicantIds.length === 0"
+    >
+      Shortlist
+    </app-button>
+  </section>
+
+  <section class="filters-row">
+    <div class="filter-main">
+      <app-search-input
+        [model]="searchText"
+        (modelChange)="searchText = $event; onSearchTextChanged($event)"
+        placeholder="Search by name or application no."
       />
     </div>
-  </div>
-  <div class="col-6 d-flex justify-content-end">
-    <button type="button" class="btn btn-primary">
-      Export Now <i class="bi bi-file-earmark-arrow-down text-white"></i>
+    <app-filter-select
+      [options]="statusOptions"
+      [model]="selectedStatus"
+      optionLabel="label"
+      placeholder="All Status"
+      (modelChange)="onStatusChange($event)"
+    />
+    <app-filter-select
+      [options]="programmeOptions"
+      [model]="selectedProgramme"
+      optionLabel="label"
+      placeholder="All Programmes"
+      (modelChange)="onProgrammeChange($event)"
+    />
+    <button type="button" class="ghost-btn">
+      Export List <i class="bi bi-download"></i>
     </button>
-  </div>
-</div>
+    <button type="button" class="ghost-btn">
+      Update with File <i class="bi bi-file-earmark-arrow-up"></i>
+    </button>
+  </section>
 
-<div class="row section3 mt-5">
-  <div class="d-flex justify-content-between">
-    <div class="card-title">All Applications ({{ total_record_count }})</div>
-    <p-select
-      [options]="approval_status"
-      [(ngModel)]="selectedStatus"
-      optionLabel="name"
-      placeholder="Select a status"
-      (onChange)="onStatusChange($event)"
-    >
-    </p-select>
-  </div>
-  <div class="summary-table">
-    <p-table
-      [columns]="cols"
-      [value]="app_summ"
-      [tableStyle]="{ 'min-width': '50rem' }"
-      [paginator]="true"
-      [rows]="rows"
-      [totalRecords]="total_record_count"
-      [lazy]="true"
-      (onLazyLoad)="onLazyLoad($event)"
-      [showCurrentPageReport]="true"
-      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-      [rowsPerPageOptions]="[10, 20, 50, 100, 150, 200]"
-    >
-      <ng-template pTemplate="header" let-columns>
+  <section class="table-wrap">
+    <p-table [value]="filteredRows" [tableStyle]="{ 'min-width': '75rem' }">
+      <ng-template pTemplate="header">
         <tr>
-          <th *ngFor="let col of columns" [pSortableColumn]="col.field">
-            {{ col.header }}
-            <p-sortIcon [field]="col.field"></p-sortIcon>
+          <th>
+            <input
+              type="checkbox"
+              [checked]="allRowsSelected()"
+              (change)="toggleSelectAll($any($event.target).checked)"
+            />
           </th>
+          @for (header of tableColumns; track header) {
+            <th>{{ header }}</th>
+          }
         </tr>
       </ng-template>
-
-      <!-- <ng-template pTemplate="body" let-rowData let-columns="columns">
-                            <tr>
-                                <td *ngFor="let col of columns">
-                                    <span class="action-icon" *ngIf="col.field === 'action'"
-                                        (click)="showActionModal($event, rowData)"
-                                        [innerHTML]="rowData[col.field]"></span>
-                                    <span *ngIf="col.field !== 'action'">{{ rowData[col.field] }}</span>
-                                </td>
-                            </tr>
-                        </ng-template> -->
-      <ng-template pTemplate="body" let-rowData let-columns="columns">
+      <ng-template pTemplate="body" let-row>
         <tr>
-          <td *ngFor="let col of columns">
-            <span
-              class="action-icon"
-              *ngIf="col.field === 'action'"
-              (click)="showActionModal($event, rowData)"
-              [innerHTML]="rowData[col.field]"
-            ></span>
-            <span *ngIf="col.field !== 'action'">{{ rowData[col.field] }}</span>
-
-            <!-- Action Menu (positioned absolutely near the clicked icon) -->
-            <div
-              class="action-menu"
-              *ngIf="
-                selectedRowData?.application_no === rowData.application_no &&
-                showActionMenu
-              "
-              [ngStyle]="{
-                top: menuPosition.y + 'px',
-                left: menuPosition.x - 10 + 'px',
-              }"
-            >
-              <ul class="list-group">
-                <li
-                  class="list-group-item list-group-item-action eye"
-                  (click)="handleAction('view profile', rowData)"
-                >
-                  <div
-                    class="d-flex justify-content-between align-items-center"
-                  >
-                    <span>View Profile</span>
-                    <div
-                      style="
-                        padding: 3px;
-                        background-color: rgba(0, 0, 128, 0.06);
-                        padding: 2px 4px;
-                        border-radius: 3px;
-                      "
-                    >
-                      <i
-                        class="bi bi-eye"
-                        style="color: rgba(0, 0, 128, 1)"
-                      ></i>
-                    </div>
-                  </div>
-                </li>
-                <li
-                  class="list-group-item list-group-item-action x"
-                  (click)="handleAction('reject candidate', rowData)"
-                >
-                  <div
-                    class="d-flex justify-content-between align-items-center"
-                  >
-                    <span>Reject Candidate</span>
-                    <div
-                      style="
-                        padding: 3px;
-                        background-color: rgba(219, 66, 66, 0.104);
-                        padding: 2px 4px;
-                        border-radius: 3px;
-                      "
-                    >
-                      <i class="bi bi-x" style="color: rgb(219, 66, 66)"></i>
-                    </div>
-                  </div>
-                </li>
-                <li
-                  class="list-group-item list-group-item-action check"
-                  (click)="handleAction('shortlist candidate', rowData)"
-                >
-                  <div
-                    class="d-flex justify-content-between align-items-center"
-                  >
-                    <span>Shortlist Candidate</span>
-                    <div
-                      style="
-                        padding: 3px;
-                        background-color: rgba(4, 250, 65, 0.104);
-                        padding: 2px 4px;
-                        border-radius: 3px;
-                      "
-                    >
-                      <i class="bi bi-check" style="color: rgb(4, 250, 66)"></i>
-                    </div>
-                  </div>
-                </li>
-                <li
-                  class="list-group-item list-group-item-action excl"
-                  (click)="handleAction('issue compliance directive', rowData)"
-                >
-                  <div
-                    class="d-flex justify-content-between align-items-center"
-                  >
-                    <span>Issue Compliance Directive</span>
-                    <div
-                      style="
-                        padding: 3px;
-                        background-color: rgba(239, 153, 5, 0.055);
-                        padding: 2px 4px;
-                        border-radius: 3px;
-                      "
-                    >
-                      <i
-                        class="bi bi-exclamation-triangle"
-                        style="color: rgb(239, 153, 5)"
-                      ></i>
-                    </div>
-                  </div>
-                </li>
-              </ul>
-            </div>
+          <td>
+            <input
+              type="checkbox"
+              [checked]="isSelected(row.id)"
+              (change)="toggleRowSelection(row.id, $any($event.target).checked)"
+            />
+          </td>
+          <td>
+            <div class="applicant-name">{{ row.full_name }}</div>
+            <div class="application-no">{{ row.application_no }}</div>
+          </td>
+          <td>
+            <app-status-indicator
+              [dot]="false"
+              [pill]="true"
+              tone="shortlisted"
+              [text]="row.jamb_score"
+            />
+          </td>
+          <td>{{ row.o_level }}</td>
+          <td>{{ row.submission_date }}</td>
+          <td>{{ row.programme }}</td>
+          <td>
+            <app-status-indicator
+              [text]="row.status_text"
+              [tone]="row.status_tone"
+            />
+          </td>
+          <td>
+            <app-table-row-actions
+              (view)="viewProfile(row)"
+              (shortlist)="shortlistSingle(row)"
+              (compliance)="openComplianceForSingle(row)"
+            />
           </td>
         </tr>
       </ng-template>
     </p-table>
-  </div>
-</div>
+  </section>
+
+  <app-pagination
+    [first]="first"
+    [rows]="rows"
+    [totalRecords]="total_record_count"
+    [rowsPerPageOptions]="[10, 20, 50, 100]"
+    reportTemplate="Showing {first} to {last} of {totalRecords} items"
+    (pageChange)="onPageChange($event)"
+  />
+</section>
 
 <app-action-note-modal
   [visible]="isReasonModalVisible"
   [title]="reasonModalTitle"
   [prompt]="reasonModalPrompt"
+  [subtitle]="'This will notify the applicant to correct their submission'"
   [confirmLabel]="reasonModalConfirmLabel"
   [initialNote]="reasonModalInitialNote"
   [loading]="isReasonActionLoading"
-  label="Reason:"
+  [showReasonSelect]="true"
+  [reasonOptions]="directiveReasons"
+  [selectedReason]="directiveSelectedReason"
+  [documentOptions]="directiveDocumentOptions"
+  [selectedDocuments]="directiveSelectedDocuments"
+  [notesLabel]="'Additional Notes:'"
+  [notesHint]="'(optional)'"
   (closed)="closeReasonModal()"
-  (submitted)="submitReasonModal($event)"
+  (submittedPayload)="submitReasonModalPayload($event)"
 ></app-action-note-modal>

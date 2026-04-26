@@ -1,0 +1,44 @@
+.metric-card {
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  background-color: var(--app-surface);
+  padding: 1rem 1.15rem;
+  min-height: 96px;
+}
+
+.metric-card.active {
+  background-color: var(--app-primary);
+  border-color: var(--app-primary);
+  color: #ffffff;
+}
+
+.metric-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.metric-head h3 {
+  margin: 0;
+  font-size: 1.65rem;
+  font-weight: 700;
+}
+
+.metric-head img {
+  width: 26px;
+  height: 26px;
+}
+
+.metric-title {
+  margin: 0.15rem 0 0;
+  font-size: 0.9rem;
+  color: var(--app-text-secondary);
+}
+
+.metric-card.active .metric-title {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+small {
+  color: var(--app-text-muted);
+}

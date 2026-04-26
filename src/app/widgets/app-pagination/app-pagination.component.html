@@ -1,0 +1,9 @@
+<p-paginator
+  [first]="first"
+  [rows]="rows"
+  [totalRecords]="totalRecords"
+  [rowsPerPageOptions]="rowsPerPageOptions"
+  [showCurrentPageReport]="true"
+  [currentPageReportTemplate]="reportTemplate"
+  (onPageChange)="pageChange.emit($event)"
+></p-paginator>

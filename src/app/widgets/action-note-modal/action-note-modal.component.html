@@ -12,8 +12,54 @@
 
       <h2 class="modal-title">{{ title }}</h2>
       <p class="modal-prompt">{{ prompt }}</p>
+      @if (subtitle) {
+        <p class="modal-subtitle">{{ subtitle }}</p>
+      }
 
-      <label class="modal-label" for="action-note-reason">{{ label }}</label>
+      @if (documentOptions.length > 0) {
+        <div class="field-block">
+          <p class="field-label" id="affected-documents-label">
+            Affected Documents
+          </p>
+          <div
+            class="checkbox-grid"
+            role="group"
+            aria-labelledby="affected-documents-label"
+          >
+            @for (doc of documentOptions; track doc) {
+              <label class="check-row">
+                <input
+                  type="checkbox"
+                  [disabled]="loading"
+                  [checked]="affectedDocumentsInternal.includes(doc)"
+                  (change)="onDocumentToggle(doc, $any($event.target).checked)"
+                />
+                <span>{{ doc }}</span>
+              </label>
+            }
+          </div>
+        </div>
+      }
+
+      @if (showReasonSelect) {
+        <div class="field-block">
+          <label class="field-label" for="action-note-reason-select"
+            >Reason:</label
+          >
+          <p-select
+            id="action-note-reason-select"
+            [options]="reasonDropdownOptions"
+            [(ngModel)]="reason"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select reason"
+          />
+        </div>
+      }
+
+      <label class="modal-label" for="action-note-reason"
+        >{{ notesLabel }} <span>{{ notesHint }}</span></label
+      >
       <textarea
         id="action-note-reason"
         [(ngModel)]="note"

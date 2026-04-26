@@ -1,0 +1,8 @@
+<p-select
+  [options]="options"
+  [ngModel]="model"
+  (ngModelChange)="modelChange.emit($event)"
+  [optionLabel]="optionLabel"
+  [placeholder]="placeholder"
+  styleClass="app-filter-select"
+></p-select>

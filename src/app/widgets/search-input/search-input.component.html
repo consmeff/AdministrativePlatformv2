@@ -1,0 +1,12 @@
+<div class="search-wrap">
+  <input
+    type="text"
+    class="form-control"
+    [placeholder]="placeholder"
+    [ngModel]="model"
+    (ngModelChange)="modelChange.emit($event)"
+  />
+  <button type="button" class="search-btn" aria-label="Search">
+    <i class="bi bi-search"></i>
+  </button>
+</div>
