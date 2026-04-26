@@ -1,128 +1,94 @@
-.statcard {
-  height: 150px;
+.dashboard-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-.first-cards img {
-  height: 28px;
+.section-title {
+  margin: 0;
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: #0b1b54;
 }
 
-.section2 .card {
-  height: 201px;
+.status-section {
+  padding-top: 0.25rem;
 }
 
-.center-pane {
-  z-index: 999999;
+.status-body {
+  margin-top: 0.9rem;
+  max-width: 430px;
 }
 
-button {
-  width: 135px;
-  height: 44px;
-  gap: 8px;
-  border-radius: 8px;
-  // padding-top: 16px;
-  padding-right: 20px;
-  // padding-bottom: 16px;
-  padding-left: 20px;
-  background-color: var(--app-primary);
-  color: #fafafc;
-}
-h6 {
-  font-size: 14px;
+.recent-section {
+  margin-top: 0.3rem;
 }
 
-.section2 {
-  font-size: 14px;
+.recent-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.65rem;
 }
-.export-pane .tiny {
-  font-size: 12px;
-}
-.card-title {
-  font-weight: bold;
-}
-.summary-table th {
-  font-size: 13px;
-  font-weight: 600px;
-}
-.summary-table tr {
-  font-size: 13px;
-  font-weight: 400px;
-}
+
 .viewall {
-  font-size: 13px;
-  font-weight: 400px;
+  color: var(--app-primary);
+  font-size: 1.25rem;
+  font-weight: 600;
   cursor: pointer;
-  color: var(--app-primary) !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
 }
 
-.metric .card-text {
-  font-family: Lato;
-  font-weight: 700;
-  font-size: 24px;
-  line-height: 100%;
-  letter-spacing: 0%;
+.summary-table {
+  border: 1px solid #eef1f6;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
 }
 
-.card-text .d-flex.justify-content-between span:last-child {
-  font-family: Lato;
-  font-weight: 700;
-  font-size: 14px;
-  line-height: 150%;
-  letter-spacing: 0%;
+.summary-table :deep(.p-datatable-thead > tr > th) {
+  border-bottom: 1px solid #edf1f7;
+  color: #111827;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0.95rem 0.8rem;
+  background: #ffffff;
 }
 
-.last-sec {
-  font-family: Lato;
-  font-weight: 700;
-  font-size: 13px;
-  line-height: 150%;
-  letter-spacing: 0%;
+.summary-table :deep(.p-datatable-tbody > tr > td) {
+  border-bottom: 1px solid #f3f5f8;
+  color: #1f2937;
+  font-size: 0.92rem;
+  padding: 0.9rem 0.8rem;
 }
 
-.action-icon {
-  cursor: pointer;
-  color: var(--app-link);
-}
-
-.action-icon:hover {
-  filter: brightness(0.9);
-}
-
-.action-menu {
-  position: fixed;
-  z-index: 1050;
-  min-width: 250px;
-  background: var(--app-surface);
-  border: 1px solid var(--app-border);
-  border-radius: 0.25rem;
-  box-shadow: 2px 2px 1px rgba(197, 196, 196, 0.15);
-}
-
-.action-menu .list-group-item {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-bottom: 1px solid var(--app-border);
-}
-
-.action-menu .list-group-item:last-child {
+.summary-table :deep(.p-datatable-tbody > tr:last-child > td) {
   border-bottom: none;
 }
 
-.action-menu .list-group-item:hover {
-  cursor: pointer;
+.checkbox-col {
+  width: 38px;
+  text-align: center;
 }
 
-.action-menu .eye:hover {
-  background-color: rgba(0, 0, 128, 0.06);
+.applicant-name {
+  font-weight: 600;
 }
 
-.action-menu .x:hover {
-  background-color: rgba(219, 66, 66, 0.104);
+.application-no {
+  color: #6b7280;
+  font-size: 0.8rem;
+  margin-top: 2px;
 }
 
-.action-menu .check:hover {
-  background-color: rgba(4, 250, 65, 0.104);
-}
+@media (max-width: 992px) {
+  .section-title {
+    font-size: 1.35rem;
+  }
 
-.action-menu .excl:hover {
-  background-color: rgba(239, 153, 5, 0.055);
+  .viewall {
+    font-size: 1rem;
+  }
 }

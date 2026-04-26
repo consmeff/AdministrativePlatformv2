@@ -1,13 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { TableModule } from 'primeng/table';
-import { SelectModule } from 'primeng/select';
 import { forkJoin, Observable, Subject, Subscription, takeUntil } from 'rxjs';
 import { AdminDashboardMetrics } from '../../model/dashboard/admin-dashboard.dto';
 import { Application } from '../../model/dashboard/applicant';
-import { role } from '../../model/page.dto';
 import {
   ApplicationService,
   ComplianceDirectivePayload,
@@ -30,7 +27,9 @@ import { TableRowActionsComponent } from '../../widgets/table-row-actions/table-
 interface DashboardRow {
   id: number;
   application_no: string;
-  full_name: string;
+  applicant: string;
+  jamb_score: number;
+  o_level: string;
   submission_date: string;
   programme: string;
   status_text: string;
@@ -43,8 +42,6 @@ interface DashboardRow {
     CommonModule,
     RouterModule,
     DoughnutComponent,
-    SelectModule,
-    FormsModule,
     TableModule,
     ActionNoteModalComponent,
     MetricCardComponent,
@@ -63,14 +60,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private readonly busyService = inject(BusyIndicatorService);
 
   _dash: DashboardInfo = {} as DashboardInfo;
-  staffs: role[] = [];
-  selectedstaff = 1;
 
   tableColumns = [
-    'Application Number',
-    'Candidate',
+    'Applicant',
+    'JAMB',
+    'O Level',
     'Submission Date',
-    'Pref. Programme',
+    'Programme',
     'Status',
     'Actions',
   ];
@@ -91,16 +87,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
     },
     payment_status_counts: [],
   };
-  paymentCounts: Record<string, number> = { initiated: 0 };
   chartData: {
     pending: number;
     shortlisted: number;
-    compliance: number;
+    resubmitted: number;
     rejected: number;
   } = {
     pending: 0,
     shortlisted: 0,
-    compliance: 0,
+    resubmitted: 0,
     rejected: 0,
   };
 
@@ -135,26 +130,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.busyService.show();
     this.loadDashboardData();
-    this.staffs = [
-      { name: 'Acad. Officer', code: 1 },
-      { name: 'Admin', code: 2 },
-    ];
   }
 
   private updateMetricsViewModel(): void {
-    this.paymentCounts = this.metrics.payment_status_counts.reduce<
-      Record<string, number>
-    >(
-      (acc, curr) => {
-        acc[curr.payment_status.toLowerCase()] = curr.count;
-        return acc;
-      },
-      { initiated: 0 },
-    );
     this.chartData = {
       pending: this.metrics.approval_status_breakdown.total_pending,
       shortlisted: this.metrics.approval_status_breakdown.total_shortlisted,
-      compliance:
+      resubmitted:
         this.metrics.approval_status_breakdown.total_compliance_required,
       rejected: this.metrics.approval_status_breakdown.total_rejected,
     };
@@ -166,7 +148,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
       return {
         id: item.id,
         application_no: item.application_no,
-        full_name: `${item.first_name} ${item.last_name}`.trim(),
+        applicant: `${item.first_name} ${item.last_name}`.trim(),
+        jamb_score: item.utme_result?.score ?? 0,
+        o_level: `${item.o_level_result?.[0]?.subjects?.length ?? 0} Credits`,
         submission_date: this.formatDate(item.created_at),
         programme: item.program?.name ?? 'N/A',
         status_text: status.text,
@@ -219,7 +203,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   openComplianceForSingle(row: DashboardRow) {
     this.pendingDirectiveApplicantId = row.id;
-    this.reasonModalPrompt = `Issue compliance directive to ${row.full_name}?`;
+    this.reasonModalPrompt = `Issue compliance directive to ${row.applicant}?`;
     this.reasonModalInitialNote = '';
     this.directiveSelectedReason = '';
     this.directiveSelectedDocuments = [];

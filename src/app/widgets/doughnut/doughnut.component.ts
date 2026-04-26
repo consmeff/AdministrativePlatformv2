@@ -16,15 +16,15 @@ import {
 })
 export class DoughnutComponent implements OnInit, OnChanges {
   @Input() chartData: {
-    pending: number;
     shortlisted: number;
-    compliance: number;
+    pending: number;
+    resubmitted: number;
     rejected: number;
-  } = { pending: 0, shortlisted: 0, compliance: 0, rejected: 0 };
+  } = { shortlisted: 0, pending: 0, resubmitted: 0, rejected: 0 };
 
   chart?: Chart<'doughnut'>;
   legendItems: { label: string; value: number; color: string }[] = [];
-  private colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'];
+  private colors = ['#0b1fa6', '#5f6bc8', '#9aa1e0', '#e6e9fb'];
 
   ngOnInit(): void {
     this.createChart();
@@ -34,18 +34,18 @@ export class DoughnutComponent implements OnInit, OnChanges {
   private prepareLegendItems(): void {
     this.legendItems = [
       {
-        label: 'Pending',
-        value: this.chartData.pending,
+        label: 'Shortlisted',
+        value: this.chartData.shortlisted,
         color: this.colors[0],
       },
       {
-        label: 'Shortlisted',
-        value: this.chartData.shortlisted,
+        label: 'Pending',
+        value: this.chartData.pending,
         color: this.colors[1],
       },
       {
-        label: 'Compliance',
-        value: this.chartData.compliance,
+        label: 'Resubmitted',
+        value: this.chartData.resubmitted,
         color: this.colors[2],
       },
       {
@@ -68,13 +68,13 @@ export class DoughnutComponent implements OnInit, OnChanges {
     this.chart = new Chart(ctx, {
       type: 'doughnut',
       data: {
-        labels: ['Pending', 'Shortlisted', 'Compliance', 'Rejected'],
+        labels: ['Shortlisted', 'Pending', 'Resubmitted', 'Rejected'],
         datasets: [
           {
             data: [
-              this.chartData.pending,
               this.chartData.shortlisted,
-              this.chartData.compliance,
+              this.chartData.pending,
+              this.chartData.resubmitted,
               this.chartData.rejected,
             ],
             backgroundColor: this.colors,
@@ -112,9 +112,9 @@ export class DoughnutComponent implements OnInit, OnChanges {
   ngOnChanges(): void {
     if (this.chart) {
       this.chart.data.datasets[0].data = [
-        this.chartData.pending,
         this.chartData.shortlisted,
-        this.chartData.compliance,
+        this.chartData.pending,
+        this.chartData.resubmitted,
         this.chartData.rejected,
       ];
       this.chart.update();

@@ -1,152 +1,93 @@
-<div class="row g-3 mb-4 first-cards">
-  <div class="col-12 col-sm-6 col-lg-3">
-    <app-metric-card
-      [active]="true"
-      title="Total Applications"
-      [value]="metrics.total_applicants"
-      icon="assets/dashboard/Capa_1.png"
-    />
+<section class="dashboard-page">
+  <div class="row g-3 first-cards">
+    <div class="col-12 col-sm-6 col-lg-3">
+      <app-metric-card
+        title="Total Applications"
+        [value]="metrics.total_applicants"
+        icon="assets/dashboard/Capa_1.png"
+      />
+    </div>
+    <div class="col-12 col-sm-6 col-lg-3">
+      <app-metric-card
+        title="Shortlisted Applications"
+        [value]="metrics.approval_status_breakdown.total_shortlisted"
+        icon="assets/dashboard/Layer_1.png"
+      />
+    </div>
+    <div class="col-12 col-sm-6 col-lg-3">
+      <app-metric-card
+        title="Pending Reviews"
+        [value]="metrics.approval_status_breakdown.total_pending"
+        icon="assets/dashboard/Layer_2.png"
+      />
+    </div>
+    <div class="col-12 col-sm-6 col-lg-3">
+      <app-metric-card
+        title="Admitted Candidates"
+        [value]="metrics.approval_status_breakdown.total_approved"
+        icon="assets/dashboard/Layer_4.png"
+      />
+    </div>
   </div>
-  <div class="col-12 col-sm-6 col-lg-3">
-    <app-metric-card
-      title="Shortlisted Applications"
-      [value]="metrics.approval_status_breakdown.total_shortlisted"
-      icon="assets/dashboard/Layer_1.png"
-    />
-  </div>
-  <div class="col-12 col-sm-6 col-lg-3">
-    <app-metric-card
-      title="Pending Review"
-      [value]="metrics.approval_status_breakdown.total_pending"
-      icon="assets/dashboard/Layer_2.png"
-    />
-  </div>
-  <div class="col-12 col-sm-6 col-lg-3">
-    <app-metric-card
-      title="Rejected Applications"
-      [value]="metrics.approval_status_breakdown.total_rejected"
-      icon="assets/dashboard/Layer_3.png"
-    />
-  </div>
-</div>
 
-<div class="row section2 mt-5">
-  <div class="col-4">
-    <div
-      class="card border-0 h-100"
-      style="
-        background: linear-gradient(to right, transparent 99.8%, #eaecee 1%);
-      "
-    >
-      <div class="card-body first-sec" style="padding: 0 10px">
-        <h6 class="card-title">Most Preferred Courses</h6>
-        <div class="card-text d-flex flex-column">
-          <div
-            class="d-flex justify-content-between mb-3"
-            *ngFor="let course of metrics.top_5_courses"
-          >
-            <span>{{ course.department__name }}</span>
-            <span>{{ course.applicant_count }}</span>
-          </div>
-        </div>
-      </div>
+  <section class="status-section">
+    <h3 class="section-title">Application Status</h3>
+    <div class="status-body">
+      <app-doughnut [chartData]="chartData"></app-doughnut>
     </div>
-  </div>
-  <div class="col-4">
-    <div
-      class="card border-0 h-100"
-      style="
-        background: linear-gradient(to right, transparent 99.8%, #eff0f1 1%);
-      "
-    >
-      <div class="card-body" style="padding: 0 10px">
-        <div class="d-flex justify-content-between mb-4">
-          <h6 class="card-title">Application Status</h6>
-          <p-select
-            [options]="staffs"
-            [(ngModel)]="selectedstaff"
-            optionLabel="name"
-            placeholder="Select a staff"
-          />
-        </div>
-        <div class="card-text d-flex flex-column">
-          <app-doughnut [chartData]="chartData"></app-doughnut>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-4">
-    <div class="card border-0 h-100">
-      <div class="card-body export-pane" style="padding: 0 10px">
-        <div class="d-flex flex-row justify-content-between mb-5">
-          <img src="assets/dashboard/export1.png" style="height: 40px" alt="" />
-          <div class="d-flex flex-column">
-            <h6 class="card-title"><span>Export Candidate Shortlist</span></h6>
-            <span class="tiny"
-              >Generate CSV file for CBT exam provisioning.</span
-            >
-          </div>
-        </div>
-        <div class="d-flex justify-content-between my-2">
-          <span>Shortlisted Candidates:</span>
-          <span class="last-sec">{{
-            metrics.approval_status_breakdown.total_shortlisted
-          }}</span>
-        </div>
-        <div class="d-flex justify-content-between my-2">
-          <span>Payment Initiated:</span>
-          <span class="last-sec">{{ paymentCounts["initiated"] }}</span>
-        </div>
-        <div>
-          <button type="button" class="btn btn-primary">Export Now</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+  </section>
 
-<div class="row section3 mt-5">
-  <div class="d-flex justify-content-between">
-    <div class="card-title">Recent Applications</div>
-    <span
-      [routerLink]="['/pages/applicants/applicantlist']"
-      class="fw-bold text-primary viewall"
-      >view all</span
-    >
-  </div>
-  <div class="summary-table">
-    <p-table [value]="recentRows" [tableStyle]="{ 'min-width': '50rem' }">
-      <ng-template pTemplate="header">
-        <tr>
-          @for (header of tableColumns; track header) {
-            <th>{{ header }}</th>
-          }
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="body" let-row>
-        <tr>
-          <td>{{ row.application_no }}</td>
-          <td>{{ row.full_name }}</td>
-          <td>{{ row.submission_date }}</td>
-          <td>{{ row.programme }}</td>
-          <td>
-            <app-status-indicator
-              [text]="row.status_text"
-              [tone]="row.status_tone"
-            />
-          </td>
-          <td>
-            <app-table-row-actions
-              (view)="viewProfile(row)"
-              (shortlist)="shortlistSingle(row)"
-              (compliance)="openComplianceForSingle(row)"
-            />
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </div>
-</div>
+  <section class="recent-section">
+    <div class="recent-head">
+      <h3 class="section-title">Recent Applications</h3>
+      <span [routerLink]="['/pages/applicants/applicantlist']" class="viewall">
+        View all <i class="bi bi-chevron-right"></i>
+      </span>
+    </div>
+    <div class="summary-table">
+      <p-table [value]="recentRows" [tableStyle]="{ 'min-width': '60rem' }">
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="checkbox-col">
+              <input type="checkbox" disabled />
+            </th>
+            @for (header of tableColumns; track header) {
+              <th>{{ header }}</th>
+            }
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row>
+          <tr>
+            <td class="checkbox-col">
+              <input type="checkbox" disabled />
+            </td>
+            <td>
+              <div class="applicant-name">{{ row.applicant }}</div>
+              <div class="application-no">{{ row.application_no }}</div>
+            </td>
+            <td>{{ row.jamb_score }}</td>
+            <td>{{ row.o_level }}</td>
+            <td>{{ row.submission_date }}</td>
+            <td>{{ row.programme }}</td>
+            <td>
+              <app-status-indicator
+                [text]="row.status_text"
+                [tone]="row.status_tone"
+              />
+            </td>
+            <td>
+              <app-table-row-actions
+                (view)="viewProfile(row)"
+                (shortlist)="shortlistSingle(row)"
+                (compliance)="openComplianceForSingle(row)"
+              />
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </section>
+</section>
 
 <app-action-note-modal
   [visible]="isReasonModalVisible"

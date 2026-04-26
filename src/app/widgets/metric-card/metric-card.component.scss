@@ -2,8 +2,8 @@
   border: 1px solid var(--app-border);
   border-radius: 12px;
   background-color: var(--app-surface);
-  padding: 1rem 1.15rem;
-  min-height: 96px;
+  padding: 0.85rem 1.05rem;
+  min-height: 92px;
 }
 
 .metric-card.active {
@@ -20,8 +20,9 @@
 
 .metric-head h3 {
   margin: 0;
-  font-size: 1.65rem;
+  font-size: 2rem;
   font-weight: 700;
+  color: #0b1b54;
 }
 
 .metric-head img {
@@ -30,8 +31,8 @@
 }
 
 .metric-title {
-  margin: 0.15rem 0 0;
-  font-size: 0.9rem;
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
   color: var(--app-text-secondary);
 }
 
