@@ -45,11 +45,16 @@
       </span>
     </div>
     <div class="summary-table">
-      <p-table [value]="recentRows" [tableStyle]="{ 'min-width': '60rem' }">
+      <p-table
+        [value]="recentRows"
+        dataKey="id"
+        [(selection)]="selectedRows"
+        [tableStyle]="{ 'min-width': '60rem' }"
+      >
         <ng-template pTemplate="header">
           <tr>
             <th class="checkbox-col">
-              <input type="checkbox" disabled />
+              <p-tableHeaderCheckbox />
             </th>
             @for (header of tableColumns; track header) {
               <th>{{ header }}</th>
@@ -59,7 +64,7 @@
         <ng-template pTemplate="body" let-row>
           <tr>
             <td class="checkbox-col">
-              <input type="checkbox" disabled />
+              <p-tableCheckbox [value]="row" />
             </td>
             <td>
               <div class="applicant-name">{{ row.applicant }}</div>
@@ -88,6 +93,27 @@
     </div>
   </section>
 </section>
+
+<p-drawer
+  [(visible)]="isApplicantDrawerVisible"
+  position="right"
+  [appendTo]="'body'"
+  [autoZIndex]="true"
+  [baseZIndex]="2000000"
+  [modal]="true"
+  [dismissible]="true"
+  [blockScroll]="true"
+  styleClass="applicant-detail-drawer"
+  (onHide)="closeApplicantDrawer()"
+>
+  @if (activeApplicationNo) {
+    <app-applicantdetail
+      [applicationNo]="activeApplicationNo"
+      [embedded]="true"
+      (closed)="closeApplicantDrawer()"
+    />
+  }
+</p-drawer>
 
 <app-action-note-modal
   [visible]="isReasonModalVisible"

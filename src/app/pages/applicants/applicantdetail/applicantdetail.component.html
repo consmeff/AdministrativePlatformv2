@@ -1,198 +1,322 @@
-<div class="row g-4 mb-4 first-cards">
-  <!-- First Row - 4 Metric Cards -->
-  <div class="col-12">
-    <!-- breadcrum -->
-    <div class="d-flex flex-row breadcrum">
-      <span [routerLink]="'/pages/applicants/applicantlist'">Applicants</span>
-      <span class="mx-3"
-        ><img src="assets/dashboard/arrow-right.png" alt=""
-      /></span>
-      <span>Adewale Soliu</span>
-    </div>
-  </div>
-</div>
-<div class="row g-4 mb-4 sec-row">
-  <div class="col-6">
-    <!-- breadcrum -->
-    <div class="d-flex flex-column justify-content-start">
-      <div class="b-name">
-        {{ application.first_name }}, {{ application.last_name }}
-        {{ application.other_names }}
+@if (embedded) {
+  <section class="drawer-shell">
+    <header class="drawer-hero">
+      <div class="hero-left">
+        <img
+          class="hero-avatar"
+          [src]="getApplicantPhotoUrl()"
+          alt="Applicant photo"
+        />
+        <div class="hero-text">
+          <h2 class="hero-name">{{ getApplicantFullName() }}</h2>
+          <div class="hero-id">{{ application.application_no || "-----" }}</div>
+          <span class="hero-status-pill">{{ getDisplayStatus() }}</span>
+        </div>
       </div>
-      <div class="body-small" *ngIf="application.program">
-        Preferred Programme:{{ application.program.name }}
-      </div>
-      <div class="body-small">
-        Status:
-        <span [ngClass]="getStatusClassName()">{{ getDisplayStatus() }}</span>
-      </div>
-    </div>
-  </div>
-  <div class="col-6">
-    <div class="last-col">
-      <div class="title-bold">
-        <span style="color: rgba(165, 71, 134, 1)">{{
-          application.application_no
-        }}</span>
-      </div>
-      <div class="body-small" style="color: rgba(0, 0, 128, 1)">
-        Download Profile <i class="bi bi-file-earmark-arrow-down"></i>
-      </div>
-    </div>
-  </div>
-</div>
+      <button type="button" class="drawer-close-btn" (click)="closed.emit()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </header>
 
-<div class="row third-row mt-5">
-  <div class="col-12">
-    <div class="tab-wrap">
-      <p-tabView>
-        <p-tabPanel header="Personal details">
-          <div class="table-responsive-md">
-            <app-reusable-table
-              [columns]="detailColumns"
-              [value]="personalDetailRows"
-              [showHeader]="false"
-            ></app-reusable-table>
-          </div>
-        </p-tabPanel>
-        <p-tabPanel header="Next of Kin Details">
-          <div class="table-responsive-md">
-            <app-reusable-table
-              [columns]="detailColumns"
-              [value]="nextOfKinRows"
-              [showHeader]="false"
-            ></app-reusable-table>
-          </div>
-        </p-tabPanel>
-        <p-tabPanel header="Academic History">
-          <div class="table-responsive-md">
-            <app-reusable-table
-              [columns]="detailColumns"
-              [value]="academicHistoryRows"
-              [showHeader]="false"
-            ></app-reusable-table>
-          </div>
-        </p-tabPanel>
-        <p-tabPanel header="Documents">
-          <div class="table-responsive-md">
-            <app-reusable-table
-              [columns]="documentColumns"
-              [value]="documentRows"
-              [showHeader]="false"
-            >
-              <ng-template #rowTemplate let-rowData>
-                <tr>
-                  <td class="fw-bold">{{ rowData["label"] }}</td>
-                  <td>
-                    @if (getDocumentFile(rowData); as file) {
-                      <div class="d-flex flex-row">
-                        <img
-                          width="40"
-                          height="50"
-                          [src]="file.file_url"
-                          [alt]="getfileName(file)"
-                        />
-                        <div class="d-flex flex-column mx-3 row-gap-2">
-                          <span class="title-small">{{
-                            getfileName(file)
-                          }}</span>
-                          <span class="size-text">{{
-                            formatFileSize(file.file_size)
-                          }}</span>
+    <div class="drawer-body">
+      <div class="tab-wrap">
+        <p-tabView>
+          <p-tabPanel header="Personal Details">
+            <div class="table-responsive-md">
+              <app-reusable-table
+                [columns]="detailColumns"
+                [value]="personalDetailRows"
+                [showHeader]="false"
+              ></app-reusable-table>
+            </div>
+          </p-tabPanel>
+          <p-tabPanel header="Next of Kin Details">
+            <div class="table-responsive-md">
+              <app-reusable-table
+                [columns]="detailColumns"
+                [value]="nextOfKinRows"
+                [showHeader]="false"
+              ></app-reusable-table>
+            </div>
+          </p-tabPanel>
+          <p-tabPanel header="Academic History">
+            <div class="table-responsive-md">
+              <app-reusable-table
+                [columns]="detailColumns"
+                [value]="academicHistoryRows"
+                [showHeader]="false"
+              ></app-reusable-table>
+            </div>
+          </p-tabPanel>
+          <p-tabPanel header="Documents">
+            <div class="table-responsive-md">
+              <app-reusable-table
+                [columns]="documentColumns"
+                [value]="documentRows"
+                [showHeader]="false"
+              >
+                <ng-template #rowTemplate let-rowData>
+                  <tr>
+                    <td class="fw-bold">{{ rowData["label"] }}</td>
+                    <td>
+                      @if (getDocumentFile(rowData); as file) {
+                        <div class="d-flex flex-row">
+                          <img
+                            width="40"
+                            height="50"
+                            [src]="file.file_url"
+                            [alt]="getfileName(file)"
+                          />
+                          <div class="d-flex flex-column mx-3 row-gap-2">
+                            <span class="title-small">{{
+                              getfileName(file)
+                            }}</span>
+                            <span class="size-text">{{
+                              formatFileSize(file.file_size)
+                            }}</span>
+                          </div>
+                        </div>
+                      } @else {
+                        <span>-----</span>
+                      }
+                    </td>
+                    <td>
+                      <div class="d-flex flex-row action justify-content-end">
+                        <div>View <i class="bi bi-eye"></i></div>
+                        <div class="mx-3">
+                          Download <i class="bi bi-download"></i>
                         </div>
                       </div>
-                    } @else {
-                      <span>-----</span>
-                    }
-                  </td>
-                  <td>
-                    <div class="d-flex flex-row action justify-content-end">
-                      <div>View <i class="bi bi-eye"></i></div>
-                      <div class="mx-3">
-                        Download <i class="bi bi-download"></i>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              </ng-template>
-            </app-reusable-table>
-          </div>
-        </p-tabPanel>
-      </p-tabView>
+                    </td>
+                  </tr>
+                </ng-template>
+              </app-reusable-table>
+            </div>
+          </p-tabPanel>
+        </p-tabView>
+      </div>
     </div>
-    <div class="h-divider"></div>
-  </div>
-</div>
 
-<div class="fourth-row my-5 d-flex justify-content-between flex-row">
-  @if (isComplianceBaseState()) {
-    <div class="status-note compliance-note w-100 text-center">
-      {{
-        isComplianceIssued()
-          ? "Compliance Directive have been issued on this candidate."
-          : "Compliance is required on this candidate."
-      }}
-    </div>
-  } @else if (isShortlistedForExam()) {
-    <app-button
-      variant="info"
-      [outline]="true"
-      iconClass="bi bi-exclamation-triangle"
-      [disabled]="isIssuingCompliance || !application.id"
-      (buttonClick)="issueComplianceDirective()"
-    >
-      {{
-        isIssuingCompliance
-          ? "Issuing Compliance Directive..."
-          : "Issue Compliance Directive"
-      }}
-    </app-button>
-    <div class="status-note">
-      Candidate have already been Shortlisted. Do you want to
-      <button
-        type="button"
-        class="inline-link"
-        [disabled]="isRejecting || !application.id"
-        (click)="rejectApplicant()"
-      >
-        {{ isRejecting ? "Rejecting..." : "Reject Candidate?" }}
-      </button>
-    </div>
-  } @else {
-    <app-button
-      variant="info"
-      [outline]="true"
-      iconClass="bi bi-exclamation-triangle"
-      [disabled]="isIssuingCompliance || !application.id"
-      (buttonClick)="issueComplianceDirective()"
-    >
-      {{
-        isIssuingCompliance
-          ? "Issuing Compliance Directive..."
-          : "Issue Compliance Directive"
-      }}
-    </app-button>
-    <div class="d-flex flex-row">
+    <footer class="drawer-actions">
       <app-button
-        variant="muted"
-        iconClass="bi bi-x"
-        [disabled]="isRejecting || !application.id"
-        (buttonClick)="rejectApplicant()"
+        variant="info"
+        [outline]="true"
+        iconClass="bi bi-exclamation-triangle"
+        [disabled]="isIssuingCompliance || !application.id"
+        (buttonClick)="issueComplianceDirective()"
       >
-        {{ isRejecting ? "Rejecting..." : "Reject" }}
+        {{
+          isIssuingCompliance
+            ? "Issuing Compliance Directive..."
+            : "Issue Compliance Directive"
+        }}
       </app-button>
       <app-button
-        class="mx-5"
         variant="muted"
         iconClass="bi bi-check"
-        [disabled]="isShortlisting || !application.id"
+        [disabled]="
+          isShortlisting || !application.id || isComplianceBaseState()
+        "
         (buttonClick)="shortlistApplicant()"
       >
         {{ isShortlisting ? "Shortlisting..." : "Shortlist" }}
       </app-button>
+    </footer>
+  </section>
+} @else {
+  <div class="row g-4 mb-4 first-cards">
+    <div class="col-12">
+      <div class="d-flex flex-row breadcrum">
+        <span [routerLink]="'/pages/applicants/applicantlist'">Applicants</span>
+        <span class="mx-3"
+          ><img src="assets/dashboard/arrow-right.png" alt=""
+        /></span>
+        <span>Adewale Soliu</span>
+      </div>
     </div>
-  }
-</div>
+  </div>
+  <div class="row g-4 mb-4 sec-row">
+    <div class="col-6">
+      <div class="d-flex flex-column justify-content-start">
+        <div class="b-name">
+          {{ application.first_name }}, {{ application.last_name }}
+          {{ application.other_names }}
+        </div>
+        <div class="body-small" *ngIf="application.program">
+          Preferred Programme:{{ application.program.name }}
+        </div>
+        <div class="body-small">
+          Status:
+          <span [ngClass]="getStatusClassName()">{{ getDisplayStatus() }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="last-col">
+        <div class="title-bold">
+          <span style="color: rgba(165, 71, 134, 1)">{{
+            application.application_no
+          }}</span>
+        </div>
+        <div class="body-small" style="color: rgba(0, 0, 128, 1)">
+          Download Profile <i class="bi bi-file-earmark-arrow-down"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row third-row mt-5">
+    <div class="col-12">
+      <div class="tab-wrap">
+        <p-tabView>
+          <p-tabPanel header="Personal details">
+            <div class="table-responsive-md">
+              <app-reusable-table
+                [columns]="detailColumns"
+                [value]="personalDetailRows"
+                [showHeader]="false"
+              ></app-reusable-table>
+            </div>
+          </p-tabPanel>
+          <p-tabPanel header="Next of Kin Details">
+            <div class="table-responsive-md">
+              <app-reusable-table
+                [columns]="detailColumns"
+                [value]="nextOfKinRows"
+                [showHeader]="false"
+              ></app-reusable-table>
+            </div>
+          </p-tabPanel>
+          <p-tabPanel header="Academic History">
+            <div class="table-responsive-md">
+              <app-reusable-table
+                [columns]="detailColumns"
+                [value]="academicHistoryRows"
+                [showHeader]="false"
+              ></app-reusable-table>
+            </div>
+          </p-tabPanel>
+          <p-tabPanel header="Documents">
+            <div class="table-responsive-md">
+              <app-reusable-table
+                [columns]="documentColumns"
+                [value]="documentRows"
+                [showHeader]="false"
+              >
+                <ng-template #rowTemplate let-rowData>
+                  <tr>
+                    <td class="fw-bold">{{ rowData["label"] }}</td>
+                    <td>
+                      @if (getDocumentFile(rowData); as file) {
+                        <div class="d-flex flex-row">
+                          <img
+                            width="40"
+                            height="50"
+                            [src]="file.file_url"
+                            [alt]="getfileName(file)"
+                          />
+                          <div class="d-flex flex-column mx-3 row-gap-2">
+                            <span class="title-small">{{
+                              getfileName(file)
+                            }}</span>
+                            <span class="size-text">{{
+                              formatFileSize(file.file_size)
+                            }}</span>
+                          </div>
+                        </div>
+                      } @else {
+                        <span>-----</span>
+                      }
+                    </td>
+                    <td>
+                      <div class="d-flex flex-row action justify-content-end">
+                        <div>View <i class="bi bi-eye"></i></div>
+                        <div class="mx-3">
+                          Download <i class="bi bi-download"></i>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </ng-template>
+              </app-reusable-table>
+            </div>
+          </p-tabPanel>
+        </p-tabView>
+      </div>
+      <div class="h-divider"></div>
+    </div>
+  </div>
+
+  <div class="fourth-row my-5 d-flex justify-content-between flex-row">
+    @if (isComplianceBaseState()) {
+      <div class="status-note compliance-note w-100 text-center">
+        {{
+          isComplianceIssued()
+            ? "Compliance Directive have been issued on this candidate."
+            : "Compliance is required on this candidate."
+        }}
+      </div>
+    } @else if (isShortlistedForExam()) {
+      <app-button
+        variant="info"
+        [outline]="true"
+        iconClass="bi bi-exclamation-triangle"
+        [disabled]="isIssuingCompliance || !application.id"
+        (buttonClick)="issueComplianceDirective()"
+      >
+        {{
+          isIssuingCompliance
+            ? "Issuing Compliance Directive..."
+            : "Issue Compliance Directive"
+        }}
+      </app-button>
+      <div class="status-note">
+        Candidate have already been Shortlisted. Do you want to
+        <button
+          type="button"
+          class="inline-link"
+          [disabled]="isRejecting || !application.id"
+          (click)="rejectApplicant()"
+        >
+          {{ isRejecting ? "Rejecting..." : "Reject Candidate?" }}
+        </button>
+      </div>
+    } @else {
+      <app-button
+        variant="info"
+        [outline]="true"
+        iconClass="bi bi-exclamation-triangle"
+        [disabled]="isIssuingCompliance || !application.id"
+        (buttonClick)="issueComplianceDirective()"
+      >
+        {{
+          isIssuingCompliance
+            ? "Issuing Compliance Directive..."
+            : "Issue Compliance Directive"
+        }}
+      </app-button>
+      <div class="d-flex flex-row">
+        <app-button
+          variant="muted"
+          iconClass="bi bi-x"
+          [disabled]="isRejecting || !application.id"
+          (buttonClick)="rejectApplicant()"
+        >
+          {{ isRejecting ? "Rejecting..." : "Reject" }}
+        </app-button>
+        <app-button
+          class="mx-5"
+          variant="muted"
+          iconClass="bi bi-check"
+          [disabled]="isShortlisting || !application.id"
+          (buttonClick)="shortlistApplicant()"
+        >
+          {{ isShortlisting ? "Shortlisting..." : "Shortlist" }}
+        </app-button>
+      </div>
+    }
+  </div>
+}
 
 <app-action-note-modal
   [visible]="isReasonModalVisible"

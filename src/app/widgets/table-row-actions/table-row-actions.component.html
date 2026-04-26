@@ -1,13 +1,24 @@
 <div class="row-actions">
-  <button type="button" title="View profile" (click)="view.emit()">
+  <button
+    type="button"
+    title="View profile"
+    [disabled]="disableView"
+    (click)="view.emit()"
+  >
     <i class="bi bi-eye"></i>
   </button>
-  <button type="button" title="Shortlist candidate" (click)="shortlist.emit()">
+  <button
+    type="button"
+    title="Shortlist candidate"
+    [disabled]="disableShortlist"
+    (click)="shortlist.emit()"
+  >
     <i class="bi bi-check"></i>
   </button>
   <button
     type="button"
     title="Issue compliance directive"
+    [disabled]="disableCompliance"
     (click)="compliance.emit()"
   >
     <i class="bi bi-exclamation-triangle"></i>

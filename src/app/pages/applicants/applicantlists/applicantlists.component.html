@@ -119,6 +119,9 @@
           </td>
           <td>
             <app-table-row-actions
+              [disableView]="isViewActionDisabled(row)"
+              [disableShortlist]="isShortlistActionDisabled(row)"
+              [disableCompliance]="isComplianceActionDisabled(row)"
               (view)="viewProfile(row)"
               (shortlist)="shortlistSingle(row)"
               (compliance)="openComplianceForSingle(row)"

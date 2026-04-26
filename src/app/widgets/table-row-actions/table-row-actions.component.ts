@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-table-row-actions',
@@ -9,6 +9,10 @@ import { Component, EventEmitter, Output } from '@angular/core';
   styleUrl: './table-row-actions.component.scss',
 })
 export class TableRowActionsComponent {
+  @Input() disableView = false;
+  @Input() disableShortlist = false;
+  @Input() disableCompliance = false;
+
   @Output() view = new EventEmitter<void>();
   @Output() shortlist = new EventEmitter<void>();
   @Output() compliance = new EventEmitter<void>();

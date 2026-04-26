@@ -1,5 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+  inject,
+} from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import {
   ApplicationService,
@@ -34,12 +43,16 @@ import { ButtonComponent } from '../../../widgets/button/button.component';
   templateUrl: './applicantdetail.component.html',
   styleUrl: './applicantdetail.component.scss',
 })
-export class ApplicantdetailComponent implements OnInit {
+export class ApplicantdetailComponent implements OnInit, OnChanges {
   private readonly rejectAction = 'reject';
   private readonly complianceAction = 'compliance';
   _applicationservice = inject(ApplicationService);
   application: Application = {} as Application;
   route = inject(ActivatedRoute);
+
+  @Input() applicationNo: string | null = null;
+  @Input() embedded = false;
+  @Output() closed = new EventEmitter<void>();
 
   app_no: string | null = '';
   isIssuingCompliance = false;
@@ -66,12 +79,24 @@ export class ApplicantdetailComponent implements OnInit {
   academicHistoryRows: Record<string, unknown>[] = [];
   documentRows: Record<string, unknown>[] = [];
 
-  constructor() {
-    this.app_no = this.route.snapshot.paramMap.get('appno');
-  }
   ngOnInit(): void {
-    this.app_no = this.app_no!.replaceAll('_', '/');
+    this.loadApplication();
+  }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['applicationNo'] && !changes['applicationNo'].firstChange) {
+      this.loadApplication();
+    }
+  }
+
+  private loadApplication(): void {
+    const rawApplicationNo =
+      this.applicationNo ?? this.route.snapshot.paramMap.get('appno');
+    if (!rawApplicationNo) {
+      return;
+    }
+
+    this.app_no = rawApplicationNo.replaceAll('_', '/');
     this._applicationservice
       .getapplication(this.app_no!)
       .subscribe((data: ApplicationListResponse) => {
@@ -529,6 +554,19 @@ export class ApplicantdetailComponent implements OnInit {
 
   private getNormalizedApprovalStatus(): string {
     return (this.application?.approval_status ?? '').toLowerCase();
+  }
+
+  getApplicantFullName(): string {
+    const fullName =
+      `${this.application?.first_name ?? ''} ${this.application?.last_name ?? ''}`.trim();
+    return fullName || 'Applicant';
+  }
+
+  getApplicantPhotoUrl(): string {
+    return (
+      this.application?.passport_photo?.file_url ??
+      'assets/dashboard/profile.jpeg'
+    );
   }
 
   isShortlistedForExam(): boolean {

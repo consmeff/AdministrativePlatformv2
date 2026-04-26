@@ -1,3 +1,64 @@
+.drawer-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.drawer-hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  background: #000b8f;
+  border-radius: 0 0 30px 30px;
+  padding: 16px 24px 18px;
+  color: #fff;
+}
+
+.hero-left {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.hero-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 14px;
+  object-fit: cover;
+  background: #fff;
+}
+
+.hero-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hero-name {
+  margin: 0;
+  font-size: 46px;
+  line-height: 1.05;
+  font-weight: 700;
+}
+
+.hero-id {
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 500;
+}
+
+.hero-status-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 12px;
+  background: #fff3d5;
+  color: #f08b00;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  width: fit-content;
+}
+
 .breadcrum span {
   font-family: Lato;
   font-weight: 400;
@@ -5,6 +66,35 @@
   line-height: 150%;
   letter-spacing: 0%;
   color: var(--app-text-muted);
+}
+
+.drawer-close-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+}
+
+.drawer-close-btn {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 10px;
+  background: #1f379f;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.drawer-body {
+  flex: 1;
+  background: #fff;
+}
+
+.drawer-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: auto;
+  padding: 16px 0 4px;
 }
 
 .breadcrum span:first-child:hover {
@@ -202,4 +292,19 @@ table td:last-child {
 .inline-link:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+@media (max-width: 900px) {
+  .hero-avatar {
+    width: 72px;
+    height: 72px;
+  }
+
+  .hero-name {
+    font-size: 24px;
+  }
+
+  .hero-id {
+    font-size: 16px;
+  }
 }

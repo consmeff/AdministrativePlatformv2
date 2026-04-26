@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
+import { DrawerModule } from 'primeng/drawer';
 import { TableModule } from 'primeng/table';
 import { forkJoin, Observable, Subject, Subscription, takeUntil } from 'rxjs';
 import { AdminDashboardMetrics } from '../../model/dashboard/admin-dashboard.dto';
@@ -23,6 +24,7 @@ import {
   StatusTone,
 } from '../../widgets/status-indicator/status-indicator.component';
 import { TableRowActionsComponent } from '../../widgets/table-row-actions/table-row-actions.component';
+import { ApplicantdetailComponent } from '../applicants/applicantdetail/applicantdetail.component';
 
 interface DashboardRow {
   id: number;
@@ -41,12 +43,14 @@ interface DashboardRow {
   imports: [
     CommonModule,
     RouterModule,
+    DrawerModule,
     DoughnutComponent,
     TableModule,
     ActionNoteModalComponent,
     MetricCardComponent,
     StatusIndicatorComponent,
     TableRowActionsComponent,
+    ApplicantdetailComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
@@ -55,7 +59,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
   private readonly subscriptions = new Subscription();
   private readonly applicationService = inject(ApplicationService);
-  private readonly router = inject(Router);
   private readonly dashInfoService = inject(DashboardinformationService);
   private readonly busyService = inject(BusyIndicatorService);
 
@@ -73,6 +76,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   applicationList: Application[] = [];
   recentRows: DashboardRow[] = [];
+  selectedRows: DashboardRow[] = [];
+  isApplicantDrawerVisible = false;
+  activeApplicationNo: string | null = null;
 
   metrics: AdminDashboardMetrics = {
     total_applicants: 0,
@@ -189,9 +195,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   viewProfile(row: DashboardRow) {
-    this.router.navigateByUrl(
-      `/pages/applicants/applicantdetail/${row.application_no.replaceAll('/', '_')}`,
-    );
+    this.activeApplicationNo = row.application_no;
+    this.isApplicantDrawerVisible = true;
+  }
+
+  closeApplicantDrawer(): void {
+    this.isApplicantDrawerVisible = false;
+    this.activeApplicationNo = null;
   }
 
   shortlistSingle(row: DashboardRow) {
@@ -285,6 +295,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
         next: ({ recentApplications, metrics }) => {
           this.applicationList = recentApplications.data;
           this.populateSummary();
+          this.selectedRows = this.selectedRows.filter((selected) =>
+            this.recentRows.some((row) => row.id === selected.id),
+          );
 
           if (this.applicationList.length > 0) {
             this._dash.academicsession = this.applicationList[0].session.name;

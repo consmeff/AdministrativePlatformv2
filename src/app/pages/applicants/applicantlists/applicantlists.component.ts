@@ -6,7 +6,7 @@ import {
   inject,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { DrawerModule } from 'primeng/drawer';
 import { TableModule } from 'primeng/table';
 import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 import { AdminDashboardMetrics } from '../../../model/dashboard/admin-dashboard.dto';
@@ -55,6 +55,7 @@ interface ApplicationListRow {
   imports: [
     ShareModule,
     TableModule,
+    DrawerModule,
     FormsModule,
     ActionNoteModalComponent,
     StatusIndicatorComponent,
@@ -73,7 +74,6 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   private readonly searchTextChanged = new Subject<string>();
   private readonly applicationService = inject(ApplicationService);
   private readonly cd = inject(ChangeDetectorRef);
-  private readonly router = inject(Router);
   private readonly busyService = inject(BusyIndicatorService);
 
   readonly tableColumns = [
@@ -136,7 +136,10 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   searchKeyword: string | undefined = undefined;
 
   selectedApplicantIds: number[] = [];
+  selectedRows: ApplicationListRow[] = [];
   pendingDirectiveApplicantIds: number[] = [];
+  isApplicantDrawerVisible = false;
+  selectedApplicationNo: string | null = null;
 
   isReasonModalVisible = false;
   isReasonActionLoading = false;
@@ -248,6 +251,9 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
     this.selectedApplicantIds = this.selectedApplicantIds.filter((id) =>
       this.filteredRows.some((row) => row.id === id),
     );
+    this.selectedRows = this.filteredRows.filter((row) =>
+      this.selectedApplicantIds.includes(row.id),
+    );
   }
 
   private resolveStatus(status: string): { text: string; tone: StatusTone } {
@@ -310,10 +316,35 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
     );
   }
 
+  onSelectionChange(rows: ApplicationListRow[] | null): void {
+    this.selectedRows = rows ?? [];
+    this.selectedApplicantIds = this.selectedRows.map((row) => row.id);
+  }
+
   viewProfile(row: ApplicationListRow) {
-    this.router.navigateByUrl(
-      `/pages/applicants/applicantdetail/${row.application_no.replaceAll('/', '_')}`,
+    this.selectedApplicationNo = row.application_no;
+    this.isApplicantDrawerVisible = true;
+  }
+
+  isViewActionDisabled(row: ApplicationListRow): boolean {
+    return row.status_tone === 'rejected';
+  }
+
+  isShortlistActionDisabled(row: ApplicationListRow): boolean {
+    return (
+      row.status_tone === 'shortlisted' ||
+      row.status_tone === 'directive' ||
+      row.status_tone === 'rejected'
     );
+  }
+
+  isComplianceActionDisabled(row: ApplicationListRow): boolean {
+    return row.status_tone === 'directive' || row.status_tone === 'rejected';
+  }
+
+  closeApplicantDrawer() {
+    this.isApplicantDrawerVisible = false;
+    this.selectedApplicationNo = null;
   }
 
   shortlistSingle(row: ApplicationListRow) {
