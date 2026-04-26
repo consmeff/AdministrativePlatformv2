@@ -142,6 +142,27 @@
   />
 </section>
 
+<p-drawer
+  [(visible)]="isApplicantDrawerVisible"
+  position="right"
+  [appendTo]="'body'"
+  [autoZIndex]="true"
+  [baseZIndex]="2000000"
+  [modal]="true"
+  [dismissible]="true"
+  [blockScroll]="true"
+  styleClass="applicant-detail-drawer"
+  (onHide)="closeApplicantDrawer()"
+>
+  @if (selectedApplicationNo) {
+    <app-applicantdetail
+      [applicationNo]="selectedApplicationNo"
+      [embedded]="true"
+      (closed)="closeApplicantDrawer()"
+    />
+  }
+</p-drawer>
+
 <app-action-note-modal
   [visible]="isReasonModalVisible"
   [title]="reasonModalTitle"

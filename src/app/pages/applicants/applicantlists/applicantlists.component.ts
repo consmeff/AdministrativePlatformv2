@@ -32,6 +32,7 @@ import {
   StatusTone,
 } from '../../../widgets/status-indicator/status-indicator.component';
 import { TableRowActionsComponent } from '../../../widgets/table-row-actions/table-row-actions.component';
+import { ApplicantdetailComponent } from '../applicantdetail/applicantdetail.component';
 
 interface FilterOption {
   label: string;
@@ -65,6 +66,7 @@ interface ApplicationListRow {
     TableRowActionsComponent,
     AppPaginationComponent,
     ButtonComponent,
+    ApplicantdetailComponent,
   ],
   templateUrl: './applicantlists.component.html',
   styleUrl: './applicantlists.component.scss',
