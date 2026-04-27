@@ -1,11 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { appstatus, Column } from '../../model/page.dto';
+import { DrawerModule } from 'primeng/drawer';
 import { TableModule } from 'primeng/table';
-import { ApplicationService } from '../../services/application.service';
+import {
+  ApplicationService,
+  ComplianceDirectivePayload,
+} from '../../services/application.service';
 import { Router } from '@angular/router';
 import {
-  AdmissionSummary,
   Application,
   ApplicationListResponse,
 } from '../../model/dashboard/applicant';
@@ -21,6 +24,13 @@ import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 import { FormsModule } from '@angular/forms';
 import { BusyIndicatorService } from '../../services/busy-indicator.service';
+import {
+  StatusIndicatorComponent,
+  StatusTone,
+} from '../../widgets/status-indicator/status-indicator.component';
+import { SearchInputComponent } from '../../widgets/search-input/search-input.component';
+import { TableRowActionsComponent } from '../../widgets/table-row-actions/table-row-actions.component';
+import { ApplicantdetailComponent } from '../applicants/applicantdetail/applicantdetail.component';
 
 interface PagingEvent {
   first: number;
@@ -34,10 +44,40 @@ interface LazyLoadEvent {
   sortOrder?: number | null;
 }
 
+interface AdmissionTableRow {
+  id: number;
+  application_no: string;
+  full_name: string;
+  jamb_score: number | string;
+  o_level: string;
+  cbt_score: number | string;
+  program: string;
+  status_text: string;
+  status_tone: StatusTone;
+  decision_category: AdmissionDecisionFilter;
+}
+
+type AdmissionDecisionFilter =
+  | 'all'
+  | 'pending-review'
+  | 'pending-publish'
+  | 'admitted';
+
 @Component({
   selector: 'app-admissions',
 
-  imports: [CommonModule, FormsModule, TableModule, ButtonModule, SelectModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    TableModule,
+    ButtonModule,
+    SelectModule,
+    DrawerModule,
+    StatusIndicatorComponent,
+    SearchInputComponent,
+    TableRowActionsComponent,
+    ApplicantdetailComponent,
+  ],
   templateUrl: './admissions.component.html',
   styleUrl: './admissions.component.scss',
 })
@@ -52,13 +92,18 @@ export class AdmissionsComponent implements OnInit {
   approval_status: appstatus[] = [];
   cols!: Column[];
   applicationList: Application[] = [];
-  app_summ: AdmissionSummary[] = [];
+  app_summ: AdmissionTableRow[] = [];
+  filteredRows: AdmissionTableRow[] = [];
   total_record_count = 0;
   first = 0;
 
   rows = 100;
 
   searchText = '';
+  selectedRows: AdmissionTableRow[] = [];
+  selectedApplicationNo: string | null = null;
+  isApplicantDrawerVisible = false;
+  activeCardFilter: AdmissionDecisionFilter = 'all';
   private searchTextChanged = new Subject<string>();
   searchKeyword: string | undefined = undefined;
 
@@ -70,13 +115,11 @@ export class AdmissionsComponent implements OnInit {
         switchMap((searchTerm) => this.performSearch(searchTerm)),
       )
       .subscribe((data: ApplicationListResponse) => {
-        if (data.data.length > 0) {
-          this.total_record_count = data.total;
-          this.applicationList = data.data;
-          this.populateSummary();
-          this.busyService.hide();
-          this.cd.detectChanges();
-        }
+        this.total_record_count = data.total;
+        this.applicationList = data.data;
+        this.populateSummary();
+        this.busyService.hide();
+        this.cd.detectChanges();
       });
   }
   performSearch(searchTerm: string): Observable<ApplicationListResponse> {
@@ -88,12 +131,10 @@ export class AdmissionsComponent implements OnInit {
   ngOnInit(): void {
     this.busyService.show();
     this.fetchRecords().subscribe((data: ApplicationListResponse) => {
-      if (data.data.length > 0) {
-        this.total_record_count = data.total;
-        this.applicationList = data.data;
-        this.populateSummary();
-        this.busyService.hide();
-      }
+      this.total_record_count = data.total;
+      this.applicationList = data.data;
+      this.populateSummary();
+      this.busyService.hide();
     });
     this.approval_status = [
       { name: 'All', code: 0 },
@@ -104,13 +145,7 @@ export class AdmissionsComponent implements OnInit {
       { name: 'Resolved', code: 5 },
     ];
 
-    this.cols = [
-      { field: 'application_no', header: 'Application Number' },
-      { field: 'full_name', header: 'Full Name' },
-      { field: 'submission_date', header: 'Submission Date' },
-      { field: 'program', header: 'Programme' },
-      { field: 'approval_status', header: 'Status' },
-    ];
+    this.cols = [];
   }
 
   onSearchTextChanged(text: string) {
@@ -136,11 +171,9 @@ export class AdmissionsComponent implements OnInit {
 
     // Fetch new data based on updated pagination parameters
     this.fetchRecords().subscribe((data: ApplicationListResponse) => {
-      if (data.data.length > 0) {
-        this.total_record_count = data.total;
-        this.applicationList = data.data;
-        this.populateSummary();
-      }
+      this.total_record_count = data.total;
+      this.applicationList = data.data;
+      this.populateSummary();
     });
   }
 
@@ -169,11 +202,9 @@ export class AdmissionsComponent implements OnInit {
     // Fetch data from the server
     this.fetchRecords(sortField, sortOrder).subscribe(
       (data: ApplicationListResponse) => {
-        if (data.data.length > 0) {
-          this.total_record_count = data.total;
-          this.applicationList = data.data;
-          this.populateSummary();
-        }
+        this.total_record_count = data.total;
+        this.applicationList = data.data;
+        this.populateSummary();
       },
     );
   }
@@ -208,32 +239,167 @@ export class AdmissionsComponent implements OnInit {
     // Fetch data with the updated filter
     this.fetchRecords('approval_status').subscribe(
       (data: ApplicationListResponse) => {
-        if (data.data.length > 0) {
-          this.total_record_count = data.total;
-          this.applicationList = data.data;
-          this.populateSummary();
-        }
+        this.total_record_count = data.total;
+        this.applicationList = data.data;
+        this.populateSummary();
       },
     );
   }
   populateSummary() {
     const batch = this.applicationList;
-    const newSummary: AdmissionSummary[] = [];
+    const newSummary: AdmissionTableRow[] = [];
     batch.forEach((v) => {
       const programmeName =
         typeof v.department === 'string'
           ? v.department
           : (v.department?.name ?? v.program?.name ?? 'N/A');
-      const _summ: AdmissionSummary = {
+      const status = this.resolveStatus(v.approval_status);
+      const _summ: AdmissionTableRow = {
+        id: v.id,
         application_no: v.application_no,
         full_name: `${v.first_name} ${v.last_name}`,
-        submission_date: (v.updated_at ?? v.created_at ?? '').toString(),
+        jamb_score: v.utme_score ?? v.utme_result?.score ?? 'N/A',
+        o_level: `${v.o_level_point ?? 'N/A'} Points`,
+        cbt_score: v.utme_result?.score ?? 'N/A',
         program: programmeName,
-        approval_status: v.approval_status,
+        status_text: status.text,
+        status_tone: status.tone,
+        decision_category: status.category,
       };
       newSummary.push(_summ);
     });
     this.app_summ = newSummary;
+    this.applyCardFilter();
     this.cd.detectChanges();
+  }
+
+  private resolveStatus(status: string): {
+    text: string;
+    tone: StatusTone;
+    category: AdmissionDecisionFilter;
+  } {
+    const value = (status ?? '').toLowerCase();
+    if (value.includes('admit') || value.includes('approved')) {
+      return { text: 'Admitted', tone: 'shortlisted', category: 'admitted' };
+    }
+    if (
+      value.includes('publish') ||
+      value.includes('shortlist') ||
+      value.includes('pending publish')
+    ) {
+      return {
+        text: 'Pending Publish',
+        tone: 'resubmitted',
+        category: 'pending-publish',
+      };
+    }
+    if (value.includes('reject')) {
+      return { text: 'Rejected', tone: 'rejected', category: 'pending-review' };
+    }
+    return {
+      text: 'Pending Review',
+      tone: 'pending',
+      category: 'pending-review',
+    };
+  }
+
+  setCardFilter(filter: AdmissionDecisionFilter) {
+    this.activeCardFilter = filter;
+    this.applyCardFilter();
+  }
+
+  private applyCardFilter() {
+    if (this.activeCardFilter === 'all') {
+      this.filteredRows = [...this.app_summ];
+      return;
+    }
+    this.filteredRows = this.app_summ.filter(
+      (row) => row.decision_category === this.activeCardFilter,
+    );
+  }
+
+  isCardActive(filter: AdmissionDecisionFilter): boolean {
+    return this.activeCardFilter === filter;
+  }
+
+  getCardCount(filter: AdmissionDecisionFilter): number {
+    if (filter === 'all') {
+      return this.total_record_count || this.app_summ.length;
+    }
+    return this.app_summ.filter((row) => row.decision_category === filter)
+      .length;
+  }
+
+  getPrimaryActionLabel(): string {
+    return this.activeCardFilter === 'pending-publish'
+      ? 'Publish Admission'
+      : 'Set Cutoff';
+  }
+
+  shouldShowPrimaryAction(): boolean {
+    return this.activeCardFilter !== 'admitted';
+  }
+
+  onPrimaryActionClick() {
+    if (this.activeCardFilter === 'pending-publish') {
+      window.alert('Publish admission action is not yet wired.');
+      return;
+    }
+    window.alert('Set cutoff action is not yet wired.');
+  }
+
+  viewProfile(row: AdmissionTableRow) {
+    this.selectedApplicationNo = row.application_no;
+    this.isApplicantDrawerVisible = true;
+  }
+
+  closeApplicantDrawer() {
+    this.isApplicantDrawerVisible = false;
+    this.selectedApplicationNo = null;
+  }
+
+  shortlistSingle(row: AdmissionTableRow) {
+    this.performApplicantAction(
+      this._applicationService.shortlistApplicants({
+        applicant_ids: [row.id],
+      }),
+      'Candidate shortlisted successfully.',
+    );
+  }
+
+  openComplianceForSingle(row: AdmissionTableRow) {
+    const payload: ComplianceDirectivePayload = {
+      applicant_ids: [row.id],
+      extra_note: '',
+    };
+    this.performApplicantAction(
+      this._applicationService.issueComplianceDirective(payload),
+      'Compliance directive issued successfully.',
+    );
+  }
+
+  private performApplicantAction(
+    request: Observable<unknown>,
+    successMessage: string,
+  ) {
+    this.busyService.show();
+    request.subscribe({
+      next: () => {
+        window.alert(successMessage);
+        this.fetchRecords().subscribe((data: ApplicationListResponse) => {
+          this.total_record_count = data.total;
+          this.applicationList = data.data;
+          this.populateSummary();
+        });
+      },
+      error: (err) => {
+        const message =
+          err?.error?.message || err?.error?.detail || 'Action failed.';
+        window.alert(message);
+      },
+      complete: () => {
+        this.busyService.hide();
+      },
+    });
   }
 }
