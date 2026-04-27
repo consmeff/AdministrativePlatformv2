@@ -555,6 +555,30 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
     return (this.application?.approval_status ?? '').toLowerCase();
   }
 
+  private getResolvedStatus(): {
+    text: string;
+    tone: 'pending' | 'shortlisted' | 'directive' | 'resubmitted' | 'rejected';
+  } {
+    const status = this.getNormalizedApprovalStatus();
+    if (status.includes('resubmit')) {
+      return { text: 'Resubmitted', tone: 'resubmitted' };
+    }
+    if (status.includes('shortlist')) {
+      return { text: 'Shortlisted', tone: 'shortlisted' };
+    }
+    if (
+      status.includes('compliance') ||
+      status.includes('complaince') ||
+      status.includes('directive')
+    ) {
+      return { text: 'Directive Issued', tone: 'directive' };
+    }
+    if (status.includes('reject')) {
+      return { text: 'Rejected', tone: 'rejected' };
+    }
+    return { text: 'Pending Review', tone: 'pending' };
+  }
+
   getApplicantFullName(): string {
     const fullName =
       `${this.application?.first_name ?? ''} ${this.application?.last_name ?? ''}`.trim();
@@ -599,16 +623,24 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
   }
 
   getDisplayStatus(): string {
-    if (this.isComplianceRequired()) {
-      return 'Compliance required';
+    return this.getResolvedStatus().text;
+  }
+
+  getHeroStatusClass(): string {
+    const tone = this.getResolvedStatus().tone;
+    if (tone === 'shortlisted') {
+      return 'hero-status-shortlisted';
     }
-    if (this.isComplianceIssued()) {
-      return 'Issued compliance directive';
+    if (tone === 'directive') {
+      return 'hero-status-directive';
     }
-    if (this.isShortlistedForExam()) {
-      return 'Shortlisted for Exam';
+    if (tone === 'resubmitted') {
+      return 'hero-status-resubmitted';
     }
-    return this.application.approval_status ?? 'Pending';
+    if (tone === 'rejected') {
+      return 'hero-status-rejected';
+    }
+    return 'hero-status-pending';
   }
 
   getStatusClassName(): string {

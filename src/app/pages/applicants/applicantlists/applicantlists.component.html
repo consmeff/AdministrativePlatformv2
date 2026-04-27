@@ -72,15 +72,17 @@
   </section>
 
   <section class="table-wrap">
-    <p-table [value]="filteredRows" [tableStyle]="{ 'min-width': '75rem' }">
+    <p-table
+      [value]="filteredRows"
+      dataKey="id"
+      [(selection)]="selectedRows"
+      (selectionChange)="onSelectionChange($event)"
+      [tableStyle]="{ 'min-width': '75rem' }"
+    >
       <ng-template pTemplate="header">
         <tr>
-          <th>
-            <input
-              type="checkbox"
-              [checked]="allRowsSelected()"
-              (change)="toggleSelectAll($any($event.target).checked)"
-            />
+          <th class="checkbox-col">
+            <p-tableHeaderCheckbox />
           </th>
           @for (header of tableColumns; track header) {
             <th>{{ header }}</th>
@@ -89,12 +91,8 @@
       </ng-template>
       <ng-template pTemplate="body" let-row>
         <tr>
-          <td>
-            <input
-              type="checkbox"
-              [checked]="isSelected(row.id)"
-              (change)="toggleRowSelection(row.id, $any($event.target).checked)"
-            />
+          <td class="checkbox-col">
+            <p-tableCheckbox [value]="row" />
           </td>
           <td>
             <div class="applicant-name">{{ row.full_name }}</div>
@@ -119,9 +117,6 @@
           </td>
           <td>
             <app-table-row-actions
-              [disableView]="isViewActionDisabled(row)"
-              [disableShortlist]="isShortlistActionDisabled(row)"
-              [disableCompliance]="isComplianceActionDisabled(row)"
               (view)="viewProfile(row)"
               (shortlist)="shortlistSingle(row)"
               (compliance)="openComplianceForSingle(row)"

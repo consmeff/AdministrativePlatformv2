@@ -10,7 +10,9 @@
         <div class="hero-text">
           <h2 class="hero-name">{{ getApplicantFullName() }}</h2>
           <div class="hero-id">{{ application.application_no || "-----" }}</div>
-          <span class="hero-status-pill">{{ getDisplayStatus() }}</span>
+          <span class="hero-status-pill" [ngClass]="getHeroStatusClass()">{{
+            getDisplayStatus()
+          }}</span>
         </div>
       </div>
       <button type="button" class="drawer-close-btn" (click)="closed.emit()">

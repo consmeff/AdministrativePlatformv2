@@ -51,12 +51,35 @@
   display: inline-flex;
   align-items: center;
   border-radius: 12px;
-  background: #fff3d5;
-  color: #f08b00;
   padding: 8px 16px;
   font-size: 14px;
   font-weight: 700;
   width: fit-content;
+}
+
+.hero-status-pending {
+  background: #fff3d5;
+  color: #f08b00;
+}
+
+.hero-status-shortlisted {
+  background: #dcffea;
+  color: #009866;
+}
+
+.hero-status-directive {
+  background: #ffeceb;
+  color: #ef2c23;
+}
+
+.hero-status-resubmitted {
+  background: #f5e5ff;
+  color: #b247ac;
+}
+
+.hero-status-rejected {
+  background: #ffe6e6;
+  color: #cc1f1f;
 }
 
 .breadcrum span {
@@ -132,9 +155,11 @@
     border-color: var(--app-primary) !important;
     font-weight: bold !important;
   }
+
   .p-tablist-active-bar {
     background-color: var(--app-primary) !important;
   }
+
   .p-tab {
     font-family: Lato;
     font-weight: 400;
@@ -142,6 +167,13 @@
     line-height: 150%;
     gap: 4px;
     letter-spacing: 0%;
+  }
+
+  .p-drawer-header {
+    display: none;
+  }
+  .p-drawer-content {
+    padding: 0;
   }
 }
 
@@ -154,6 +186,7 @@ table td:first-child {
   letter-spacing: 0%;
   color: var(--app-text-secondary) !important;
 }
+
 table td:last-child {
   font-family: Lato;
   font-weight: 400;
@@ -163,6 +196,7 @@ table td:last-child {
   letter-spacing: 0%;
   color: var(--app-text-primary) !important;
 }
+
 .h-divider {
   width: 100%;
   background-color: var(--app-border);
@@ -176,6 +210,7 @@ table td:last-child {
   cursor: pointer;
   transition: all 0.2s ease-in-out;
 }
+
 .compl:hover {
   color: rgba(199, 124, 39, 1);
   border: 2px solid rgba(199, 124, 39, 1);
@@ -186,6 +221,7 @@ table td:last-child {
     color: rgba(199, 124, 39, 1) !important;
   }
 }
+
 .compl:disabled {
   opacity: 0.6;
   cursor: not-allowed;
@@ -198,6 +234,7 @@ table td:last-child {
   cursor: pointer;
   transition: all 0.2s ease-in-out;
 }
+
 .short:hover {
   color: rgb(39, 172, 6);
   border: 2px solid rgb(39, 172, 6);
@@ -208,6 +245,7 @@ table td:last-child {
     color: rgb(39, 172, 6) !important;
   }
 }
+
 .reject {
   border: 1px solid transparent;
   background-color: transparent;
@@ -215,6 +253,7 @@ table td:last-child {
   cursor: pointer;
   transition: all 0.2s ease-in-out;
 }
+
 .reject:hover {
   color: rgb(167, 14, 14);
   border: 2px solid rgb(167, 14, 14);
@@ -225,6 +264,7 @@ table td:last-child {
     color: rgb(167, 14, 14) !important;
   }
 }
+
 .short:disabled,
 .reject:disabled {
   opacity: 0.6;
