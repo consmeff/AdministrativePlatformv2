@@ -43,8 +43,8 @@ interface ApplicationListRow {
   id: number;
   application_no: string;
   full_name: string;
-  jamb_score: number;
-  o_level: string;
+  jamb_score: number | string;
+  o_level: number | string;
   submission_date: string;
   programme: string;
   status_text: string;
@@ -122,7 +122,7 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
       total_rejected: 0,
       total_shortlisted: 0,
       total_approved: 0,
-      total_confirmed: 0,
+      total_admitted: 0,
       total_compliance_required: 0,
     },
     payment_status_counts: [],
@@ -189,7 +189,9 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   }
 
   private buildProgrammeOptions(rows: Application[]) {
-    const set = new Set(rows.map((item) => item.program?.name).filter(Boolean));
+    const set = new Set(
+      rows.map((item) => this.getProgrammeName(item)).filter(Boolean),
+    );
     this.programmeOptions = [
       { label: 'All Programmes', value: 'all' },
       ...Array.from(set).map((name) => ({ label: name, value: name })),
@@ -230,10 +232,12 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
         id: item.id,
         application_no: item.application_no,
         full_name: `${item.first_name} ${item.last_name}`.trim(),
-        jamb_score: item.utme_result?.score ?? 0,
-        o_level: `${item.o_level_result?.[0]?.subjects?.length ?? 0} Credits`,
-        submission_date: this.formatDate(item.created_at),
-        programme: item.program?.name ?? 'N/A',
+        jamb_score: item.utme_score ?? item.utme_result?.score ?? 'N/A',
+        o_level: item.o_level_point ?? 'N/A',
+        submission_date: this.formatDate(
+          item.updated_at ?? item.created_at ?? '',
+        ),
+        programme: this.getProgrammeName(item),
         status_text: status.text,
         status_tone: status.tone,
       };
@@ -266,13 +270,30 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
     if (value.includes('shortlist')) {
       return { text: 'Shortlisted', tone: 'shortlisted' };
     }
-    if (value.includes('compliance') || value.includes('directive')) {
+    if (
+      value.includes('compliance') ||
+      value.includes('complaince') ||
+      value.includes('directive')
+    ) {
       return { text: 'Directive Issued', tone: 'directive' };
     }
     if (value.includes('reject')) {
       return { text: 'Rejected', tone: 'rejected' };
     }
     return { text: 'Pending Review', tone: 'pending' };
+  }
+
+  private getProgrammeName(item: Application): string {
+    if (
+      typeof item.department === 'string' &&
+      item.department.trim().length > 0
+    ) {
+      return item.department;
+    }
+    if (item.department && typeof item.department !== 'string') {
+      return item.department.name ?? 'N/A';
+    }
+    return item.program?.name ?? 'N/A';
   }
 
   private formatDate(input: string): string {

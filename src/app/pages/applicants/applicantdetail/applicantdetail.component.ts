@@ -108,20 +108,19 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
   }
 
   getAcademicHistory(name: string): AcademicHistory | undefined {
+    const academicHistory = this.application.academic_history ?? [];
     if (name == 'primary') {
-      return this.application.academic_history.filter(
+      return academicHistory.filter(
         (f) => f.certificate_type == 'Primary School Leaving Certificate',
       )[0];
     } else if (name == 'secondary') {
-      return this.application.academic_history.filter(
-        (f) => f.certificate_type == 'SSSCE',
-      )[0];
+      return academicHistory.filter((f) => f.certificate_type == 'SSSCE')[0];
     } else {
       return undefined;
     }
   }
   getAttemptCount(): number {
-    return this.application.academic_history.filter(
+    return (this.application.academic_history ?? []).filter(
       (f) => f.certificate_type == 'SSSCE',
     ).length;
   }

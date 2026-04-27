@@ -220,12 +220,15 @@ export class AdmissionsComponent implements OnInit {
     const batch = this.applicationList;
     const newSummary: AdmissionSummary[] = [];
     batch.forEach((v) => {
+      const programmeName =
+        typeof v.department === 'string'
+          ? v.department
+          : (v.department?.name ?? v.program?.name ?? 'N/A');
       const _summ: AdmissionSummary = {
         application_no: v.application_no,
         full_name: `${v.first_name} ${v.last_name}`,
-
-        submission_date: v.created_at.toString(),
-        program: v.program.name,
+        submission_date: (v.updated_at ?? v.created_at ?? '').toString(),
+        program: programmeName,
         approval_status: v.approval_status,
       };
       newSummary.push(_summ);

@@ -88,7 +88,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       total_rejected: 0,
       total_shortlisted: 0,
       total_approved: 0,
-      total_confirmed: 0,
+      total_admitted: 0,
       total_compliance_required: 0,
     },
     payment_status_counts: [],
@@ -155,10 +155,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
         id: item.id,
         application_no: item.application_no,
         applicant: `${item.first_name} ${item.last_name}`.trim(),
-        jamb_score: item.utme_result?.score ?? 0,
-        o_level: `${item.o_level_result?.[0]?.subjects?.length ?? 0} Credits`,
-        submission_date: this.formatDate(item.created_at),
-        programme: item.program?.name ?? 'N/A',
+        jamb_score: item.utme_score ?? item.utme_result?.score ?? 0,
+        o_level: `${item.o_level_point ?? item.o_level_result?.[0]?.subjects?.length ?? 0}`,
+        submission_date: this.formatDate(
+          item.updated_at ?? item.created_at ?? '',
+        ),
+        programme:
+          typeof item.department === 'string'
+            ? item.department
+            : (item.department?.name ?? item.program?.name ?? 'N/A'),
         status_text: status.text,
         status_tone: status.tone,
       };
@@ -173,7 +178,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (value.includes('shortlist')) {
       return { text: 'Shortlisted', tone: 'shortlisted' };
     }
-    if (value.includes('compliance') || value.includes('directive')) {
+    if (
+      value.includes('compliance') ||
+      value.includes('complaince') ||
+      value.includes('directive')
+    ) {
       return { text: 'Directive Issued', tone: 'directive' };
     }
     if (value.includes('reject')) {
@@ -300,7 +309,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
           );
 
           if (this.applicationList.length > 0) {
-            this._dash.academicsession = this.applicationList[0].session.name;
+            this._dash.academicsession =
+              this.applicationList[0].session?.name ??
+              this._dash.academicsession;
             this.dashInfoService.setdashInfo(this._dash);
           }
 
