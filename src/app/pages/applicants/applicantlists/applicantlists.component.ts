@@ -25,7 +25,6 @@ import { ActionNoteModalComponent } from '../../../widgets/action-note-modal/act
 import { AppPaginationComponent } from '../../../widgets/app-pagination/app-pagination.component';
 import { ButtonComponent } from '../../../widgets/button/button.component';
 import { FilterSelectComponent } from '../../../widgets/filter-select/filter-select.component';
-import { MetricCardComponent } from '../../../widgets/metric-card/metric-card.component';
 import { SearchInputComponent } from '../../../widgets/search-input/search-input.component';
 import {
   StatusIndicatorComponent,
@@ -51,6 +50,13 @@ interface ApplicationListRow {
   status_tone: StatusTone;
 }
 
+type ApplicantCardFilter =
+  | 'all'
+  | 'pending'
+  | 'shortlisted'
+  | 'directive'
+  | 'resubmitted';
+
 @Component({
   selector: 'app-applicantlists',
   imports: [
@@ -62,7 +68,6 @@ interface ApplicationListRow {
     StatusIndicatorComponent,
     SearchInputComponent,
     FilterSelectComponent,
-    MetricCardComponent,
     TableRowActionsComponent,
     AppPaginationComponent,
     ButtonComponent,
@@ -113,6 +118,7 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   ];
   selectedStatus: FilterOption = this.statusOptions[0];
   selectedProgramme: FilterOption = this.programmeOptions[0];
+  activeCardFilter: ApplicantCardFilter = 'all';
 
   metrics: AdminDashboardMetrics = {
     total_applicants: 0,
@@ -207,6 +213,7 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
 
   onStatusChange(option: FilterOption) {
     this.selectedStatus = option;
+    this.activeCardFilter = this.getCardFilterFromStatus(option.value);
     this.applyLocalFilters();
   }
 
@@ -247,8 +254,8 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   private applyLocalFilters() {
     this.filteredRows = this.appRows.filter((row) => {
       const statusPass =
-        this.selectedStatus.value === 'all' ||
-        row.status_tone === this.selectedStatus.value;
+        this.activeCardFilter === 'all' ||
+        row.status_tone === this.activeCardFilter;
       const programmePass =
         this.selectedProgramme.value === 'all' ||
         row.programme === this.selectedProgramme.value;
@@ -260,6 +267,37 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
     this.selectedRows = this.filteredRows.filter((row) =>
       this.selectedApplicantIds.includes(row.id),
     );
+  }
+
+  setCardFilter(filter: ApplicantCardFilter): void {
+    this.activeCardFilter = filter;
+    this.selectedStatus =
+      this.statusOptions.find((item) => item.value === filter) ??
+      this.statusOptions[0];
+    this.applyLocalFilters();
+  }
+
+  isCardActive(filter: ApplicantCardFilter): boolean {
+    return this.activeCardFilter === filter;
+  }
+
+  getCardCount(filter: ApplicantCardFilter): number {
+    if (filter === 'all') {
+      return this.metrics.total_applicants || this.total_record_count;
+    }
+    return this.appRows.filter((row) => row.status_tone === filter).length;
+  }
+
+  private getCardFilterFromStatus(value: string): ApplicantCardFilter {
+    if (
+      value === 'pending' ||
+      value === 'shortlisted' ||
+      value === 'directive' ||
+      value === 'resubmitted'
+    ) {
+      return value;
+    }
+    return 'all';
   }
 
   private resolveStatus(status: string): { text: string; tone: StatusTone } {

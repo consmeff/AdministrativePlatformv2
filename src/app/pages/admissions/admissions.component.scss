@@ -4,6 +4,207 @@
   gap: 18px;
 }
 
+.admissions-empty {
+  max-width: 980px;
+  margin: 60px auto 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.hidden-file-input {
+  display: none;
+}
+
+.empty-title {
+  margin: 0;
+  font-size: 42px;
+  font-weight: 700;
+  color: #0b1b54;
+}
+
+.empty-subtitle {
+  margin: 0;
+  font-size: 30px;
+  color: #7183a6;
+}
+
+.upload-dropzone {
+  width: min(100%, 760px);
+  min-height: 250px;
+  border: 2px dashed #d0dff8;
+  border-radius: 24px;
+  background: #fbfdff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+
+.upload-icon {
+  font-size: 56px;
+  color: #0d31ba;
+}
+
+.upload-text {
+  font-size: 36px;
+  font-weight: 700;
+  color: #0b1b54;
+}
+
+.flow-action-btn {
+  border: 0;
+  border-radius: 14px;
+  background: var(--app-primary);
+  color: #fff;
+  min-width: 220px;
+  height: 64px;
+  font-size: 26px;
+  font-weight: 600;
+  padding: 0 24px;
+}
+
+.selected-file-card {
+  width: min(100%, 1040px);
+  border: 1px solid #dde9ff;
+  border-radius: 20px;
+  background: #fbfdff;
+  padding: 18px 22px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 16px;
+}
+
+.file-leading-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1px solid #dbe8ff;
+  display: grid;
+  place-items: center;
+  color: #395380;
+  font-size: 22px;
+}
+
+.file-name {
+  font-size: 38px;
+  font-weight: 700;
+  color: #0b1b54;
+}
+
+.file-size {
+  font-size: 26px;
+  color: #7b8fb3;
+}
+
+.file-remove-btn {
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #8aa0c5;
+  font-size: 20px;
+}
+
+.flow-progress-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.flow-progress {
+  width: 100%;
+  height: 14px;
+  border-radius: 999px;
+  background: #edf2f9;
+  overflow: hidden;
+}
+
+.flow-progress-value {
+  height: 100%;
+  background: var(--app-primary);
+  border-radius: 999px;
+}
+
+.flow-progress-label {
+  font-size: 28px;
+  color: #7b8fb3;
+}
+
+.update-progress-card {
+  width: min(100%, 920px);
+  border: 1px solid #dde9ff;
+  border-radius: 20px;
+  background: #fbfdff;
+  padding: 26px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+}
+
+.rows-counter {
+  width: 220px;
+  height: 148px;
+  border-radius: 20px;
+  background: var(--app-primary);
+  color: #fff;
+  display: grid;
+  place-items: center;
+}
+
+.rows-value {
+  font-size: 62px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.rows-total {
+  font-size: 40px;
+}
+
+@media (max-width: 1200px) {
+  .empty-title {
+    font-size: 32px;
+  }
+
+  .empty-subtitle {
+    font-size: 22px;
+  }
+
+  .upload-text {
+    font-size: 26px;
+  }
+
+  .file-name {
+    font-size: 28px;
+  }
+
+  .file-size {
+    font-size: 20px;
+  }
+
+  .flow-progress-label {
+    font-size: 22px;
+  }
+
+  .rows-value {
+    font-size: 52px;
+  }
+
+  .rows-total {
+    font-size: 30px;
+  }
+}
+
 .cards-head {
   display: grid;
   grid-template-columns: repeat(4, minmax(190px, 1fr)) auto;

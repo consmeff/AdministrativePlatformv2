@@ -1,5 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  inject,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 import { appstatus, Column } from '../../model/page.dto';
 import { DrawerModule } from 'primeng/drawer';
 import { TableModule } from 'primeng/table';
@@ -63,6 +69,13 @@ type AdmissionDecisionFilter =
   | 'pending-publish'
   | 'admitted';
 
+type AdmissionEmptyFlowStage =
+  | 'upload'
+  | 'file-selected'
+  | 'syncing'
+  | 'updating'
+  | 'complete';
+
 @Component({
   selector: 'app-admissions',
 
@@ -81,7 +94,7 @@ type AdmissionDecisionFilter =
   templateUrl: './admissions.component.html',
   styleUrl: './admissions.component.scss',
 })
-export class AdmissionsComponent implements OnInit {
+export class AdmissionsComponent implements OnInit, OnDestroy {
   _applicationService = inject(ApplicationService);
   router = inject(Router);
   busyService = inject(BusyIndicatorService);
@@ -104,6 +117,13 @@ export class AdmissionsComponent implements OnInit {
   selectedApplicationNo: string | null = null;
   isApplicantDrawerVisible = false;
   activeCardFilter: AdmissionDecisionFilter = 'all';
+  emptyFlowStage: AdmissionEmptyFlowStage = 'upload';
+  selectedFileName = '';
+  selectedFileSize = '';
+  uploadProgress = 0;
+  processedRows = 0;
+  totalRows = 247;
+  private flowTimerId: number | null = null;
   private searchTextChanged = new Subject<string>();
   searchKeyword: string | undefined = undefined;
 
@@ -146,6 +166,11 @@ export class AdmissionsComponent implements OnInit {
     ];
 
     this.cols = [];
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+    this.clearFlowTimer();
   }
 
   onSearchTextChanged(text: string) {
@@ -401,5 +426,103 @@ export class AdmissionsComponent implements OnInit {
         this.busyService.hide();
       },
     });
+  }
+
+  get showEmptyState(): boolean {
+    return this.total_record_count === 0;
+  }
+
+  get emptyStateTitle(): string {
+    switch (this.emptyFlowStage) {
+      case 'syncing':
+        return 'Syncing with existing';
+      case 'updating':
+        return 'Updating CBT Results File...';
+      case 'complete':
+        return 'File Syncing complete';
+      default:
+        return 'Upload CBT Results File';
+    }
+  }
+
+  triggerFileInput(fileInput: HTMLInputElement): void {
+    fileInput.click();
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) {
+      return;
+    }
+    this.selectedFileName = file.name;
+    this.selectedFileSize = this.formatFileSize(file.size);
+    this.emptyFlowStage = 'file-selected';
+    this.uploadProgress = 0;
+    this.processedRows = 0;
+    this.clearFlowTimer();
+  }
+
+  removeSelectedFile(fileInput: HTMLInputElement): void {
+    this.selectedFileName = '';
+    this.selectedFileSize = '';
+    this.uploadProgress = 0;
+    this.processedRows = 0;
+    this.emptyFlowStage = 'upload';
+    fileInput.value = '';
+    this.clearFlowTimer();
+  }
+
+  startUpdateFlow(): void {
+    if (!this.selectedFileName) {
+      return;
+    }
+    this.emptyFlowStage = 'syncing';
+    this.uploadProgress = 60;
+  }
+
+  updateFiles(): void {
+    if (!this.selectedFileName) {
+      return;
+    }
+    this.emptyFlowStage = 'updating';
+    this.uploadProgress = 0;
+    this.processedRows = 0;
+    this.clearFlowTimer();
+
+    const maxRows = this.totalRows;
+    const step = Math.max(1, Math.floor(maxRows / 40));
+
+    this.flowTimerId = window.setInterval(() => {
+      this.processedRows = Math.min(maxRows, this.processedRows + step);
+      this.uploadProgress = Math.min(
+        100,
+        Math.round((this.processedRows / maxRows) * 100),
+      );
+      if (this.processedRows >= maxRows) {
+        this.clearFlowTimer();
+        this.emptyFlowStage = 'complete';
+      }
+      this.cd.detectChanges();
+    }, 160);
+  }
+
+  onDownloadTemplate(): void {
+    window.alert('Template download is not yet wired.');
+  }
+
+  private formatFileSize(sizeInBytes: number): string {
+    if (sizeInBytes <= 0) {
+      return '0 KB';
+    }
+    const sizeInKb = Math.max(1, Math.round(sizeInBytes / 1024));
+    return `${sizeInKb} KB`;
+  }
+
+  private clearFlowTimer(): void {
+    if (this.flowTimerId !== null) {
+      window.clearInterval(this.flowTimerId);
+      this.flowTimerId = null;
+    }
   }
 }
