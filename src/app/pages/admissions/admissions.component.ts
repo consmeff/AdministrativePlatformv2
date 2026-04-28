@@ -37,7 +37,7 @@ import {
 import { SearchInputComponent } from '../../widgets/search-input/search-input.component';
 import { TableRowActionsComponent } from '../../widgets/table-row-actions/table-row-actions.component';
 import { ApplicantdetailComponent } from '../applicants/applicantdetail/applicantdetail.component';
-import { AdmissionsUploadFlowComponent } from './admissions-upload-flow.component';
+import { AdmissionsUploadFlowComponent } from './upload-flow/admissions-upload-flow.component';
 
 interface PagingEvent {
   first: number;
