@@ -1,0 +1,103 @@
+<section class="admissions-empty">
+  <input
+    #fileInput
+    type="file"
+    class="hidden-file-input"
+    accept=".csv,.xls,.xlsx"
+    (change)="onFileSelected($event)"
+  />
+
+  <div class="flow-types">
+    @for (option of options; track option.type) {
+      <button
+        type="button"
+        class="flow-type-chip"
+        [class.active]="activeType === option.type"
+        (click)="selectType(option.type, fileInput)"
+      >
+        {{ option.label }}
+      </button>
+    }
+  </div>
+
+  <h2 class="empty-title">{{ stageTitle }}</h2>
+  <p class="empty-subtitle">
+    @if (stage === "complete") {
+      {{ processedRows }} rows processed successfully.
+    } @else {
+      {{ activeFlowOption.subtitle }}
+    }
+  </p>
+
+  @if (stage === "upload") {
+    <button
+      type="button"
+      class="upload-dropzone"
+      (click)="triggerFileInput(fileInput)"
+    >
+      <span class="upload-icon"><i class="bi bi-folder2-open"></i></span>
+      <span class="upload-text">Click to Upload or drag and drop file</span>
+    </button>
+
+    <button
+      type="button"
+      class="flow-action-btn"
+      (click)="onDownloadTemplate()"
+    >
+      Download Template
+    </button>
+  } @else if (stage === "file-selected" || stage === "syncing") {
+    <article class="selected-file-card">
+      <div class="file-leading-icon">
+        <i class="bi bi-file-earmark-text"></i>
+      </div>
+      <div class="file-main">
+        <div class="file-name">{{ selectedFileName }}</div>
+        <div class="file-size">{{ selectedFileSize }}</div>
+      </div>
+      <button
+        type="button"
+        class="file-remove-btn"
+        (click)="removeSelectedFile(fileInput)"
+      >
+        <i class="bi bi-trash"></i>
+      </button>
+
+      @if (stage === "syncing") {
+        <div class="flow-progress-wrap">
+          <div class="flow-progress">
+            <div
+              class="flow-progress-value"
+              [style.width.%]="uploadProgress"
+            ></div>
+          </div>
+          <span class="flow-progress-label">{{ uploadProgress }}%</span>
+        </div>
+      }
+    </article>
+
+    <button
+      type="button"
+      class="flow-action-btn"
+      (click)="stage === 'file-selected' ? startSyncing() : processUpdate()"
+    >
+      {{ stage === "file-selected" ? "Start Update" : "Update Files" }}
+    </button>
+  } @else if (stage === "processing") {
+    <section class="update-progress-card">
+      <div class="rows-counter">
+        <span class="rows-value">{{ processedRows }}</span>
+        <span class="rows-total">of {{ totalRows }} rows</span>
+      </div>
+      <div class="flow-progress">
+        <div class="flow-progress-value" [style.width.%]="uploadProgress"></div>
+      </div>
+      <span class="flow-progress-label">{{ uploadProgress }}%</span>
+    </section>
+  } @else {
+    <div class="success-icon"><i class="bi bi-clipboard2-check"></i></div>
+    <button type="button" class="flow-action-btn" (click)="continue()">
+      Continue to Admissions
+    </button>
+  }
+</section>
