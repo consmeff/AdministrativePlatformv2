@@ -1,54 +1,93 @@
-button {
-  width: 145px;
-  height: 44px;
-  gap: 8px;
-  border-radius: 8px;
-  // padding-top: 16px;
-  padding-right: 20px;
-  // padding-bottom: 16px;
-  padding-left: 20px;
-  background-color: var(--app-primary);
-  color: #fafafc;
+.admissions-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
-.input-container {
-  position: relative; /* Establishes a positioning context for child elements */
-  display: inline-block; /* Ensures the container wraps around the input */
+.cards-head {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(190px, 1fr)) auto;
+  gap: 14px;
+  align-items: stretch;
 }
 
-.form-control {
-  width: 480px;
-  height: 52px;
+.summary-card {
+  border: 1px solid #dbe8ff;
   border-radius: 12px;
-  padding-right: 40px; /* Add padding to prevent text from overlapping the icon */
-  box-sizing: border-box; /* Ensures padding is included in the width/height */
+  background: #fff;
+  color: #1a2f59;
+  padding: 14px 16px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.search-icon {
-  position: absolute; /* Position the icon absolutely within the container */
-  top: 50%; /* Center vertically */
-  right: 12px; /* Align to the right edge with some spacing */
-  transform: translateY(-50%); /* Fine-tune vertical centering */
-  width: 24px; /* Adjust size of the icon as needed */
-  height: 24px; /* Adjust size of the icon as needed */
-  pointer-events: none; /* Prevent the icon from interfering with input interactions */
+.summary-card.active {
+  background: var(--app-primary);
+  color: #fff;
 }
-.search-icon :hover {
-  cursor: pointer;
+
+.summary-card .metric {
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.summary-card .label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.primary-action {
+  border: 0;
+  border-radius: 12px;
+  background: var(--app-primary);
+  color: #fff;
+  min-width: 170px;
+  padding: 0 18px;
+  font-weight: 600;
+}
+
+.filters-head {
+  display: grid;
+  grid-template-columns: minmax(320px, 1fr) 220px auto auto;
+  gap: 14px;
+  align-items: center;
+}
+
+.outline-btn {
+  border: 1px solid #dbe8ff;
+  border-radius: 12px;
+  background: #fff;
+  color: #395380;
+  height: 48px;
+  padding: 0 16px;
+  font-weight: 600;
 }
 
 .summary-table th {
   font-size: 13px;
-  font-weight: 600px;
+  font-weight: 600;
 }
+
 .summary-table tr {
   font-size: 13px;
-  font-weight: 400px;
+}
+
+.applicant-name {
+  font-weight: 700;
+}
+
+.application-no {
+  color: var(--app-text-secondary);
 }
 
 ::ng-deep {
-  .p-datatable-table-container {
-    max-height: 300px !important;
-    overflow-y: scroll;
+  .p-select {
+    height: 48px;
+    border-radius: 12px;
+    border-color: #dbe8ff;
+    width: 100%;
   }
 }

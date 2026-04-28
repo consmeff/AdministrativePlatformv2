@@ -1,115 +1,111 @@
-.center-pane {
-  z-index: 99998;
+.applications-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-button {
-  width: 145px;
-  height: 44px;
-  gap: 8px;
-  border-radius: 8px;
-  // padding-top: 16px;
-  padding-right: 20px;
-  // padding-bottom: 16px;
-  padding-left: 20px;
-  background-color: var(--app-primary);
-  color: #fafafc;
+.top-cards {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.75rem;
 }
 
-.input-container {
-  position: relative; /* Establishes a positioning context for child elements */
-  display: inline-block; /* Ensures the container wraps around the input */
-}
-
-.form-control {
-  width: 480px;
-  height: 52px;
+.summary-card {
+  border: 1px solid #dbe8ff;
   border-radius: 12px;
-  padding-right: 40px; /* Add padding to prevent text from overlapping the icon */
-  box-sizing: border-box; /* Ensures padding is included in the width/height */
+  background: #fff;
+  color: #1a2f59;
+  padding: 14px 16px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.search-icon {
-  position: absolute; /* Position the icon absolutely within the container */
-  top: 50%; /* Center vertically */
-  right: 12px; /* Align to the right edge with some spacing */
-  transform: translateY(-50%); /* Fine-tune vertical centering */
-  width: 24px; /* Adjust size of the icon as needed */
-  height: 24px; /* Adjust size of the icon as needed */
-  pointer-events: none; /* Prevent the icon from interfering with input interactions */
-}
-.search-icon :hover {
-  cursor: pointer;
-}
-.summary-table th {
-  font-size: 13px;
-  font-weight: 600px;
-}
-.summary-table tr {
-  font-size: 13px;
-  font-weight: 400px;
+.summary-card.active {
+  background: var(--app-primary);
+  border-color: var(--app-primary);
+  color: #fff;
 }
 
-::ng-deep {
-  .p-datatable-table-container {
-    max-height: 600px !important;
-    overflow-y: scroll;
+.summary-card .metric {
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.summary-card .label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.selected-count {
+  margin-right: auto;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.filters-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr auto auto;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.filter-main {
+  min-width: 260px;
+}
+
+.ghost-btn {
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #111827;
+  border-radius: 8px;
+  height: 40px;
+  padding: 0 0.85rem;
+  font-size: 0.875rem;
+}
+
+.table-wrap {
+  background: #fff;
+  border: 1px solid #eef1f4;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.applicant-name {
+  font-weight: 600;
+}
+
+.application-no {
+  color: #6b7280;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 1200px) {
+  .top-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .filters-row {
+    grid-template-columns: 1fr 1fr;
   }
 }
 
-.action-icon:hover {
-  cursor: pointer;
-}
-
-.action-icon {
-  cursor: pointer;
-  color: var(--app-link);
-  &:hover {
-    filter: brightness(0.9);
+@media (max-width: 768px) {
+  .top-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-}
 
-.action-menu {
-  position: fixed;
-  z-index: 1050; // Above most elements
-  min-width: 250px;
-  background: var(--app-surface);
-  border: 1px solid var(--app-border);
-  border-radius: 0.25rem;
-  box-shadow: 2px 2px 1px rgba(197, 196, 196, 0.15);
-
-  .list-group {
-    border-radius: inherit;
-
-    &-item {
-      padding: 0.5rem 1rem;
-      border: none;
-      border-bottom: 1px solid var(--app-border);
-
-      &:last-child {
-        border-bottom: none;
-      }
-
-      &:hover {
-        // background-color: #dfdfdf;
-        cursor: pointer;
-      }
-    }
+  .bulk-actions {
+    flex-wrap: wrap;
+    justify-content: flex-start;
   }
-}
-
-.bi {
-  color: #6c757d;
-}
-
-.action-menu .eye:hover {
-  background-color: rgba(0, 0, 128, 0.06);
-}
-.action-menu .x:hover {
-  background-color: rgba(219, 66, 66, 0.104);
-}
-.action-menu .check:hover {
-  background-color: rgba(4, 250, 65, 0.104);
-}
-.action-menu .excl:hover {
-  background-color: rgba(239, 153, 5, 0.055);
 }

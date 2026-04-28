@@ -1,414 +1,495 @@
 import {
   ChangeDetectorRef,
   Component,
-  HostListener,
-  inject,
+  OnDestroy,
   OnInit,
+  inject,
 } from '@angular/core';
-
-import {
-  debounceTime,
-  distinctUntilChanged,
-  Observable,
-  Subject,
-  Subscription,
-  switchMap,
-} from 'rxjs';
+import { FormsModule } from '@angular/forms';
+import { DrawerModule } from 'primeng/drawer';
 import { TableModule } from 'primeng/table';
-
-import { SelectModule } from 'primeng/select';
+import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
+import { AdminDashboardMetrics } from '../../../model/dashboard/admin-dashboard.dto';
 import {
   Application,
-  ApplicationSummary,
   ApplicationListResponse,
 } from '../../../model/dashboard/applicant';
-import { appstatus, Column } from '../../../model/page.dto';
+import { ActionModalPayload } from '../../../widgets/action-note-modal/action-note-modal.component';
 import {
   ApplicationService,
   ComplianceDirectivePayload,
-  RejectApplicantPayload,
 } from '../../../services/application.service';
-import { ShareModule } from '../../../shared/share/share.module';
-import { Router } from '@angular/router';
 import { BusyIndicatorService } from '../../../services/busy-indicator.service';
-import { FormsModule } from '@angular/forms';
+import { ShareModule } from '../../../shared/share/share.module';
 import { ActionNoteModalComponent } from '../../../widgets/action-note-modal/action-note-modal.component';
+import { AppPaginationComponent } from '../../../widgets/app-pagination/app-pagination.component';
+import { ButtonComponent } from '../../../widgets/button/button.component';
+import { FilterSelectComponent } from '../../../widgets/filter-select/filter-select.component';
+import { SearchInputComponent } from '../../../widgets/search-input/search-input.component';
+import {
+  StatusIndicatorComponent,
+  StatusTone,
+} from '../../../widgets/status-indicator/status-indicator.component';
+import { TableRowActionsComponent } from '../../../widgets/table-row-actions/table-row-actions.component';
+import { ApplicantdetailComponent } from '../applicantdetail/applicantdetail.component';
 
-interface PagingEvent {
-  first: number;
-  rows: number;
+interface FilterOption {
+  label: string;
+  value: string;
 }
 
-interface LazyLoadEvent {
-  first?: number | null;
-  rows?: number | null;
-  sortField?: string | string[] | null;
-  sortOrder?: number | null;
+interface ApplicationListRow {
+  id: number;
+  application_no: string;
+  full_name: string;
+  jamb_score: number | string;
+  o_level: number | string;
+  submission_date: string;
+  programme: string;
+  status_text: string;
+  status_tone: StatusTone;
 }
+
+type ApplicantCardFilter =
+  | 'all'
+  | 'pending'
+  | 'shortlisted'
+  | 'directive'
+  | 'resubmitted';
 
 @Component({
   selector: 'app-applicantlists',
   imports: [
     ShareModule,
-    SelectModule,
     TableModule,
+    DrawerModule,
     FormsModule,
     ActionNoteModalComponent,
+    StatusIndicatorComponent,
+    SearchInputComponent,
+    FilterSelectComponent,
+    TableRowActionsComponent,
+    AppPaginationComponent,
+    ButtonComponent,
+    ApplicantdetailComponent,
   ],
   templateUrl: './applicantlists.component.html',
   styleUrl: './applicantlists.component.scss',
 })
-export class ApplicantlistsComponent implements OnInit {
-  private readonly rejectAction = 'reject';
-  private readonly complianceAction = 'compliance';
-  selectedRowData?: ApplicationSummary;
-  showActionMenu = false;
-  menuPosition = { x: 0, y: 0 };
-  _applicationService = inject(ApplicationService);
-  cd = inject(ChangeDetectorRef);
-  router = inject(Router);
-  busyService = inject(BusyIndicatorService);
-  application!: Application[];
-  subscriptions = new Subscription();
-  selectedStatus: appstatus = { name: 'All', code: 0 };
-  approval_status: appstatus[] = [];
-  cols!: Column[];
+export class ApplicantlistsComponent implements OnInit, OnDestroy {
+  private readonly destroy$ = new Subject<void>();
+  private readonly searchTextChanged = new Subject<string>();
+  private readonly applicationService = inject(ApplicationService);
+  private readonly cd = inject(ChangeDetectorRef);
+  private readonly busyService = inject(BusyIndicatorService);
+
+  readonly tableColumns = [
+    'Applicant',
+    'JAMB',
+    'O Level',
+    'Submission Date',
+    'Programme',
+    'Status',
+    'Actions',
+  ];
+
+  readonly statusOptions: FilterOption[] = [
+    { label: 'All Status', value: 'all' },
+    { label: 'Pending Review', value: 'pending' },
+    { label: 'Shortlisted Candidates', value: 'shortlisted' },
+    { label: 'Directive Issued', value: 'directive' },
+    { label: 'Resubmitted', value: 'resubmitted' },
+  ];
+  readonly directiveDocumentOptions = [
+    'Certificate of Birth',
+    "O'Level Result",
+    'Passport Photograph',
+    'UTME Result',
+  ];
+  readonly directiveReasons = [
+    'Blurry Document',
+    'Wrong File Uploaded',
+    'Name Mismatch with Application',
+    'Others (specify below)',
+  ];
+
+  programmeOptions: FilterOption[] = [
+    { label: 'All Programmes', value: 'all' },
+  ];
+  selectedStatus: FilterOption = this.statusOptions[0];
+  selectedProgramme: FilterOption = this.programmeOptions[0];
+  activeCardFilter: ApplicantCardFilter = 'all';
+
+  metrics: AdminDashboardMetrics = {
+    total_applicants: 0,
+    top_5_courses: [],
+    approval_status_breakdown: {
+      total_pending: 0,
+      total_rejected: 0,
+      total_shortlisted: 0,
+      total_approved: 0,
+      total_admitted: 0,
+      total_compliance_required: 0,
+    },
+    payment_status_counts: [],
+  };
+
   applicationList: Application[] = [];
-  app_summ: ApplicationSummary[] = [];
+  appRows: ApplicationListRow[] = [];
+  filteredRows: ApplicationListRow[] = [];
   total_record_count = 0;
   first = 0;
-
   rows = 10;
-
   searchText = '';
-  private searchTextChanged = new Subject<string>();
   searchKeyword: string | undefined = undefined;
+
+  selectedApplicantIds: number[] = [];
+  selectedRows: ApplicationListRow[] = [];
+  pendingDirectiveApplicantIds: number[] = [];
+  isApplicantDrawerVisible = false;
+  selectedApplicationNo: string | null = null;
+
   isReasonModalVisible = false;
   isReasonActionLoading = false;
-  reasonModalTitle = '';
+  reasonModalTitle = 'Issue Compliance Directive';
   reasonModalPrompt = '';
-  reasonModalConfirmLabel = '';
+  reasonModalConfirmLabel = 'Issue Directive';
   reasonModalInitialNote = '';
-  pendingReasonAction: 'reject' | 'compliance' | null = null;
-  pendingReasonApplicant?: ApplicationSummary;
+  directiveSelectedReason = '';
+  directiveSelectedDocuments: string[] = [];
 
-  constructor() {
-    this.searchTextChanged
-      .pipe(
-        debounceTime(2000),
-        distinctUntilChanged(),
-        switchMap((searchTerm) => this.performSearch(searchTerm)),
-      )
-      .subscribe((data: ApplicationListResponse) => {
-        if (data.data.length > 0) {
-          this.total_record_count = data.total;
-          this.applicationList = data.data;
-          this.populateSummary();
-          this.busyService.hide();
-          this.cd.detectChanges();
-        }
-      });
-  }
-  performSearch(searchTerm: string): Observable<ApplicationListResponse> {
-    this.searchKeyword = searchTerm;
-    this.first = 0; // Reset pagination to the first page
-    return this.fetchRecords();
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent) {
-    // Close menu when clicking anywhere else
-    if (
-      !(event.target as Element).closest('.action-icon') &&
-      !(event.target as Element).closest('.action-menu')
-    ) {
-      this.showActionMenu = false;
-    }
-  }
   ngOnInit(): void {
     this.busyService.show();
-    this.fetchRecords().subscribe((data: ApplicationListResponse) => {
-      if (data.data.length > 0) {
-        this.total_record_count = data.total;
-        this.applicationList = data.data;
-        this.populateSummary();
-        this.busyService.hide();
-      }
+    this.fetchRecords();
+    this.applicationService.getAdminDashboardMetrics().subscribe((metrics) => {
+      this.metrics = metrics;
     });
 
-    this.approval_status = [
-      { name: 'All', code: 0 },
-      { name: 'Pending', code: 1 },
-      { name: 'Shortlisted', code: 2 },
-      { name: 'Compliance', code: 3 },
-      { name: 'Rejected', code: 4 },
-      { name: 'Resolved', code: 5 },
-    ];
-
-    this.cols = [
-      { field: 'application_no', header: 'Application Number' },
-      { field: 'first_name', header: 'First Name' },
-      { field: 'last_name', header: 'Last Name' },
-      { field: 'created_at', header: 'Submission Date' },
-      { field: 'program', header: 'Pref. Programme' },
-      { field: 'approval_status', header: 'Status' },
-      { field: 'action', header: 'Actions' },
-    ];
+    this.searchTextChanged
+      .pipe(debounceTime(500), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe((searchTerm) => {
+        this.searchKeyword = searchTerm.trim() || undefined;
+        this.first = 0;
+        this.fetchRecords();
+      });
   }
-  private fetchRecords(
-    sortField?: string,
-    sortOrder?: number,
-  ): Observable<ApplicationListResponse> {
-    return this._applicationService.getapplications(
-      this.searchKeyword, // Search keyword
-      // Filters (if applicable)
-      this.rows, // Rows per page
-      // Include additional data (if needed)
-      this.first + 1, // First record index
-      sortField, // Field to sort by
-      sortOrder, // Sort order (1 for ascending, -1 for descending)
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private fetchRecords(): void {
+    const pageNumber = Math.floor(this.first / this.rows) + 1;
+    this.applicationService
+      .getapplications(this.searchKeyword, this.rows, pageNumber)
+      .subscribe((data: ApplicationListResponse) => {
+        this.total_record_count = data.total;
+        this.applicationList = data.data;
+        this.buildProgrammeOptions(data.data);
+        this.populateSummary();
+        this.applyLocalFilters();
+        this.busyService.hide();
+        this.cd.detectChanges();
+      });
+  }
+
+  private buildProgrammeOptions(rows: Application[]) {
+    const set = new Set(
+      rows.map((item) => this.getProgrammeName(item)).filter(Boolean),
     );
-  }
-
-  onStatusChange(event: unknown) {
-    void event;
-    // Reset pagination to the first page when applying a new filter
-    this.first = 0;
-
-    // Use the selected status as part of the search/filter criteria
-    if (this.selectedStatus && this.selectedStatus.code !== undefined) {
-      this.searchKeyword = `${this.selectedStatus.name}`; // Format the search keyword for the backend
-    } else {
-      this.searchKeyword = undefined; // Clear the filter if "All" is selected
+    this.programmeOptions = [
+      { label: 'All Programmes', value: 'all' },
+      ...Array.from(set).map((name) => ({ label: name, value: name })),
+    ];
+    if (
+      !this.programmeOptions.some(
+        (item) => item.value === this.selectedProgramme.value,
+      )
+    ) {
+      this.selectedProgramme = this.programmeOptions[0];
     }
-
-    // Fetch data with the updated filter
-    this.fetchRecords('approval_status').subscribe(
-      (data: ApplicationListResponse) => {
-        if (data.data.length > 0) {
-          this.total_record_count = data.total;
-          this.applicationList = data.data;
-          this.populateSummary();
-        }
-      },
-    );
   }
 
-  onLazyLoad(event: LazyLoadEvent) {
-    // Update pagination parameters
-    this.first = event.first || 0; // First record index
-    this.rows = event.rows || 10; // Number of rows per page
+  onStatusChange(option: FilterOption) {
+    this.selectedStatus = option;
+    this.activeCardFilter = this.getCardFilterFromStatus(option.value);
+    this.applyLocalFilters();
+  }
 
-    // Get sorting parameters
-    const sortField =
-      typeof event.sortField === 'string' ? event.sortField : undefined;
-    const sortOrder = event.sortOrder ?? undefined;
-
-    // Fetch data from the server
-    this.fetchRecords(sortField, sortOrder).subscribe(
-      (data: ApplicationListResponse) => {
-        if (data.data.length > 0) {
-          this.total_record_count = data.total;
-          this.applicationList = data.data;
-          this.populateSummary();
-        }
-      },
-    );
+  onProgrammeChange(option: FilterOption) {
+    this.selectedProgramme = option;
+    this.applyLocalFilters();
   }
 
   onSearchTextChanged(text: string) {
-    if (text != undefined) {
-      this.searchTextChanged.next(text);
-    }
+    this.searchTextChanged.next(text);
   }
 
-  next() {
-    this.first = this.first + this.rows;
+  onPageChange(event: { first?: number; rows?: number }) {
+    this.first = event.first ?? 0;
+    this.rows = event.rows ?? this.rows;
+    this.fetchRecords();
   }
 
-  prev() {
-    this.first = this.first - this.rows;
-  }
-
-  reset() {
-    this.first = 0;
-  }
-
-  pageChange(event: PagingEvent) {
-    this.first = event.first;
-    this.rows = event.rows;
-
-    // Fetch new data based on updated pagination parameters
-    this.fetchRecords().subscribe((data: ApplicationListResponse) => {
-      if (data.data.length > 0) {
-        this.total_record_count = data.total;
-        this.applicationList = data.data;
-        this.populateSummary();
-      }
-    });
-  }
-
-  isLastPage(): boolean {
-    return this.app_summ
-      ? this.first === this.app_summ.length - this.rows
-      : true;
-  }
-
-  isFirstPage(): boolean {
-    return this.app_summ ? this.first === 0 : true;
-  }
-  populateSummary() {
-    const newSummary: ApplicationSummary[] = [];
-    const batch = this.applicationList;
-    batch.forEach((v) => {
-      const _summ: ApplicationSummary = {
-        id: v.id,
-        application_no: v.application_no,
-        first_name: v.first_name,
-        last_name: v.last_name,
-        created_at: v.created_at.toString(),
-        program: v.program.name,
-        approval_status: v.approval_status,
-        action: '<i class="bi bi-three-dots"></i>',
+  private populateSummary() {
+    this.appRows = this.applicationList.map((item) => {
+      const status = this.resolveStatus(item.approval_status);
+      return {
+        id: item.id,
+        application_no: item.application_no,
+        full_name: `${item.first_name} ${item.last_name}`.trim(),
+        jamb_score: item.utme_score ?? item.utme_result?.score ?? 'N/A',
+        o_level: item.o_level_point ?? 'N/A',
+        submission_date: this.formatDate(
+          item.updated_at ?? item.created_at ?? '',
+        ),
+        programme: this.getProgrammeName(item),
+        status_text: status.text,
+        status_tone: status.tone,
       };
-      newSummary.push(_summ);
     });
-    this.app_summ = newSummary;
-    this.cd.detectChanges();
   }
 
-  showActionModal(event: MouseEvent, rowData: ApplicationSummary) {
-    event.stopPropagation();
-    // console.log(rowData.id)
-    // Toggle menu if clicking the same row's action icon
+  private applyLocalFilters() {
+    this.filteredRows = this.appRows.filter((row) => {
+      const statusPass =
+        this.activeCardFilter === 'all' ||
+        row.status_tone === this.activeCardFilter;
+      const programmePass =
+        this.selectedProgramme.value === 'all' ||
+        row.programme === this.selectedProgramme.value;
+      return statusPass && programmePass;
+    });
+    this.selectedApplicantIds = this.selectedApplicantIds.filter((id) =>
+      this.filteredRows.some((row) => row.id === id),
+    );
+    this.selectedRows = this.filteredRows.filter((row) =>
+      this.selectedApplicantIds.includes(row.id),
+    );
+  }
+
+  setCardFilter(filter: ApplicantCardFilter): void {
+    this.activeCardFilter = filter;
+    this.selectedStatus =
+      this.statusOptions.find((item) => item.value === filter) ??
+      this.statusOptions[0];
+    this.applyLocalFilters();
+  }
+
+  isCardActive(filter: ApplicantCardFilter): boolean {
+    return this.activeCardFilter === filter;
+  }
+
+  getCardCount(filter: ApplicantCardFilter): number {
+    if (filter === 'all') {
+      return this.metrics.total_applicants || this.total_record_count;
+    }
+    return this.appRows.filter((row) => row.status_tone === filter).length;
+  }
+
+  private getCardFilterFromStatus(value: string): ApplicantCardFilter {
     if (
-      this.selectedRowData?.application_no === rowData.application_no &&
-      this.showActionMenu
+      value === 'pending' ||
+      value === 'shortlisted' ||
+      value === 'directive' ||
+      value === 'resubmitted'
     ) {
-      this.showActionMenu = false;
-      return;
+      return value;
     }
-
-    this.selectedRowData = rowData;
-    this.showActionMenu = true;
-
-    // Position the menu near the clicked icon
-    this.menuPosition = {
-      x: event.clientX - 10, // 10px left offset
-      y: event.clientY + 10, // 10px below the icon
-    };
-
-    // Adjust position if near window edges
-    const menuWidth = 250; // Approximate menu width
-    const menuHeight = 200; // Approximate menu height
-
-    if (this.menuPosition.x + menuWidth > window.innerWidth) {
-      this.menuPosition.x = window.innerWidth - menuWidth - 10;
-    }
-
-    if (this.menuPosition.y + menuHeight > window.innerHeight) {
-      this.menuPosition.y = event.clientY - menuHeight - 10;
-    }
+    return 'all';
   }
 
-  handleAction(action: string, rowData: ApplicationSummary) {
-    const applicationNo = rowData.application_no;
-    const applicantId = rowData.id;
-    this.showActionMenu = false;
-
-    if (!applicantId) {
-      window.alert('Applicant ID not found for this action.');
-      return;
+  private resolveStatus(status: string): { text: string; tone: StatusTone } {
+    const value = (status ?? '').toLowerCase();
+    if (value.includes('resubmit')) {
+      return { text: 'Resubmitted', tone: 'resubmitted' };
     }
-
-    switch (action.toLowerCase()) {
-      case 'view profile':
-        this.router.navigateByUrl(
-          `/pages/applicants/applicantdetail/${applicationNo.replaceAll('/', '_')}`,
-        );
-        break;
-      case 'reject candidate': {
-        this.openReasonModal(this.rejectAction, rowData);
-        break;
-      }
-      case 'shortlist candidate':
-        this.performApplicantAction(
-          this._applicationService.shortlistApplicants({
-            applicant_ids: [applicantId],
-          }),
-          'Candidate shortlisted successfully.',
-        );
-        break;
-      case 'issue compliance directive': {
-        this.openReasonModal(this.complianceAction, rowData);
-        break;
-      }
+    if (value.includes('shortlist')) {
+      return { text: 'Shortlisted', tone: 'shortlisted' };
     }
+    if (
+      value.includes('compliance') ||
+      value.includes('complaince') ||
+      value.includes('directive')
+    ) {
+      return { text: 'Directive Issued', tone: 'directive' };
+    }
+    if (value.includes('reject')) {
+      return { text: 'Rejected', tone: 'rejected' };
+    }
+    return { text: 'Pending Review', tone: 'pending' };
   }
 
-  openReasonModal(
-    action: 'reject' | 'compliance',
-    rowData: ApplicationSummary,
-  ) {
-    const fullName = `${rowData.first_name} ${rowData.last_name}`.trim();
-    this.pendingReasonAction = action;
-    this.pendingReasonApplicant = rowData;
-    this.reasonModalTitle =
-      action === this.complianceAction
-        ? 'Issue Compliance Directive'
-        : 'Reject Candidate';
-    this.reasonModalPrompt =
-      action === this.complianceAction
-        ? `Do you want to issue compliance directive to ${fullName}?`
-        : `Do you want to reject ${fullName}?`;
-    this.reasonModalConfirmLabel =
-      action === this.complianceAction ? 'Issue Directive' : 'Reject Candidate';
+  private getProgrammeName(item: Application): string {
+    if (
+      typeof item.department === 'string' &&
+      item.department.trim().length > 0
+    ) {
+      return item.department;
+    }
+    if (item.department && typeof item.department !== 'string') {
+      return item.department.name ?? 'N/A';
+    }
+    return item.program?.name ?? 'N/A';
+  }
+
+  private formatDate(input: string): string {
+    const date = new Date(input);
+    if (Number.isNaN(date.getTime())) {
+      return input;
+    }
+    return new Intl.DateTimeFormat('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: '2-digit',
+    }).format(date);
+  }
+
+  isSelected(rowId: number): boolean {
+    return this.selectedApplicantIds.includes(rowId);
+  }
+
+  toggleRowSelection(rowId: number, checked: boolean): void {
+    if (checked && !this.isSelected(rowId)) {
+      this.selectedApplicantIds.push(rowId);
+      return;
+    }
+    this.selectedApplicantIds = this.selectedApplicantIds.filter(
+      (id) => id !== rowId,
+    );
+  }
+
+  toggleSelectAll(checked: boolean): void {
+    if (checked) {
+      this.selectedApplicantIds = this.filteredRows.map((row) => row.id);
+      return;
+    }
+    this.selectedApplicantIds = [];
+  }
+
+  allRowsSelected(): boolean {
+    return (
+      this.filteredRows.length > 0 &&
+      this.filteredRows.every((row) =>
+        this.selectedApplicantIds.includes(row.id),
+      )
+    );
+  }
+
+  onSelectionChange(rows: ApplicationListRow[] | null): void {
+    this.selectedRows = rows ?? [];
+    this.selectedApplicantIds = this.selectedRows.map((row) => row.id);
+  }
+
+  viewProfile(row: ApplicationListRow) {
+    this.selectedApplicationNo = row.application_no;
+    this.isApplicantDrawerVisible = true;
+  }
+
+  isViewActionDisabled(row: ApplicationListRow): boolean {
+    return row.status_tone === 'rejected';
+  }
+
+  isShortlistActionDisabled(row: ApplicationListRow): boolean {
+    return (
+      row.status_tone === 'shortlisted' ||
+      row.status_tone === 'directive' ||
+      row.status_tone === 'rejected'
+    );
+  }
+
+  isComplianceActionDisabled(row: ApplicationListRow): boolean {
+    return row.status_tone === 'directive' || row.status_tone === 'rejected';
+  }
+
+  closeApplicantDrawer() {
+    this.isApplicantDrawerVisible = false;
+    this.selectedApplicationNo = null;
+  }
+
+  shortlistSingle(row: ApplicationListRow) {
+    this.performApplicantAction(
+      this.applicationService.shortlistApplicants({
+        applicant_ids: [row.id],
+      }),
+      'Candidate shortlisted successfully.',
+    );
+  }
+
+  shortlistSelected() {
+    if (this.selectedApplicantIds.length === 0) {
+      return;
+    }
+    this.performApplicantAction(
+      this.applicationService.shortlistApplicants({
+        applicant_ids: this.selectedApplicantIds,
+      }),
+      'Candidates shortlisted successfully.',
+    );
+  }
+
+  openComplianceForSingle(row: ApplicationListRow) {
+    this.pendingDirectiveApplicantIds = [row.id];
+    this.reasonModalPrompt = `Issue compliance directive to ${row.full_name}?`;
+    this.directiveSelectedReason = '';
+    this.directiveSelectedDocuments = [];
+    this.reasonModalInitialNote = '';
+    this.isReasonModalVisible = true;
+  }
+
+  openComplianceForSelected() {
+    if (this.selectedApplicantIds.length === 0) {
+      return;
+    }
+    this.pendingDirectiveApplicantIds = [...this.selectedApplicantIds];
+    this.reasonModalPrompt = `Issue compliance directive to ${this.selectedApplicantIds.length} selected candidate(s)?`;
+    this.directiveSelectedReason = '';
+    this.directiveSelectedDocuments = [];
     this.reasonModalInitialNote = '';
     this.isReasonModalVisible = true;
   }
 
   closeReasonModal() {
     this.isReasonModalVisible = false;
-    this.pendingReasonAction = null;
-    this.pendingReasonApplicant = undefined;
+    this.pendingDirectiveApplicantIds = [];
     this.reasonModalInitialNote = '';
   }
 
-  submitReasonModal(note: string) {
-    const applicantId = this.pendingReasonApplicant?.id;
-    if (!applicantId || !this.pendingReasonAction) {
+  submitReasonModalPayload(payload: ActionModalPayload) {
+    if (this.pendingDirectiveApplicantIds.length === 0) {
       window.alert('Applicant ID not found for this action.');
       return;
     }
 
     this.isReasonActionLoading = true;
-
-    if (this.pendingReasonAction === this.complianceAction) {
-      const payload: ComplianceDirectivePayload = {
-        applicant_ids: [applicantId],
-        extra_note: note,
-      };
-      this.performApplicantAction(
-        this._applicationService.issueComplianceDirective(payload),
-        'Compliance directive issued successfully.',
-        () => this.closeReasonModal(),
-      );
-      return;
-    }
-
-    const payload: RejectApplicantPayload = {
-      applicant_ids: [applicantId],
-      extra_note: note,
+    const requestPayload: ComplianceDirectivePayload = {
+      applicant_ids: this.pendingDirectiveApplicantIds,
+      extra_note: this.composeDirectiveNote(payload),
     };
     this.performApplicantAction(
-      this._applicationService.rejectApplicants(payload),
-      'Candidate rejected successfully.',
+      this.applicationService.issueComplianceDirective(requestPayload),
+      'Compliance directive issued successfully.',
       () => this.closeReasonModal(),
     );
   }
 
+  private composeDirectiveNote(payload: ActionModalPayload): string {
+    const lines: string[] = [];
+    if (payload.reason) {
+      lines.push(`Reason: ${payload.reason}`);
+    }
+    if (payload.affectedDocuments.length > 0) {
+      lines.push(`Affected Documents: ${payload.affectedDocuments.join(', ')}`);
+    }
+    if (payload.note) {
+      lines.push(`Additional Notes: ${payload.note}`);
+    }
+    return lines.join('\n');
+  }
+
   private performApplicantAction(
-    request: Observable<unknown>,
+    request: import('rxjs').Observable<unknown>,
     successMessage: string,
     onSuccess?: () => void,
   ) {
@@ -417,13 +498,8 @@ export class ApplicantlistsComponent implements OnInit {
       next: () => {
         onSuccess?.();
         window.alert(successMessage);
-        this.fetchRecords().subscribe((data: ApplicationListResponse) => {
-          if (data.data.length > 0) {
-            this.total_record_count = data.total;
-            this.applicationList = data.data;
-            this.populateSummary();
-          }
-        });
+        this.selectedApplicantIds = [];
+        this.fetchRecords();
       },
       error: (err) => {
         const message =

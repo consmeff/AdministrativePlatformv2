@@ -3,7 +3,7 @@ export interface ApplicationListResponse {
   current_page: number;
   last_page: number;
   total: number;
-  next_page_url: string;
+  next_page_url: string | null;
   prev_page_url: string | null;
   data: Application[];
 }
@@ -14,19 +14,21 @@ export interface Application {
   first_name: string;
   last_name: string;
   other_names: string;
-  email: string;
-  phone_number: string;
-  alt_phone_number: string;
+  email?: string;
+  phone_number?: string;
+  alt_phone_number?: string;
   certificate_of_birth?: CertificateOfBirth;
   o_level_result?: OLevelResult[];
+  o_level_point?: number | null;
   certificate_of_origin?: CertificateOfOrigin;
   passport_photo?: PassportPhoto;
-  marital_status: string;
-  payment_status: string;
+  marital_status?: string;
+  payment_status?: string;
   payment_slip?: PaymentSlip;
   dob?: string;
-  gender: string;
+  gender?: string;
   utme_result?: UtmeResult;
+  utme_score?: number | null;
   residential_address?: ResidentialAddress;
   correspondence_address?: CorrespondenceAddress;
   nationality?: string;
@@ -34,16 +36,16 @@ export interface Application {
   state_of_origin?: string;
   lga?: string;
   primary_parent_or_guardian?: PrimaryParentOrGuardian;
-  secondary_parent_or_guardian: PrimaryParentOrGuardian | null;
+  secondary_parent_or_guardian?: PrimaryParentOrGuardian | null;
   approval_status: string;
-  payment_record: Record<string, unknown> | null;
-  program: Program;
-  session: Session;
-  academic_history: AcademicHistory[];
-  department: Department;
+  payment_record?: Record<string, unknown> | null;
+  program?: Program;
+  session?: Session;
+  academic_history?: AcademicHistory[];
+  department?: Department | string;
   compliance_directive?: string;
-  deleted_at: string | null;
-  created_at: string;
+  deleted_at?: string | null;
+  created_at?: string;
   updated_at: string;
 }
 

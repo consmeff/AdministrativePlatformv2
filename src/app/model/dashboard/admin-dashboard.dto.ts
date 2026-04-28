@@ -16,7 +16,7 @@ export interface ApprovalStatusBreakdown {
   total_rejected: number;
   total_shortlisted: number;
   total_approved: number;
-  total_confirmed: number;
+  total_admitted: number;
   total_compliance_required: number;
 }
 

@@ -1,5 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+  inject,
+} from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import {
   ApplicationService,
@@ -34,12 +43,16 @@ import { ButtonComponent } from '../../../widgets/button/button.component';
   templateUrl: './applicantdetail.component.html',
   styleUrl: './applicantdetail.component.scss',
 })
-export class ApplicantdetailComponent implements OnInit {
+export class ApplicantdetailComponent implements OnInit, OnChanges {
   private readonly rejectAction = 'reject';
   private readonly complianceAction = 'compliance';
   _applicationservice = inject(ApplicationService);
   application: Application = {} as Application;
   route = inject(ActivatedRoute);
+
+  @Input() applicationNo: string | null = null;
+  @Input() embedded = false;
+  @Output() closed = new EventEmitter<void>();
 
   app_no: string | null = '';
   isIssuingCompliance = false;
@@ -66,12 +79,24 @@ export class ApplicantdetailComponent implements OnInit {
   academicHistoryRows: Record<string, unknown>[] = [];
   documentRows: Record<string, unknown>[] = [];
 
-  constructor() {
-    this.app_no = this.route.snapshot.paramMap.get('appno');
-  }
   ngOnInit(): void {
-    this.app_no = this.app_no!.replaceAll('_', '/');
+    this.loadApplication();
+  }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['applicationNo'] && !changes['applicationNo'].firstChange) {
+      this.loadApplication();
+    }
+  }
+
+  private loadApplication(): void {
+    const rawApplicationNo =
+      this.applicationNo ?? this.route.snapshot.paramMap.get('appno');
+    if (!rawApplicationNo) {
+      return;
+    }
+
+    this.app_no = rawApplicationNo.replaceAll('_', '/');
     this._applicationservice
       .getapplication(this.app_no!)
       .subscribe((data: ApplicationListResponse) => {
@@ -83,20 +108,19 @@ export class ApplicantdetailComponent implements OnInit {
   }
 
   getAcademicHistory(name: string): AcademicHistory | undefined {
+    const academicHistory = this.application.academic_history ?? [];
     if (name == 'primary') {
-      return this.application.academic_history.filter(
+      return academicHistory.filter(
         (f) => f.certificate_type == 'Primary School Leaving Certificate',
       )[0];
     } else if (name == 'secondary') {
-      return this.application.academic_history.filter(
-        (f) => f.certificate_type == 'SSSCE',
-      )[0];
+      return academicHistory.filter((f) => f.certificate_type == 'SSSCE')[0];
     } else {
       return undefined;
     }
   }
   getAttemptCount(): number {
-    return this.application.academic_history.filter(
+    return (this.application.academic_history ?? []).filter(
       (f) => f.certificate_type == 'SSSCE',
     ).length;
   }
@@ -531,6 +555,43 @@ export class ApplicantdetailComponent implements OnInit {
     return (this.application?.approval_status ?? '').toLowerCase();
   }
 
+  private getResolvedStatus(): {
+    text: string;
+    tone: 'pending' | 'shortlisted' | 'directive' | 'resubmitted' | 'rejected';
+  } {
+    const status = this.getNormalizedApprovalStatus();
+    if (status.includes('resubmit')) {
+      return { text: 'Resubmitted', tone: 'resubmitted' };
+    }
+    if (status.includes('shortlist')) {
+      return { text: 'Shortlisted', tone: 'shortlisted' };
+    }
+    if (
+      status.includes('compliance') ||
+      status.includes('complaince') ||
+      status.includes('directive')
+    ) {
+      return { text: 'Directive Issued', tone: 'directive' };
+    }
+    if (status.includes('reject')) {
+      return { text: 'Rejected', tone: 'rejected' };
+    }
+    return { text: 'Pending Review', tone: 'pending' };
+  }
+
+  getApplicantFullName(): string {
+    const fullName =
+      `${this.application?.first_name ?? ''} ${this.application?.last_name ?? ''}`.trim();
+    return fullName || 'Applicant';
+  }
+
+  getApplicantPhotoUrl(): string {
+    return (
+      this.application?.passport_photo?.file_url ??
+      'assets/dashboard/profile.jpeg'
+    );
+  }
+
   isShortlistedForExam(): boolean {
     return this.getNormalizedApprovalStatus().includes('shortlist');
   }
@@ -562,16 +623,24 @@ export class ApplicantdetailComponent implements OnInit {
   }
 
   getDisplayStatus(): string {
-    if (this.isComplianceRequired()) {
-      return 'Compliance required';
+    return this.getResolvedStatus().text;
+  }
+
+  getHeroStatusClass(): string {
+    const tone = this.getResolvedStatus().tone;
+    if (tone === 'shortlisted') {
+      return 'hero-status-shortlisted';
     }
-    if (this.isComplianceIssued()) {
-      return 'Issued compliance directive';
+    if (tone === 'directive') {
+      return 'hero-status-directive';
     }
-    if (this.isShortlistedForExam()) {
-      return 'Shortlisted for Exam';
+    if (tone === 'resubmitted') {
+      return 'hero-status-resubmitted';
     }
-    return this.application.approval_status ?? 'Pending';
+    if (tone === 'rejected') {
+      return 'hero-status-rejected';
+    }
+    return 'hero-status-pending';
   }
 
   getStatusClassName(): string {

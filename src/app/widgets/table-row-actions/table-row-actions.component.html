@@ -1,0 +1,32 @@
+<div class="row-actions">
+  <button
+    class="action-btn"
+    type="button"
+    aria-label="View Profile"
+    data-tooltip="View Profile"
+    [disabled]="disableView"
+    (click)="view.emit()"
+  >
+    <i class="bi bi-eye"></i>
+  </button>
+  <button
+    class="action-btn"
+    type="button"
+    aria-label="Shortlist"
+    data-tooltip="Shortlist"
+    [disabled]="disableShortlist"
+    (click)="shortlist.emit()"
+  >
+    <i class="bi bi-check"></i>
+  </button>
+  <button
+    class="action-btn"
+    type="button"
+    aria-label="Issue Compliance"
+    data-tooltip="Issue Compliance"
+    [disabled]="disableCompliance || disableShortlist"
+    (click)="compliance.emit()"
+  >
+    <i class="bi bi-exclamation-triangle"></i>
+  </button>
+</div>

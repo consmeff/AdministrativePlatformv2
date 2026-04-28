@@ -1,0 +1,23 @@
+.search-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.form-control {
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid var(--app-border);
+  padding-right: 3rem;
+}
+
+.search-btn {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: none;
+  background-color: var(--app-primary);
+  color: #fff;
+}

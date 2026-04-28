@@ -1,0 +1,12 @@
+<article class="metric-card" [class.active]="active">
+  <p class="metric-title">{{ title }}</p>
+  <div class="metric-head">
+    <h3>{{ value }}</h3>
+    @if (icon) {
+      <img [src]="icon" alt="" />
+    }
+  </div>
+  @if (subtext) {
+    <small>{{ subtext }}</small>
+  }
+</article>

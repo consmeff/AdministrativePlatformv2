@@ -46,11 +46,6 @@ body {
   font-family: "Lato", sans-serif;
 }
 
-.layout .content {
-  position: relative;
-  z-index: 999999;
-}
-
 .is-valid {
   border-color: #86b7fe !important;
 }
@@ -60,7 +55,25 @@ body {
 }
 
 .center-pane {
-  z-index: 999999;
+  position: relative;
+  z-index: 1;
+}
+
+.applicant-detail-drawer {
+  width: min(980px, 96vw) !important;
+}
+
+.applicant-detail-drawer .p-drawer-content {
+  padding: 0;
+  overflow: auto;
+}
+
+.p-drawer-mask {
+  z-index: 2000000 !important;
+}
+
+.p-drawer {
+  z-index: 2000001 !important;
 }
 
 .body-small {
@@ -100,4 +113,16 @@ body {
 
 .p-tablist-tab-list {
   border-color: var(--app-border);
+}
+* {
+  box-sizing: border-box;
+  outline: none;
+  :disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+ul {
+  list-style: none;
+  padding: 0 !important;
 }
