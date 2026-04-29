@@ -1,0 +1,53 @@
+<div class="details-backdrop" (click)="onClose()">
+  <article class="details-modal" (click)="$event.stopPropagation()">
+    <button type="button" class="close-btn" (click)="onClose()">
+      <i class="bi bi-x"></i>
+    </button>
+    <h3>Transaction Details</h3>
+
+    <div class="details-top">
+      <div class="details-label">Amount</div>
+      <div class="details-amount">{{ formatAmount(transaction.amount) }}</div>
+
+      <div class="details-grid">
+        <span>Reference Number</span>
+        <strong>{{ transaction.referenceNo }}</strong>
+        <span>Payment Type</span>
+        <strong>{{ transaction.paymentTypeLabel }}</strong>
+        <span>Payment Date</span>
+        <strong>{{ transaction.paymentDateTime }}</strong>
+        <span>Status</span>
+        <strong [ngClass]="['status-text', getStatusClass(transaction.status)]">
+          {{ getStatusLabel(transaction.status) }}
+        </strong>
+      </div>
+    </div>
+
+    <section class="payer-card">
+      <h4>Payer Information</h4>
+      <div class="payer-row">
+        <span>Full Name</span><strong>{{ transaction.fullName }}</strong>
+      </div>
+      <div class="payer-row">
+        <span>Programme</span><strong>{{ transaction.programme }}</strong>
+      </div>
+      <div class="payer-row">
+        <span>Level</span><strong>{{ transaction.payerLevel }}</strong>
+      </div>
+      <div class="payer-row">
+        <span>Application / Matric No.</span
+        ><strong>{{ transaction.applicationNo }}</strong>
+      </div>
+      <div class="payer-row">
+        <span>Email</span><strong>{{ transaction.email }}</strong>
+      </div>
+      <div class="payer-row">
+        <span>Phone No.</span><strong>{{ transaction.phoneNumber }}</strong>
+      </div>
+    </section>
+
+    <button type="button" class="download-btn" (click)="onDownload()">
+      Download Receipt
+    </button>
+  </article>
+</div>

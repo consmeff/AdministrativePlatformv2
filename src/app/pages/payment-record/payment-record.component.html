@@ -1,0 +1,159 @@
+<section class="payment-page">
+  <div class="page-title-row">
+    <h2>Payment Records</h2>
+    <p-select
+      [options]="sessionOptions"
+      [(ngModel)]="selectedSession"
+      optionLabel="label"
+      class="session-select"
+    />
+  </div>
+
+  <div class="metrics-grid">
+    <article class="metric-card total-revenue-card">
+      <p class="metric-title">Total Revenue</p>
+      <h3>N684.3M</h3>
+      <span class="metric-subtext">1054 Transactions</span>
+    </article>
+
+    @for (card of summaryCards; track card.title) {
+      <article class="metric-card">
+        <p class="metric-title">{{ card.title }}</p>
+        <h3>{{ card.amountText }}</h3>
+        <span class="metric-subtext">{{ card.subText }}</span>
+      </article>
+    }
+  </div>
+
+  <hr class="section-divider" />
+
+  <section class="transactions-wrap">
+    <h3>All Transactions</h3>
+
+    <div class="filters-row">
+      <div class="search-box">
+        <input
+          type="text"
+          class="search-input"
+          [(ngModel)]="searchText"
+          (ngModelChange)="onSearchChange()"
+          placeholder="Search by name, reference no. or application no."
+        />
+        <button type="button" class="search-btn">
+          <i class="bi bi-search"></i>
+        </button>
+      </div>
+
+      <p-select
+        [options]="paymentTypeOptions"
+        [(ngModel)]="selectedPaymentType"
+        optionLabel="label"
+        class="filter-select"
+        (onChange)="onPaymentTypeChange()"
+      />
+      <p-select
+        [options]="statusOptions"
+        [(ngModel)]="selectedStatus"
+        optionLabel="label"
+        class="filter-select"
+        (onChange)="onStatusChange()"
+      />
+      <p-select
+        [options]="programmeOptions"
+        [(ngModel)]="selectedProgramme"
+        optionLabel="label"
+        class="filter-select"
+        (onChange)="onProgrammeChange()"
+      />
+      <p-select
+        [options]="dateOptions"
+        [(ngModel)]="selectedDate"
+        optionLabel="label"
+        class="filter-select"
+        (onChange)="onDateChange()"
+      />
+    </div>
+
+    <p-table
+      [value]="pagedTransactions"
+      [tableStyle]="{ 'min-width': '70rem' }"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Date &amp; Time</th>
+          <th>Full Name</th>
+          <th>Payment Type</th>
+          <th>Reference No.</th>
+          <th>Programme</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-row>
+        <tr>
+          <td>
+            <div class="cell-primary">{{ row.dateText }}</div>
+            <div class="cell-secondary">{{ row.timeText }}</div>
+          </td>
+          <td>
+            <div class="cell-primary">{{ row.fullName }}</div>
+            <div class="cell-secondary">{{ row.applicationNo }}</div>
+          </td>
+          <td>
+            <span class="type-pill">{{ row.paymentTypeLabel }}</span>
+            @if (row.installmentLabel) {
+              <div class="cell-secondary">{{ row.installmentLabel }}</div>
+            }
+          </td>
+          <td>{{ row.referenceNo }}</td>
+          <td>{{ row.programme }}</td>
+          <td class="amount-cell">{{ formatAmount(row.amount) }}</td>
+          <td>
+            <span class="status-pill" [ngClass]="getStatusClass(row.status)">
+              <i class="bi bi-circle-fill"></i>
+              {{ getStatusLabel(row.status) }}
+            </span>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <button
+                type="button"
+                class="icon-btn"
+                (click)="openTransactionDetails(row)"
+              >
+                <i class="bi bi-eye"></i>
+              </button>
+              <button
+                type="button"
+                class="icon-btn"
+                (click)="downloadReceipt(row)"
+              >
+                <i class="bi bi-download"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <p-paginator
+      [first]="first"
+      [rows]="rows"
+      [totalRecords]="filteredTransactions.length"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} items"
+      [rowsPerPageOptions]="[10]"
+      (onPageChange)="onPageChange($event)"
+    />
+  </section>
+</section>
+
+@if (selectedTransaction) {
+  <app-payment-receipt-modal
+    [transaction]="selectedTransaction"
+    (closed)="closeTransactionDetails()"
+    (download)="downloadReceipt($event)"
+  />
+}
