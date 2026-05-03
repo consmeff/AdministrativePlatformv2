@@ -1,10 +1,7 @@
 <div class="top-bar">
   <div class="d-flex align-items-center">
     <i class="bi bi-list burger-menu" (click)="toggleSidebar()"></i>
-    <div
-      class=""
-      [ngStyle]="{ 'margin-left': sidebarVisible ? '12rem' : '1rem' }"
-    >
+    <div class="top-title">
       Current Session:
       {{
         dashinfo && dashinfo.academicsession != null

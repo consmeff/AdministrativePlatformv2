@@ -17,6 +17,8 @@
   --app-info: #c77c27;
   --app-link: #0d6efd;
   --app-shadow-sm: 0 2px 5px rgba(15, 23, 42, 0.08);
+  --app-neutral-500: #64748b;
+  --app-neutral-600: #475569;
 }
 
 [data-theme="dark"] {
@@ -33,6 +35,8 @@
   --app-info: #f59e0b;
   --app-link: #60a5fa;
   --app-shadow-sm: 0 2px 5px rgba(2, 6, 23, 0.45);
+  --app-neutral-500: #64748b;
+  --app-neutral-600: #475569;
 }
 
 html,
@@ -86,6 +90,43 @@ body {
   letter-spacing: 0%;
 }
 
+.body-xs,
+.body-xs-500 {
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 150%;
+  letter-spacing: 0%;
+}
+.body-xs-500 {
+  font-weight: 500;
+}
+
+.label-small {
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 120%;
+  letter-spacing: 0%;
+}
+
+.title-large {
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 120%;
+  letter-spacing: 0%;
+}
+.title-medium {
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 120%;
+  letter-spacing: 0%;
+}
+.title-small {
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 120%;
+  letter-spacing: 0%;
+}
+
 .card,
 .table,
 .table-responsive,
@@ -115,20 +156,22 @@ body {
 .p-tablist-tab-list {
   border-color: var(--app-border);
 }
+
 * {
   box-sizing: border-box;
   outline: none;
+
   :disabled {
     cursor: not-allowed;
     opacity: 0.5;
   }
 }
+
 ul {
   list-style: none;
   padding: 0 !important;
 }
 
-/* Global table header typography and spacing */
 table thead th,
 .p-datatable thead th {
   font-family: "Raleway", "Inter", "Montserrat", sans-serif;
@@ -140,7 +183,6 @@ table thead th,
   background-color: var(--app-bg);
 }
 
-/* Header row radius (applied through first/last cells for table compatibility) */
 table thead tr th:first-child,
 .p-datatable thead tr th:first-child {
   border-top-left-radius: 8px;
@@ -153,7 +195,6 @@ table thead tr th:last-child,
   border-bottom-right-radius: 8px;
 }
 
-/* Approximate 24px inter-column gap for header cells */
 table thead tr th:not(:last-child),
 .p-datatable thead tr th:not(:last-child),
 table tbody tr td:not(:last-child),
