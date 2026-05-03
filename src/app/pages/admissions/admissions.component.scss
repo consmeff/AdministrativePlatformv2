@@ -76,10 +76,18 @@
 }
 
 .applicant-name {
-  font-weight: 700;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 120%;
+  letter-spacing: 0%;
+  color: var(--app-text-primary);
 }
 
 .application-no {
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 150%;
+  letter-spacing: 0%;
   color: var(--app-text-secondary);
 }
 

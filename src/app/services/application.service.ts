@@ -1,8 +1,11 @@
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ApplicationListResponse } from '../model/dashboard/applicant';
+import {
+  Application,
+  ApplicationListResponse,
+} from '../model/dashboard/applicant';
 import { AdminDashboardMetrics } from '../model/dashboard/admin-dashboard.dto';
 
 export interface ComplianceDirectivePayload {
@@ -53,9 +56,14 @@ export class ApplicationService {
     return this.http.get<ApplicationListResponse>(url);
   }
 
-  getapplication(app_no: string): Observable<ApplicationListResponse> {
-    const Url = `${this.apiRoot}/api/v1/applicants?application_no=${app_no}`;
-    return this.http.get<ApplicationListResponse>(Url);
+  getapplication(
+    applicantNo: string,
+  ): Observable<ApplicationListResponse | Application> {
+    const url = `${this.apiRoot}/api/v1/applicants/single`;
+    const params = new HttpParams().set('applicant_no', applicantNo);
+    return this.http.get<ApplicationListResponse | Application>(url, {
+      params,
+    });
   }
 
   getAdminDashboardMetrics(): Observable<AdminDashboardMetrics> {

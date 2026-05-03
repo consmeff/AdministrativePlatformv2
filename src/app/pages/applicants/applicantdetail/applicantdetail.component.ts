@@ -99,12 +99,33 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
     this.app_no = rawApplicationNo.replaceAll('_', '/');
     this._applicationservice
       .getapplication(this.app_no!)
-      .subscribe((data: ApplicationListResponse) => {
-        if (data.data.length > 0) {
-          this.application = data.data[0];
-          this.buildDetailRows();
+      .subscribe((response: ApplicationListResponse | Application) => {
+        const applicant = this.resolveApplicantFromResponse(response);
+        if (!applicant) {
+          return;
         }
+        this.application = applicant;
+        this.buildDetailRows();
       });
+  }
+
+  private resolveApplicantFromResponse(
+    response: ApplicationListResponse | Application,
+  ): Application | null {
+    if (response && typeof response === 'object' && 'data' in response) {
+      if (Array.isArray(response.data)) {
+        return response.data.length > 0 ? response.data[0] : null;
+      }
+      if (
+        response.data &&
+        typeof response.data === 'object' &&
+        'application_no' in response.data
+      ) {
+        return response.data as unknown as Application;
+      }
+      return null;
+    }
+    return response ?? null;
   }
 
   getAcademicHistory(name: string): AcademicHistory | undefined {

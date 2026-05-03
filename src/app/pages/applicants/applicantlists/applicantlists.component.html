@@ -47,26 +47,30 @@
     </button>
   </header>
 
-  <section class="bulk-actions">
-    <span class="selected-count"
-      >{{ selectedApplicantIds.length }} Candidates selected</span
-    >
-    <app-button
-      variant="outline"
-      iconClass="bi bi-exclamation-triangle"
-      (buttonClick)="openComplianceForSelected()"
-      [disabled]="selectedApplicantIds.length === 0"
-    >
-      Issue Compliance Directive
-    </app-button>
-    <app-button
-      variant="primary"
-      (buttonClick)="shortlistSelected()"
-      [disabled]="selectedApplicantIds.length === 0"
-    >
-      Shortlist
-    </app-button>
-  </section>
+  @if (selectedApplicantIds.length > 0) {
+    <ng-container>
+      <section class="bulk-actions">
+        <span class="selected-count"
+          >{{ selectedApplicantIds.length }} Candidates selected</span
+        >
+        <app-button
+          variant="outline"
+          iconClass="bi bi-exclamation-triangle"
+          (buttonClick)="openComplianceForSelected()"
+          [disabled]="selectedApplicantIds.length === 0"
+        >
+          Issue Compliance Directive
+        </app-button>
+        <app-button
+          variant="primary"
+          (buttonClick)="shortlistSelected()"
+          [disabled]="selectedApplicantIds.length === 0"
+        >
+          Shortlist
+        </app-button>
+      </section>
+    </ng-container>
+  }
 
   <section class="filters-row">
     <div class="filter-main">
@@ -144,6 +148,8 @@
           </td>
           <td>
             <app-table-row-actions
+              [disableCompliance]="row.status_text === 'Shortlisted'"
+              [disableShortlist]="row.status_text === 'Shortlisted'"
               (view)="viewProfile(row)"
               (shortlist)="shortlistSingle(row)"
               (compliance)="openComplianceForSingle(row)"

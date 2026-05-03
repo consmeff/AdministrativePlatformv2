@@ -29,6 +29,9 @@
 }
 
 .legend-text {
-  font-size: 0.95rem;
-  color: #6b7280;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 150%;
+  letter-spacing: 0%;
+  color: var(--app-text-secondary);
 }

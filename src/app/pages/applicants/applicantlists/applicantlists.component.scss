@@ -82,11 +82,18 @@
 
 .applicant-name {
   font-weight: 600;
+  font-size: 12px;
+  line-height: 120%;
+  letter-spacing: 0%;
+  color: var(--app-text-primary);
 }
 
 .application-no {
-  color: #6b7280;
-  font-size: 0.8rem;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 150%;
+  letter-spacing: 0%;
+  color: var(--app-text-secondary);
 }
 
 @media (max-width: 1200px) {

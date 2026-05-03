@@ -6,9 +6,11 @@
 
 .section-title {
   margin: 0;
-  font-size: 1.65rem;
-  font-weight: 700;
-  color: #0b1b54;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 120%;
+  letter-spacing: 0%;
+  color: var(--app-text-primary);
 }
 
 .status-section {
@@ -33,8 +35,11 @@
 
 .viewall {
   color: var(--app-primary);
-  font-size: 1.25rem;
   font-weight: 600;
+  font-size: 12px;
+  line-height: 120%;
+  letter-spacing: 0%;
+
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -75,12 +80,18 @@
 
 .applicant-name {
   font-weight: 600;
+  font-size: 12px;
+  line-height: 120%;
+  letter-spacing: 0%;
+  color: var(--app-text-primary);
 }
 
 .application-no {
-  color: #6b7280;
-  font-size: 0.8rem;
-  margin-top: 2px;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 150%;
+  letter-spacing: 0%;
+  color: var(--app-text-secondary);
 }
 
 @media (max-width: 992px) {
