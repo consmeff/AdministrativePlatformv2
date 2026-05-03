@@ -11,6 +11,10 @@
   align-items: stretch;
 }
 
+.cards-head app-metric-card {
+  display: block;
+}
+
 .summary-card {
   border: 1px solid #dbe8ff;
   border-radius: 12px;

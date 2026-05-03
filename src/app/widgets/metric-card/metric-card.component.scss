@@ -8,6 +8,10 @@
   gap: 20px;
 }
 
+.metric-card.clickable {
+  cursor: pointer;
+}
+
 .metric-card.active {
   background-color: var(--app-primary);
   border-color: var(--app-primary);
@@ -20,7 +24,8 @@
   align-items: center;
 }
 
-.metric-card h3 {
+.metric-card h3,
+.metric-card.filter-card h3.metric {
   font-weight: 600;
   font-size: 24px;
   line-height: 120%;
@@ -44,4 +49,29 @@
 
 small {
   color: var(--app-text-muted);
+}
+
+.metric-card.filter-card {
+  border: 1px solid #dbe8ff;
+  border-radius: 12px;
+  background: #fff;
+  color: #1a2f59;
+  padding: 14px 16px;
+  text-align: left;
+  gap: 4px;
+}
+
+.metric-card.filter-card .metric-head {
+  display: block;
+}
+
+.metric-card.filter-card .metric-title.label {
+  font-weight: 500;
+  color: inherit;
+}
+
+.metric-card.filter-card.active {
+  background: var(--app-primary);
+  border-color: var(--app-primary);
+  color: #fff;
 }

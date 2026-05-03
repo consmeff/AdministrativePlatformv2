@@ -32,6 +32,7 @@ import {
 } from '../../../widgets/status-indicator/status-indicator.component';
 import { TableRowActionsComponent } from '../../../widgets/table-row-actions/table-row-actions.component';
 import { ApplicantdetailComponent } from '../applicantdetail/applicantdetail.component';
+import { MetricCardComponent } from '../../../widgets/metric-card/metric-card.component';
 
 interface FilterOption {
   label: string;
@@ -48,6 +49,11 @@ interface ApplicationListRow {
   programme: string;
   status_text: string;
   status_tone: StatusTone;
+}
+
+interface ApplicantFilterCard {
+  label: string;
+  filter: ApplicantCardFilter;
 }
 
 type ApplicantCardFilter =
@@ -72,6 +78,7 @@ type ApplicantCardFilter =
     AppPaginationComponent,
     ButtonComponent,
     ApplicantdetailComponent,
+    MetricCardComponent,
   ],
   templateUrl: './applicantlists.component.html',
   styleUrl: './applicantlists.component.scss',
@@ -119,6 +126,13 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   selectedStatus: FilterOption = this.statusOptions[0];
   selectedProgramme: FilterOption = this.programmeOptions[0];
   activeCardFilter: ApplicantCardFilter = 'all';
+  readonly filterCards: ApplicantFilterCard[] = [
+    { label: 'All Applicants', filter: 'all' },
+    { label: 'Pending Review', filter: 'pending' },
+    { label: 'Shortlisted', filter: 'shortlisted' },
+    { label: 'Directive Issued', filter: 'directive' },
+    { label: 'Resubmitted', filter: 'resubmitted' },
+  ];
 
   metrics: AdminDashboardMetrics = {
     total_applicants: 0,

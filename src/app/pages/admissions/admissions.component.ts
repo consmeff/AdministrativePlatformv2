@@ -38,6 +38,7 @@ import { SearchInputComponent } from '../../widgets/search-input/search-input.co
 import { TableRowActionsComponent } from '../../widgets/table-row-actions/table-row-actions.component';
 import { ApplicantdetailComponent } from '../applicants/applicantdetail/applicantdetail.component';
 import { AdmissionsUploadFlowComponent } from './upload-flow/admissions-upload-flow.component';
+import { MetricCardComponent } from '../../widgets/metric-card/metric-card.component';
 
 interface PagingEvent {
   first: number;
@@ -70,6 +71,11 @@ type AdmissionDecisionFilter =
   | 'pending-publish'
   | 'admitted';
 
+interface AdmissionFilterCard {
+  label: string;
+  filter: AdmissionDecisionFilter;
+}
+
 @Component({
   selector: 'app-admissions',
 
@@ -85,6 +91,7 @@ type AdmissionDecisionFilter =
     TableRowActionsComponent,
     ApplicantdetailComponent,
     AdmissionsUploadFlowComponent,
+    MetricCardComponent,
   ],
   templateUrl: './admissions.component.html',
   styleUrl: './admissions.component.scss',
@@ -112,6 +119,12 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   selectedApplicationNo: string | null = null;
   isApplicantDrawerVisible = false;
   activeCardFilter: AdmissionDecisionFilter = 'all';
+  readonly filterCards: AdmissionFilterCard[] = [
+    { label: 'All Candidates', filter: 'all' },
+    { label: 'Pending Review', filter: 'pending-review' },
+    { label: 'Pending Publish', filter: 'pending-publish' },
+    { label: 'Admitted Candidates', filter: 'admitted' },
+  ];
   private searchTextChanged = new Subject<string>();
   searchKeyword: string | undefined = undefined;
 

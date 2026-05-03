@@ -3,42 +3,16 @@
 } @else {
   <section class="admissions-shell">
     <div class="cards-head">
-      <button
-        type="button"
-        class="summary-card"
-        [class.active]="isCardActive('all')"
-        (click)="setCardFilter('all')"
-      >
-        <span class="metric">{{ getCardCount("all") }}</span>
-        <span class="label">All Candidates</span>
-      </button>
-      <button
-        type="button"
-        class="summary-card"
-        [class.active]="isCardActive('pending-review')"
-        (click)="setCardFilter('pending-review')"
-      >
-        <span class="metric">{{ getCardCount("pending-review") }}</span>
-        <span class="label">Pending Review</span>
-      </button>
-      <button
-        type="button"
-        class="summary-card"
-        [class.active]="isCardActive('pending-publish')"
-        (click)="setCardFilter('pending-publish')"
-      >
-        <span class="metric">{{ getCardCount("pending-publish") }}</span>
-        <span class="label">Pending Publish</span>
-      </button>
-      <button
-        type="button"
-        class="summary-card"
-        [class.active]="isCardActive('admitted')"
-        (click)="setCardFilter('admitted')"
-      >
-        <span class="metric">{{ getCardCount("admitted") }}</span>
-        <span class="label">Admitted Candidates</span>
-      </button>
+      @for (card of filterCards; track card.filter) {
+        <app-metric-card
+          variant="filter"
+          [title]="card.label"
+          [value]="getCardCount(card.filter)"
+          [active]="isCardActive(card.filter)"
+          [clickable]="true"
+          (cardClick)="setCardFilter(card.filter)"
+        />
+      }
       @if (shouldShowPrimaryAction()) {
         <button
           type="button"

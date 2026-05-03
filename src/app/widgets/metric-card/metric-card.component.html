@@ -1,11 +1,21 @@
-<article class="metric-card" [class.active]="active">
+<article
+  class="metric-card"
+  [class.active]="active"
+  [class.filter-card]="variant === 'filter'"
+  [class.clickable]="clickable"
+  [attr.role]="clickable ? 'button' : null"
+  [attr.tabindex]="clickable ? '0' : null"
+  (click)="onCardClick()"
+  (keydown.enter)="onCardClick()"
+  (keydown.space)="$event.preventDefault(); onCardClick()"
+>
   <div class="metric-head">
-    <p class="metric-title">{{ title }}</p>
+    <p class="metric-title" [class.label]="variant === 'filter'">{{ title }}</p>
     @if (icon) {
       <img [src]="icon" alt="" />
     }
   </div>
-  <h3>{{ value }}</h3>
+  <h3 [class.metric]="variant === 'filter'">{{ value }}</h3>
   @if (subtext) {
     <small>{{ subtext }}</small>
   }

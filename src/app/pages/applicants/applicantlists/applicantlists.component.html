@@ -1,50 +1,15 @@
 <section class="applications-page">
   <header class="top-cards">
-    <button
-      type="button"
-      class="summary-card"
-      [class.active]="isCardActive('all')"
-      (click)="setCardFilter('all')"
-    >
-      <span class="metric">{{ getCardCount("all") }}</span>
-      <span class="label">All Applicants</span>
-    </button>
-    <button
-      type="button"
-      class="summary-card"
-      [class.active]="isCardActive('pending')"
-      (click)="setCardFilter('pending')"
-    >
-      <span class="metric">{{ getCardCount("pending") }}</span>
-      <span class="label">Pending Review</span>
-    </button>
-    <button
-      type="button"
-      class="summary-card"
-      [class.active]="isCardActive('shortlisted')"
-      (click)="setCardFilter('shortlisted')"
-    >
-      <span class="metric">{{ getCardCount("shortlisted") }}</span>
-      <span class="label">Shortlisted</span>
-    </button>
-    <button
-      type="button"
-      class="summary-card"
-      [class.active]="isCardActive('directive')"
-      (click)="setCardFilter('directive')"
-    >
-      <span class="metric">{{ getCardCount("directive") }}</span>
-      <span class="label">Directive Issued</span>
-    </button>
-    <button
-      type="button"
-      class="summary-card"
-      [class.active]="isCardActive('resubmitted')"
-      (click)="setCardFilter('resubmitted')"
-    >
-      <span class="metric">{{ getCardCount("resubmitted") }}</span>
-      <span class="label">Resubmitted</span>
-    </button>
+    @for (card of filterCards; track card.filter) {
+      <app-metric-card
+        variant="filter"
+        [title]="card.label"
+        [value]="getCardCount(card.filter)"
+        [active]="isCardActive(card.filter)"
+        [clickable]="true"
+        (cardClick)="setCardFilter(card.filter)"
+      />
+    }
   </header>
 
   @if (selectedApplicantIds.length > 0) {
