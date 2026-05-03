@@ -53,11 +53,18 @@
       (modelChange)="onStatusChange($event)"
     />
     <app-filter-select
-      [options]="programmeOptions"
-      [model]="selectedProgramme"
+      [options]="formOptions"
+      [model]="selectedForm"
       optionLabel="label"
-      placeholder="All Programmes"
-      (modelChange)="onProgrammeChange($event)"
+      placeholder="All Form"
+      (modelChange)="onFormChange($event)"
+    />
+    <app-filter-select
+      [options]="orderingOptions"
+      [model]="selectedOrdering"
+      optionLabel="label"
+      placeholder="Ordering"
+      (modelChange)="onOrderingChange($event)"
     />
     <button type="button" class="ghost-btn">
       Export List <i class="bi bi-download"></i>

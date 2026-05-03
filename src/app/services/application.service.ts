@@ -21,6 +21,15 @@ export interface RejectApplicantPayload extends ApplicantActionPayload {
   extra_note: string;
 }
 
+export interface GetApplicantsQuery {
+  approval_status?: string;
+  form?: string;
+  ordering?: string;
+  payment_status?: string;
+  application_no?: string;
+  search?: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -39,21 +48,47 @@ export class ApplicationService {
     page = 1,
     sortField?: string | undefined,
     sortOrder?: number | undefined,
+    query?: GetApplicantsQuery,
   ): Observable<ApplicationListResponse> {
     const baseUrl = `${this.apiRoot}/api/v1/applicants`;
-    const params = new URLSearchParams();
+    let params = new HttpParams();
 
-    if (keyword) params.append('keyword', keyword);
-    if (sortField)
-      params.append(
-        'ordering',
-        sortOrder && sortOrder > 0 ? '-' + sortField : sortField,
-      );
-    if (page_size) params.append('page_size', page_size.toString());
-    if (page) params.append('page', page.toString());
+    const effectiveSearch = query?.search ?? keyword;
+    if (effectiveSearch) {
+      params = params.set('search', effectiveSearch);
+    }
 
-    const url = `${baseUrl}?${params.toString()}`;
-    return this.http.get<ApplicationListResponse>(url);
+    const effectiveOrdering =
+      query?.ordering ??
+      (sortField
+        ? sortOrder && sortOrder > 0
+          ? `-${sortField}`
+          : sortField
+        : undefined);
+    if (effectiveOrdering) {
+      params = params.set('ordering', effectiveOrdering);
+    }
+
+    if (query?.approval_status) {
+      params = params.set('approval_status', query.approval_status);
+    }
+    if (query?.form) {
+      params = params.set('form', query.form);
+    }
+    if (query?.payment_status) {
+      params = params.set('payment_status', query.payment_status);
+    }
+    if (query?.application_no) {
+      params = params.set('application_no', query.application_no);
+    }
+    if (page_size) {
+      params = params.set('page_size', page_size.toString());
+    }
+    if (page) {
+      params = params.set('page', page.toString());
+    }
+
+    return this.http.get<ApplicationListResponse>(baseUrl, { params });
   }
 
   getapplication(

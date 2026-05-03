@@ -6,6 +6,7 @@ import {
   inject,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 import { DrawerModule } from 'primeng/drawer';
 import { TableModule } from 'primeng/table';
 import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
@@ -18,6 +19,7 @@ import { ActionModalPayload } from '../../../widgets/action-note-modal/action-no
 import {
   ApplicationService,
   ComplianceDirectivePayload,
+  GetApplicantsQuery,
 } from '../../../services/application.service';
 import { BusyIndicatorService } from '../../../services/busy-indicator.service';
 import { ShareModule } from '../../../shared/share/share.module';
@@ -89,6 +91,7 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   private readonly applicationService = inject(ApplicationService);
   private readonly cd = inject(ChangeDetectorRef);
   private readonly busyService = inject(BusyIndicatorService);
+  private readonly route = inject(ActivatedRoute);
 
   readonly tableColumns = [
     'Applicant',
@@ -102,10 +105,26 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
 
   readonly statusOptions: FilterOption[] = [
     { label: 'All Status', value: 'all' },
-    { label: 'Pending Review', value: 'pending' },
-    { label: 'Shortlisted Candidates', value: 'shortlisted' },
-    { label: 'Directive Issued', value: 'directive' },
-    { label: 'Resubmitted', value: 'resubmitted' },
+    { label: 'Pending', value: 'Pending' },
+    { label: 'Shortlisted', value: 'Shortlisted' },
+    { label: 'Compliance Required', value: 'Complaince Required' },
+    { label: 'Resubmitted', value: 'Resubmited' },
+    { label: 'Rejected', value: 'Rejected' },
+    { label: 'Admitted', value: 'Admitted' },
+    { label: 'Approved', value: 'Approved' },
+    { label: 'Submitted', value: 'Submitted' },
+  ];
+  readonly formOptions: FilterOption[] = [
+    { label: 'All Form', value: 'all' },
+    { label: 'OND', value: 'ond' },
+    { label: 'HND', value: 'hnd' },
+  ];
+  readonly orderingOptions: FilterOption[] = [
+    { label: 'Newest First', value: '-created_at' },
+    { label: 'Oldest First', value: 'created_at' },
+    { label: 'Name (A-Z)', value: 'first_name' },
+    { label: 'Name (Z-A)', value: '-first_name' },
+    { label: 'Application No.', value: 'application_no' },
   ];
   readonly directiveDocumentOptions = [
     'Certificate of Birth',
@@ -120,11 +139,9 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
     'Others (specify below)',
   ];
 
-  programmeOptions: FilterOption[] = [
-    { label: 'All Programmes', value: 'all' },
-  ];
   selectedStatus: FilterOption = this.statusOptions[0];
-  selectedProgramme: FilterOption = this.programmeOptions[0];
+  selectedForm: FilterOption = this.formOptions[0];
+  selectedOrdering: FilterOption = this.orderingOptions[0];
   activeCardFilter: ApplicantCardFilter = 'all';
   readonly filterCards: ApplicantFilterCard[] = [
     { label: 'All Applicants', filter: 'all' },
@@ -173,11 +190,17 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   directiveSelectedDocuments: string[] = [];
 
   ngOnInit(): void {
-    this.busyService.show();
-    this.fetchRecords();
     this.applicationService.getAdminDashboardMetrics().subscribe((metrics) => {
       this.metrics = metrics;
     });
+
+    this.route.queryParamMap
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((params: ParamMap) => {
+        this.syncFormFromQuery(params.get('level'));
+        this.first = 0;
+        this.fetchRecords();
+      });
 
     this.searchTextChanged
       .pipe(debounceTime(500), distinctUntilChanged(), takeUntil(this.destroy$))
@@ -194,13 +217,31 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   }
 
   private fetchRecords(): void {
+    this.busyService.show();
     const pageNumber = Math.floor(this.first / this.rows) + 1;
+    const query: GetApplicantsQuery = {
+      search: this.searchKeyword,
+      approval_status:
+        this.selectedStatus.value === 'all'
+          ? undefined
+          : this.selectedStatus.value,
+      form:
+        this.selectedForm.value === 'all' ? undefined : this.selectedForm.value,
+      ordering: this.selectedOrdering.value,
+    };
+
     this.applicationService
-      .getapplications(this.searchKeyword, this.rows, pageNumber)
+      .getapplications(
+        undefined,
+        this.rows,
+        pageNumber,
+        undefined,
+        undefined,
+        query,
+      )
       .subscribe((data: ApplicationListResponse) => {
         this.total_record_count = data.total;
         this.applicationList = data.data;
-        this.buildProgrammeOptions(data.data);
         this.populateSummary();
         this.applyLocalFilters();
         this.busyService.hide();
@@ -208,32 +249,23 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
       });
   }
 
-  private buildProgrammeOptions(rows: Application[]) {
-    const set = new Set(
-      rows.map((item) => this.getProgrammeName(item)).filter(Boolean),
-    );
-    this.programmeOptions = [
-      { label: 'All Programmes', value: 'all' },
-      ...Array.from(set).map((name) => ({ label: name, value: name })),
-    ];
-    if (
-      !this.programmeOptions.some(
-        (item) => item.value === this.selectedProgramme.value,
-      )
-    ) {
-      this.selectedProgramme = this.programmeOptions[0];
-    }
-  }
-
   onStatusChange(option: FilterOption) {
     this.selectedStatus = option;
     this.activeCardFilter = this.getCardFilterFromStatus(option.value);
-    this.applyLocalFilters();
+    this.first = 0;
+    this.fetchRecords();
   }
 
-  onProgrammeChange(option: FilterOption) {
-    this.selectedProgramme = option;
-    this.applyLocalFilters();
+  onFormChange(option: FilterOption) {
+    this.selectedForm = option;
+    this.first = 0;
+    this.fetchRecords();
+  }
+
+  onOrderingChange(option: FilterOption) {
+    this.selectedOrdering = option;
+    this.first = 0;
+    this.fetchRecords();
   }
 
   onSearchTextChanged(text: string) {
@@ -266,15 +298,7 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   }
 
   private applyLocalFilters() {
-    this.filteredRows = this.appRows.filter((row) => {
-      const statusPass =
-        this.activeCardFilter === 'all' ||
-        row.status_tone === this.activeCardFilter;
-      const programmePass =
-        this.selectedProgramme.value === 'all' ||
-        row.programme === this.selectedProgramme.value;
-      return statusPass && programmePass;
-    });
+    this.filteredRows = [...this.appRows];
     this.selectedApplicantIds = this.selectedApplicantIds.filter((id) =>
       this.filteredRows.some((row) => row.id === id),
     );
@@ -286,9 +310,11 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   setCardFilter(filter: ApplicantCardFilter): void {
     this.activeCardFilter = filter;
     this.selectedStatus =
-      this.statusOptions.find((item) => item.value === filter) ??
-      this.statusOptions[0];
-    this.applyLocalFilters();
+      this.statusOptions.find(
+        (item) => item.value === this.getApprovalStatusForCardFilter(filter),
+      ) ?? this.statusOptions[0];
+    this.first = 0;
+    this.fetchRecords();
   }
 
   isCardActive(filter: ApplicantCardFilter): boolean {
@@ -303,15 +329,47 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   }
 
   private getCardFilterFromStatus(value: string): ApplicantCardFilter {
+    const normalized = value.toLowerCase();
+    if (normalized.includes('shortlist')) {
+      return 'shortlisted';
+    }
     if (
-      value === 'pending' ||
-      value === 'shortlisted' ||
-      value === 'directive' ||
-      value === 'resubmitted'
+      normalized.includes('complaince') ||
+      normalized.includes('compliance')
     ) {
-      return value;
+      return 'directive';
+    }
+    if (normalized.includes('resub')) {
+      return 'resubmitted';
+    }
+    if (normalized.includes('pending')) {
+      return 'pending';
     }
     return 'all';
+  }
+
+  private getApprovalStatusForCardFilter(filter: ApplicantCardFilter): string {
+    if (filter === 'pending') {
+      return 'Pending';
+    }
+    if (filter === 'shortlisted') {
+      return 'Shortlisted';
+    }
+    if (filter === 'directive') {
+      return 'Complaince Required';
+    }
+    if (filter === 'resubmitted') {
+      return 'Resubmited';
+    }
+    return 'all';
+  }
+
+  private syncFormFromQuery(level: string | null): void {
+    const normalizedLevel = (level ?? '').toLowerCase();
+    const matched =
+      this.formOptions.find((option) => option.value === normalizedLevel) ??
+      this.formOptions[0];
+    this.selectedForm = matched;
   }
 
   private resolveStatus(status: string): { text: string; tone: StatusTone } {

@@ -57,6 +57,18 @@ export class SidebarComponent {
       label: 'Admissions',
       iconClass: 'bi bi-card-list',
       route: '/pages/admissions',
+      children: [
+        {
+          label: 'OND',
+          route: '/pages/admissions',
+          queryParams: { level: 'ond' },
+        },
+        {
+          label: 'HND',
+          route: '/pages/admissions',
+          queryParams: { level: 'hnd' },
+        },
+      ],
     },
     {
       label: 'Payment Records',
