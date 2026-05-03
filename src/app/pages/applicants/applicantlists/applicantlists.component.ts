@@ -114,11 +114,6 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
     { label: 'Approved', value: 'Approved' },
     { label: 'Submitted', value: 'Submitted' },
   ];
-  readonly formOptions: FilterOption[] = [
-    { label: 'All Form', value: 'all' },
-    { label: 'OND', value: 'ond' },
-    { label: 'HND', value: 'hnd' },
-  ];
   readonly orderingOptions: FilterOption[] = [
     { label: 'Newest First', value: '-created_at' },
     { label: 'Oldest First', value: 'created_at' },
@@ -140,8 +135,8 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   ];
 
   selectedStatus: FilterOption = this.statusOptions[0];
-  selectedForm: FilterOption = this.formOptions[0];
   selectedOrdering: FilterOption = this.orderingOptions[0];
+  currentFormLevel: string | undefined = undefined;
   activeCardFilter: ApplicantCardFilter = 'all';
   readonly filterCards: ApplicantFilterCard[] = [
     { label: 'All Applicants', filter: 'all' },
@@ -225,8 +220,7 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
         this.selectedStatus.value === 'all'
           ? undefined
           : this.selectedStatus.value,
-      form:
-        this.selectedForm.value === 'all' ? undefined : this.selectedForm.value,
+      // form: this.currentFormLevel,
       ordering: this.selectedOrdering.value,
     };
 
@@ -252,12 +246,6 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   onStatusChange(option: FilterOption) {
     this.selectedStatus = option;
     this.activeCardFilter = this.getCardFilterFromStatus(option.value);
-    this.first = 0;
-    this.fetchRecords();
-  }
-
-  onFormChange(option: FilterOption) {
-    this.selectedForm = option;
     this.first = 0;
     this.fetchRecords();
   }
@@ -366,10 +354,11 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
 
   private syncFormFromQuery(level: string | null): void {
     const normalizedLevel = (level ?? '').toLowerCase();
-    const matched =
-      this.formOptions.find((option) => option.value === normalizedLevel) ??
-      this.formOptions[0];
-    this.selectedForm = matched;
+    if (normalizedLevel === 'ond' || normalizedLevel === 'hnd') {
+      this.currentFormLevel = normalizedLevel;
+      return;
+    }
+    this.currentFormLevel = undefined;
   }
 
   private resolveStatus(status: string): { text: string; tone: StatusTone } {
