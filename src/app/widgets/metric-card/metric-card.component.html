@@ -10,13 +10,21 @@
   (keydown.space)="$event.preventDefault(); onCardClick()"
 >
   <div class="metric-head">
-    <p class="metric-title" [class.label]="variant === 'filter'">{{ title }}</p>
+    <p class="metric-title body-small" [class.label]="variant === 'filter'">
+      {{ title }}
+    </p>
     @if (icon) {
       <img [src]="icon" alt="" />
     }
   </div>
-  <h3 [class.metric]="variant === 'filter'">{{ value }}</h3>
+  <h3 [class.metric]="variant === 'filter'" class="title-xlarge">
+    {{ value }}
+  </h3>
   @if (subtext) {
-    <small>{{ subtext }}</small>
+    <small
+      [class.metric-subtext]="variant === 'filter'"
+      class="metric-small body-xs"
+      >{{ subtext }}</small
+    >
   }
 </article>

@@ -39,7 +39,6 @@
 
 .metric-title {
   margin: 0;
-  font-size: 14px;
   color: var(--app-text-secondary);
 }
 
@@ -49,6 +48,14 @@
 
 small {
   color: var(--app-text-muted);
+}
+
+.metric-card.filter-card .metric-subtext {
+  font-size: 12px;
+  line-height: 120%;
+  letter-spacing: 0%;
+  color: inherit;
+  opacity: 0.85;
 }
 
 .metric-card.filter-card {
