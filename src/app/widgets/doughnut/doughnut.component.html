@@ -1,11 +1,11 @@
 <div class="chart-container">
-    <div class="chart-wrapper">
-      <canvas id="doughnutChart"></canvas>
-    </div>
-    <div class="legend-column">
-      <div *ngFor="let item of legendItems" class="legend-item">
-        <span class="legend-color" [style.background-color]="item.color"></span>
-        <span class="legend-text">{{item.label}} ({{item.value}})</span>
-      </div>
+  <div class="chart-wrapper">
+    <canvas id="doughnutChart"></canvas>
+  </div>
+  <div class="legend-column">
+    <div *ngFor="let item of legendItems" class="legend-item">
+      <span class="legend-color" [style.background-color]="item.color"></span>
+      <span class="legend-text">{{ item.label }} ({{ item.value }})</span>
     </div>
   </div>
+</div>

@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PaginatorModule } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
+import { NotificationService } from '../../services/notification.service';
 import { PaymentReceiptModalComponent } from './receipt-modal/payment-receipt-modal.component';
 import {
   FilterOption,
@@ -27,6 +28,7 @@ import {
   styleUrl: './payment-record.component.scss',
 })
 export class PaymentRecordComponent implements OnInit {
+  private readonly notification = inject(NotificationService);
   searchText = '';
 
   readonly sessionOptions: FilterOption[] = [
@@ -130,7 +132,7 @@ export class PaymentRecordComponent implements OnInit {
   }
 
   downloadReceipt(transaction: TransactionRow): void {
-    window.alert(
+    this.notification.warn(
       `Download receipt is not yet wired for ${transaction.referenceNo}.`,
     );
   }

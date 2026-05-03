@@ -22,6 +22,7 @@ import {
   GetApplicantsQuery,
 } from '../../../services/application.service';
 import { BusyIndicatorService } from '../../../services/busy-indicator.service';
+import { NotificationService } from '../../../services/notification.service';
 import { ShareModule } from '../../../shared/share/share.module';
 import { ActionNoteModalComponent } from '../../../widgets/action-note-modal/action-note-modal.component';
 import { AppPaginationComponent } from '../../../widgets/app-pagination/app-pagination.component';
@@ -91,6 +92,7 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   private readonly applicationService = inject(ApplicationService);
   private readonly cd = inject(ChangeDetectorRef);
   private readonly busyService = inject(BusyIndicatorService);
+  private readonly notification = inject(NotificationService);
   private readonly route = inject(ActivatedRoute);
 
   readonly tableColumns = [
@@ -519,7 +521,7 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
 
   submitReasonModalPayload(payload: ActionModalPayload) {
     if (this.pendingDirectiveApplicantIds.length === 0) {
-      window.alert('Applicant ID not found for this action.');
+      this.notification.error('Applicant ID not found for this action.');
       return;
     }
 
@@ -558,14 +560,9 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
     request.subscribe({
       next: () => {
         onSuccess?.();
-        window.alert(successMessage);
+        this.notification.success(successMessage);
         this.selectedApplicantIds = [];
         this.fetchRecords();
-      },
-      error: (err) => {
-        const message =
-          err?.error?.message || err?.error?.detail || 'Action failed.';
-        window.alert(message);
       },
       complete: () => {
         this.isReasonActionLoading = false;

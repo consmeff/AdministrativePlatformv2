@@ -1,0 +1,17 @@
+.app-loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(1px);
+  display: grid;
+  place-items: center;
+  z-index: 2100000;
+}
+
+:host ::ng-deep .p-toast {
+  z-index: 2200000;
+}
+
+:host ::ng-deep .app-loading-spinner .p-progress-spinner-circle {
+  stroke: var(--app-primary);
+}

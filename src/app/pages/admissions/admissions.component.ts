@@ -30,6 +30,7 @@ import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 import { FormsModule } from '@angular/forms';
 import { BusyIndicatorService } from '../../services/busy-indicator.service';
+import { NotificationService } from '../../services/notification.service';
 import {
   StatusIndicatorComponent,
   StatusTone,
@@ -100,6 +101,7 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   _applicationService = inject(ApplicationService);
   router = inject(Router);
   busyService = inject(BusyIndicatorService);
+  notification = inject(NotificationService);
   cd = inject(ChangeDetectorRef);
   application!: Application[];
   subscriptions = new Subscription();
@@ -369,10 +371,10 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
 
   onPrimaryActionClick() {
     if (this.activeCardFilter === 'pending-publish') {
-      window.alert('Publish admission action is not yet wired.');
+      this.notification.warn('Publish admission action is not yet wired.');
       return;
     }
-    window.alert('Set cutoff action is not yet wired.');
+    this.notification.warn('Set cutoff action is not yet wired.');
   }
 
   viewProfile(row: AdmissionTableRow) {
@@ -412,17 +414,12 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     this.busyService.show();
     request.subscribe({
       next: () => {
-        window.alert(successMessage);
+        this.notification.success(successMessage);
         this.fetchRecords().subscribe((data: ApplicationListResponse) => {
           this.total_record_count = data.total;
           this.applicationList = data.data;
           this.populateSummary();
         });
-      },
-      error: (err) => {
-        const message =
-          err?.error?.message || err?.error?.detail || 'Action failed.';
-        window.alert(message);
       },
       complete: () => {
         this.busyService.hide();

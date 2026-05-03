@@ -1,9 +1,12 @@
-<app-busy-indicator 
-  [isActive]="(isLoading$ | async) ?? false"
-  [colorStart]="'#4f46e5'"
-  [colorMiddle]="'#ec4899'"
-  [colorEnd]="'#4f46e5'"
-  [height]="'3px'"
-  [position]="'fixed'">
-</app-busy-indicator>
+<p-toast position="top-right" />
+@if ((isLoading$ | async) === true) {
+  <div class="app-loading-overlay" aria-live="polite" aria-busy="true">
+    <p-progressSpinner
+      styleClass="app-loading-spinner"
+      strokeWidth="1"
+      fill="transparent"
+      animationDuration=".8s"
+    />
+  </div>
+}
 <router-outlet></router-outlet>

@@ -8,9 +8,8 @@ describe('HtmliconComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HtmliconComponent]
-    })
-    .compileComponents();
+      imports: [HtmliconComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(HtmliconComponent);
     component = fixture.componentInstance;

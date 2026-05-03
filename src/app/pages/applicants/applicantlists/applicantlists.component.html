@@ -3,7 +3,7 @@
     @for (card of filterCards; track card.filter) {
       <app-metric-card
         variant="filter"
-        [title]="card.label"
+        [subtext]="card.label"
         [value]="getCardCount(card.filter)"
         [active]="isCardActive(card.filter)"
         [clickable]="true"

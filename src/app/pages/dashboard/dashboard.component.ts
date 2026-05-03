@@ -12,6 +12,7 @@ import {
 } from '../../services/application.service';
 import { BusyIndicatorService } from '../../services/busy-indicator.service';
 import { DashboardinformationService } from '../../services/dashboardinformation.service';
+import { NotificationService } from '../../services/notification.service';
 import { DashboardInfo } from '../../model/dashboard/information.dto';
 import {
   ActionModalPayload,
@@ -61,6 +62,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private readonly applicationService = inject(ApplicationService);
   private readonly dashInfoService = inject(DashboardinformationService);
   private readonly busyService = inject(BusyIndicatorService);
+  private readonly notification = inject(NotificationService);
 
   _dash: DashboardInfo = {} as DashboardInfo;
 
@@ -237,7 +239,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   submitReasonModalPayload(payload: ActionModalPayload) {
     if (!this.pendingDirectiveApplicantId) {
-      window.alert('Applicant ID not found for this action.');
+      this.notification.error('Applicant ID not found for this action.');
       return;
     }
 
@@ -277,13 +279,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     request.subscribe({
       next: () => {
         onSuccess?.();
-        window.alert(successMessage);
+        this.notification.success(successMessage);
         this.loadDashboardData();
-      },
-      error: (err) => {
-        const message =
-          err?.error?.message || err?.error?.detail || 'Action failed.';
-        window.alert(message);
       },
       complete: () => {
         this.isReasonActionLoading = false;

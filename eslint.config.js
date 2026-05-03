@@ -45,5 +45,5 @@ module.exports = defineConfig([
       "@angular-eslint/template/interactive-supports-focus": "off",
       "@angular-eslint/template/eqeqeq": "off",
     },
-  }
+  },
 ]);

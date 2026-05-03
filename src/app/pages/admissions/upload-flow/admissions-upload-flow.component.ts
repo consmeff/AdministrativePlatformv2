@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, inject } from '@angular/core';
+import { NotificationService } from '../../../services/notification.service';
 
 type AdmissionUploadType =
   | 'cbt-results'
@@ -28,6 +29,7 @@ interface UploadFlowOption {
   styleUrl: './admissions-upload-flow.component.scss',
 })
 export class AdmissionsUploadFlowComponent {
+  private readonly notification = inject(NotificationService);
   @Output() continueToAdmissions = new EventEmitter<AdmissionUploadType>();
 
   readonly options: UploadFlowOption[] = [
@@ -150,7 +152,7 @@ export class AdmissionsUploadFlowComponent {
   }
 
   onDownloadTemplate(): void {
-    window.alert('Template download is not yet wired.');
+    this.notification.warn('Template download is not yet wired.');
   }
 
   private resetFlow(fileInput: HTMLInputElement): void {

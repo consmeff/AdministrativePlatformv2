@@ -15,6 +15,7 @@ import {
   ComplianceDirectivePayload,
   RejectApplicantPayload,
 } from '../../../services/application.service';
+import { NotificationService } from '../../../services/notification.service';
 import {
   AcademicHistory,
   Application,
@@ -47,6 +48,7 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
   private readonly rejectAction = 'reject';
   private readonly complianceAction = 'compliance';
   _applicationservice = inject(ApplicationService);
+  notification = inject(NotificationService);
   application: Application = {} as Application;
   route = inject(ActivatedRoute);
 
@@ -358,7 +360,7 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
 
   submitReasonModal(note: string) {
     if (!this.application?.id || !this.pendingReasonAction) {
-      window.alert('Applicant ID not found for this action.');
+      this.notification.error('Applicant ID not found for this action.');
       return;
     }
 
@@ -419,13 +421,9 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
     request.subscribe({
       next: () => {
         onSuccess?.();
-        window.alert(successMessage);
+        this.notification.success(successMessage);
       },
-      error: (err) => {
-        const message =
-          err?.error?.message || err?.error?.detail || 'Action failed.';
-        window.alert(message);
-      },
+
       complete: () => {
         this.isReasonActionLoading = false;
         onComplete?.();
