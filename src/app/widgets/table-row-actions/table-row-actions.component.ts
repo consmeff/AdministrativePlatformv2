@@ -12,6 +12,10 @@ export class TableRowActionsComponent {
   @Input() disableView = false;
   @Input() disableShortlist = false;
   @Input() disableCompliance = false;
+  @Input() shortlistTooltip = 'Shortlist';
+  @Input() shortlistIconClass = 'bi bi-check';
+  @Input() complianceTooltip = 'Issue Compliance';
+  @Input() complianceIconClass = 'bi bi-exclamation-triangle';
 
   @Output() view = new EventEmitter<void>();
   @Output() shortlist = new EventEmitter<void>();

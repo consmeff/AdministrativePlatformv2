@@ -4,16 +4,15 @@
   --btn-border: var(--btn-bg);
   --btn-outline-fg: var(--btn-bg);
   --btn-outline-border: var(--btn-bg);
-  height: 52px;
-  padding: 0 1rem;
-  border-radius: 12px;
+  padding: 8px;
+  border-radius: 8px;
   border: 1px solid transparent;
-  font-size: 1.75rem;
+  font-size: 14px;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.6rem;
+  gap: 8px;
   transition: opacity 0.2s ease;
 }
 

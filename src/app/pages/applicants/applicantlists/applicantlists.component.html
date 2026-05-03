@@ -59,12 +59,25 @@
       placeholder="Ordering"
       (modelChange)="onOrderingChange($event)"
     />
-    <button type="button" class="ghost-btn">
-      Export List <i class="bi bi-download"></i>
-    </button>
-    <button type="button" class="ghost-btn">
-      Update with File <i class="bi bi-file-earmark-arrow-up"></i>
-    </button>
+    <app-button
+      variant="muted"
+      [outline]="true"
+      iconClass="bi bi-download"
+      iconPosition="right"
+      (buttonClick)="openExportModal()"
+      [fullWidth]="true"
+    >
+      Export List
+    </app-button>
+    <app-button
+      variant="muted"
+      [outline]="true"
+      [fullWidth]="true"
+      iconClass="bi bi-file-earmark-arrow-up"
+      iconPosition="right"
+    >
+      Update with File
+    </app-button>
   </section>
 
   <section class="table-wrap">
@@ -174,3 +187,10 @@
   (closed)="closeReasonModal()"
   (submittedPayload)="submitReasonModalPayload($event)"
 ></app-action-note-modal>
+
+<app-applicant-export-modal
+  [visible]="isExportModalVisible"
+  [loading]="isExporting"
+  (closed)="closeExportModal()"
+  (exported)="exportApplicantsList($event)"
+/>

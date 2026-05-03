@@ -19,6 +19,7 @@ import { ActionModalPayload } from '../../../widgets/action-note-modal/action-no
 import {
   ApplicationService,
   ComplianceDirectivePayload,
+  ExportApplicantsPayload,
   GetApplicantsQuery,
 } from '../../../services/application.service';
 import { BusyIndicatorService } from '../../../services/busy-indicator.service';
@@ -36,6 +37,10 @@ import {
 import { TableRowActionsComponent } from '../../../widgets/table-row-actions/table-row-actions.component';
 import { ApplicantdetailComponent } from '../applicantdetail/applicantdetail.component';
 import { MetricCardComponent } from '../../../widgets/metric-card/metric-card.component';
+import {
+  ApplicantExportModalComponent,
+  ApplicantExportSelection,
+} from './export-modal/applicant-export-modal.component';
 
 interface FilterOption {
   label: string;
@@ -82,6 +87,7 @@ type ApplicantCardFilter =
     ButtonComponent,
     ApplicantdetailComponent,
     MetricCardComponent,
+    ApplicantExportModalComponent,
   ],
   templateUrl: './applicantlists.component.html',
   styleUrl: './applicantlists.component.scss',
@@ -185,6 +191,8 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   reasonModalInitialNote = '';
   directiveSelectedReason = '';
   directiveSelectedDocuments: string[] = [];
+  isExportModalVisible = false;
+  isExporting = false;
 
   ngOnInit(): void {
     this.applicationService.getAdminDashboardMetrics().subscribe((metrics) => {
@@ -517,6 +525,61 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
     this.isReasonModalVisible = false;
     this.pendingDirectiveApplicantIds = [];
     this.reasonModalInitialNote = '';
+  }
+
+  openExportModal(): void {
+    this.isExportModalVisible = true;
+  }
+
+  closeExportModal(): void {
+    this.isExportModalVisible = false;
+  }
+
+  exportApplicantsList(selection: ApplicantExportSelection): void {
+    if (selection.fields.length === 0) {
+      this.notification.warn('Please select at least one field to export.');
+      return;
+    }
+
+    this.isExporting = true;
+    const payload: ExportApplicantsPayload = {
+      format: 'xlsx',
+      fields: selection.fields,
+      applicant_ids:
+        this.selectedApplicantIds.length > 0 ? this.selectedApplicantIds : [],
+      keyword: (this.searchKeyword ?? this.searchText?.trim()) || undefined,
+      approval_status: selection.approval_status,
+      form: this.currentFormLevel,
+      ordering: this.selectedOrdering.value,
+    };
+
+    this.applicationService.exportApplicants(payload).subscribe({
+      next: (blob) => {
+        const extension = 'xlsx';
+        const datePart = new Date().toISOString().slice(0, 10);
+        this.downloadBlob(blob, `applicants-export-${datePart}.${extension}`);
+        this.notification.success('Export started successfully.');
+        this.closeExportModal();
+        this.isExporting = false;
+      },
+      error: () => {
+        this.isExporting = false;
+      },
+      complete: () => {
+        this.isExporting = false;
+      },
+    });
+  }
+
+  private downloadBlob(blob: Blob, filename: string): void {
+    const url = window.URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+    window.URL.revokeObjectURL(url);
   }
 
   submitReasonModalPayload(payload: ActionModalPayload) {

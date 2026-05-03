@@ -98,9 +98,12 @@
             </td>
             <td>
               <app-table-row-actions
+                shortlistTooltip="Grant Admission"
+                complianceTooltip="Change Programme"
+                complianceIconClass="bi bi-bezier2"
                 (view)="viewProfile(rowData)"
-                (shortlist)="shortlistSingle(rowData)"
-                (compliance)="openComplianceForSingle(rowData)"
+                (shortlist)="grantAdmissionFromTable(rowData)"
+                (compliance)="changeProgrammeFromTable(rowData)"
               />
             </td>
           </tr>
@@ -126,6 +129,7 @@
     <app-applicantdetail
       [applicationNo]="selectedApplicationNo"
       [embedded]="true"
+      embeddedMode="admissions"
       (closed)="closeApplicantDrawer()"
     />
   }

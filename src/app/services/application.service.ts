@@ -30,6 +30,18 @@ export interface GetApplicantsQuery {
   search?: string;
 }
 
+export interface ExportApplicantsPayload {
+  format?: 'xlsx' | 'csv';
+  fields?: string[];
+  applicant_ids?: number[];
+  keyword?: string;
+  payment_status?: string;
+  approval_status?: string;
+  application_no?: string;
+  form?: string;
+  ordering?: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -121,5 +133,10 @@ export class ApplicationService {
   rejectApplicants(payload: RejectApplicantPayload): Observable<unknown> {
     const url = `${this.apiRoot}/api/v1/applicants/reject-applicants`;
     return this.http.post(url, payload);
+  }
+
+  exportApplicants(payload: ExportApplicantsPayload): Observable<Blob> {
+    const url = `${this.apiRoot}/api/v1/applicants/export`;
+    return this.http.post(url, payload, { responseType: 'blob' });
   }
 }

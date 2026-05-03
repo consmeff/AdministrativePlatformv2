@@ -9,10 +9,7 @@ import {
 import { appstatus, Column } from '../../model/page.dto';
 import { DrawerModule } from 'primeng/drawer';
 import { TableModule } from 'primeng/table';
-import {
-  ApplicationService,
-  ComplianceDirectivePayload,
-} from '../../services/application.service';
+import { ApplicationService } from '../../services/application.service';
 import { Router } from '@angular/router';
 import {
   Application,
@@ -387,23 +384,15 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     this.selectedApplicationNo = null;
   }
 
-  shortlistSingle(row: AdmissionTableRow) {
-    this.performApplicantAction(
-      this._applicationService.shortlistApplicants({
-        applicant_ids: [row.id],
-      }),
-      'Candidate shortlisted successfully.',
+  grantAdmissionFromTable(row: AdmissionTableRow): void {
+    this.notification.warn(
+      `Grant admission is not yet wired for ${row.full_name}.`,
     );
   }
 
-  openComplianceForSingle(row: AdmissionTableRow) {
-    const payload: ComplianceDirectivePayload = {
-      applicant_ids: [row.id],
-      extra_note: '',
-    };
-    this.performApplicantAction(
-      this._applicationService.issueComplianceDirective(payload),
-      'Compliance directive issued successfully.',
+  changeProgrammeFromTable(row: AdmissionTableRow): void {
+    this.notification.warn(
+      `Change programme is not yet wired for ${row.full_name}.`,
     );
   }
 
