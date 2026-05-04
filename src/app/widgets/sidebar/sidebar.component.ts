@@ -85,7 +85,7 @@ export class SidebarComponent {
   }
 
   toggleSidebar() {
-    this.sidebarVisible = !this.sidebarVisible;
+    this._widgetService.setSidebarState({ isvisible: !this.sidebarVisible });
   }
   onSidebarHide() {
     this._widgetService.setSidebarState({ isvisible: false });
@@ -100,6 +100,18 @@ export class SidebarComponent {
     }
     this.openGroupRoute =
       this.openGroupRoute === item.route ? null : item.route;
+  }
+
+  onGroupItemClick(item: SidebarMenuItem): void {
+    if (!item.children?.length) {
+      return;
+    }
+
+    if (!this.sidebarVisible) {
+      return;
+    }
+
+    this.toggleGroup(item);
   }
 
   isGroupOpen(item: SidebarMenuItem): boolean {
