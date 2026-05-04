@@ -28,12 +28,27 @@ export class ApplicantExportModalComponent {
   @Output() exported = new EventEmitter<ApplicantExportSelection>();
 
   readonly exportFieldOptions: ExportOption[] = [
-    { label: 'Status', value: 'approval_status' },
-    { label: 'JAMB Score', value: 'jamb_score' },
-    { label: 'JAMB Registration No.', value: 'jamb_registration_no' },
-    { label: 'O Level Result', value: 'o_level_result' },
-    { label: 'Programme', value: 'programme' },
-    { label: 'Email Address', value: 'email' },
+    { label: 'ID', value: 'id' },
+    { label: 'Application No.', value: 'application_no' },
+    { label: 'UTME Reg No.', value: 'utme_reg_no' },
+    { label: 'First Name', value: 'first_name' },
+    { label: 'Last Name', value: 'last_name' },
+    { label: 'Other Names', value: 'other_names' },
+    { label: 'Email', value: 'email' },
+    { label: 'Post UTME Point', value: 'post_utme_point' },
+    { label: 'Phone Number', value: 'phone_number' },
+    { label: 'Alt Phone Number', value: 'alt_phone_number' },
+    { label: 'Gender', value: 'gender' },
+    { label: 'Approval Status', value: 'approval_status' },
+    { label: 'Payment Status', value: 'payment_status' },
+    { label: 'Application ID', value: 'application_id' },
+    { label: 'Program Name', value: 'program_name' },
+    { label: 'Department Name', value: 'department_name' },
+    { label: 'Approved Department', value: 'approved_department_name' },
+    { label: 'O Level Point', value: 'o_level_point' },
+    { label: 'Created At', value: 'created_at' },
+    { label: 'Updated At', value: 'updated_at' },
+    { label: 'Compliance Directive', value: 'compliance_directive' },
   ];
 
   readonly exportStatusOptions: ExportOption[] = [
@@ -44,7 +59,12 @@ export class ApplicantExportModalComponent {
     { label: 'Resubmitted', value: 'Resubmited' },
   ];
 
-  selectedFields: string[] = ['approval_status', 'jamb_score', 'programme'];
+  selectedFields: string[] = [
+    'application_no',
+    'first_name',
+    'last_name',
+    'approval_status',
+  ];
   selectedStatus = 'all';
 
   isFieldChecked(value: string): boolean {
