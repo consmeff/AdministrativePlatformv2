@@ -117,6 +117,9 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   selectedRows: AdmissionTableRow[] = [];
   selectedApplicationNo: string | null = null;
   isApplicantDrawerVisible = false;
+  hasCheckedCbtUploadStatus = false;
+  isCbtResultsUploaded = false;
+  isDocumentUploadFlowVisible = false;
   activeCardFilter: AdmissionDecisionFilter = 'all';
   readonly filterCards: AdmissionFilterCard[] = [
     { label: 'All Candidates', filter: 'all' },
@@ -151,13 +154,7 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.busyService.show();
-    this.fetchRecords().subscribe((data: ApplicationListResponse) => {
-      this.total_record_count = data.total;
-      this.applicationList = data.data;
-      this.populateSummary();
-      this.busyService.hide();
-    });
+    this.checkCbtUploadStatus();
     this.approval_status = [
       { name: 'All', code: 0 },
       { name: 'Pending', code: 1 },
@@ -384,6 +381,19 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     this.selectedApplicationNo = null;
   }
 
+  openDocumentUploadFlow(): void {
+    this.isDocumentUploadFlowVisible = true;
+  }
+
+  closeDocumentUploadFlow(): void {
+    this.isDocumentUploadFlowVisible = false;
+  }
+
+  onCbtUploadFlowCompleted(): void {
+    this.isCbtResultsUploaded = true;
+    this.loadAdmissionsRecords();
+  }
+
   grantAdmissionFromTable(row: AdmissionTableRow): void {
     this.notification.warn(
       `Grant admission is not yet wired for ${row.full_name}.`,
@@ -416,7 +426,69 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     });
   }
 
+  private checkCbtUploadStatus(): void {
+    this._applicationService.getCbtResultsUploaded().subscribe({
+      next: (response: unknown) => {
+        this.isCbtResultsUploaded = this.resolveCbtUploadStatus(response);
+        if (this.isCbtResultsUploaded) {
+          this.loadAdmissionsRecords();
+        }
+      },
+      error: () => {
+        this.isCbtResultsUploaded = true;
+        this.notification.warn(
+          'Unable to verify CBT upload status. Showing admissions list.',
+        );
+        this.loadAdmissionsRecords();
+      },
+      complete: () => {
+        this.hasCheckedCbtUploadStatus = true;
+      },
+    });
+  }
+
+  private loadAdmissionsRecords(): void {
+    this.busyService.show();
+    this.fetchRecords().subscribe((data: ApplicationListResponse) => {
+      this.total_record_count = data.total;
+      this.applicationList = data.data;
+      this.populateSummary();
+      this.busyService.hide();
+    });
+  }
+
+  private resolveCbtUploadStatus(response: unknown): boolean {
+    if (typeof response === 'boolean') {
+      return response;
+    }
+    if (response && typeof response === 'object') {
+      const maybeObject = response as Record<string, unknown>;
+      const candidates = [
+        maybeObject['uploaded'],
+        maybeObject['is_uploaded'],
+        maybeObject['cbt_results_uploaded'],
+        maybeObject['status'],
+        maybeObject['data'],
+      ];
+      for (const value of candidates) {
+        if (typeof value === 'boolean') {
+          return value;
+        }
+        if (typeof value === 'string') {
+          const normalized = value.trim().toLowerCase();
+          if (normalized === 'true' || normalized === 'uploaded') {
+            return true;
+          }
+          if (normalized === 'false' || normalized === 'not_uploaded') {
+            return false;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
   get showEmptyState(): boolean {
-    return this.total_record_count === 0;
+    return this.hasCheckedCbtUploadStatus && !this.isCbtResultsUploaded;
   }
 }

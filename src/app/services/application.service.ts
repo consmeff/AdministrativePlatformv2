@@ -118,6 +118,11 @@ export class ApplicationService {
     return this.http.get<AdminDashboardMetrics>(url);
   }
 
+  getCbtResultsUploaded(): Observable<unknown> {
+    const url = `${this.apiRoot}/api/v1/applicants/cbt-results-uploaded`;
+    return this.http.get<unknown>(url);
+  }
+
   issueComplianceDirective(
     payload: ComplianceDirectivePayload,
   ): Observable<unknown> {

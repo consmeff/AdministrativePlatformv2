@@ -7,25 +7,12 @@
     (change)="onFileSelected($event)"
   />
 
-  <div class="flow-types">
-    @for (option of options; track option.type) {
-      <button
-        type="button"
-        class="flow-type-chip"
-        [class.active]="activeType === option.type"
-        (click)="selectType(option.type, fileInput)"
-      >
-        {{ option.label }}
-      </button>
-    }
-  </div>
-
   <h2 class="empty-title">{{ stageTitle }}</h2>
   <p class="empty-subtitle">
     @if (stage === "complete") {
       {{ processedRows }} rows processed successfully.
     } @else {
-      {{ activeFlowOption.subtitle }}
+      {{ activeFlow.subtitle }}
     }
   </p>
 
@@ -97,7 +84,7 @@
   } @else {
     <div class="success-icon"><i class="bi bi-clipboard2-check"></i></div>
     <button type="button" class="flow-action-btn" (click)="continue()">
-      Continue to Admissions
+      {{ mode === "cbt" ? "Continue to Admissions" : "Back to Admissions" }}
     </button>
   }
 </section>

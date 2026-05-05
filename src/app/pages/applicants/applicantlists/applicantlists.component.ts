@@ -549,7 +549,7 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
         this.selectedApplicantIds.length > 0 ? this.selectedApplicantIds : [],
       keyword: (this.searchKeyword ?? this.searchText?.trim()) || undefined,
       approval_status: selection.approval_status,
-      form: this.currentFormLevel,
+      // form: this.currentFormLevel,
       ordering: this.selectedOrdering.value,
     };
 

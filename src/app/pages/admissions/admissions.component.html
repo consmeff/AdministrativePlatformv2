@@ -1,5 +1,17 @@
-@if (showEmptyState) {
-  <app-admissions-upload-flow />
+@if (!hasCheckedCbtUploadStatus) {
+  <section class="admissions-shell">
+    <p>Checking CBT upload status...</p>
+  </section>
+} @else if (showEmptyState) {
+  <app-admissions-upload-flow
+    mode="cbt"
+    (continueToAdmissions)="onCbtUploadFlowCompleted()"
+  />
+} @else if (isDocumentUploadFlowVisible) {
+  <app-admissions-upload-flow
+    mode="document"
+    (continueToAdmissions)="closeDocumentUploadFlow()"
+  />
 } @else {
   <section class="admissions-shell">
     <div class="cards-head">
@@ -41,7 +53,11 @@
       <button type="button" class="outline-btn">
         Export List <i class="bi bi-download"></i>
       </button>
-      <button type="button" class="outline-btn">
+      <button
+        type="button"
+        class="outline-btn"
+        (click)="openDocumentUploadFlow()"
+      >
         Update with File <i class="bi bi-file-earmark-arrow-up"></i>
       </button>
     </div>
