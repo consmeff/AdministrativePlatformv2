@@ -383,8 +383,15 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   }
 
   grantAdmissionFromTable(row: AdmissionTableRow): void {
-    this.notification.warn(
-      `Grant admission is not yet wired for ${row.full_name}.`,
+    if (this.isPendingPublishDecision(row)) {
+      this.revertDecision(row);
+      return;
+    }
+    this.performApplicantAction(
+      this._applicationService.markAsAdmittedInternally({
+        applicant_ids: [row.id],
+      }),
+      `Admission granted for ${row.full_name}.`,
     );
   }
 
@@ -392,9 +399,12 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     if (!this.selectedApplicationNo) {
       return;
     }
-    this.notification.warn(
-      `Grant admission is not yet wired for ${this.selectedApplicationNo}.`,
-    );
+    const row = this.findRowByApplicationNo(this.selectedApplicationNo);
+    if (!row) {
+      this.notification.error('Unable to resolve selected applicant record.');
+      return;
+    }
+    this.grantAdmissionFromTable(row);
   }
 
   changeProgrammeFromTable(row: AdmissionTableRow): void {
@@ -453,6 +463,42 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     this.isChangeProgrammeModalVisible = false;
     this.isApplicantDrawerVisible = false;
     this.selectedApplicationNo = null;
+  }
+
+  getDecisionActionTooltip(row: AdmissionTableRow): string {
+    return this.isPendingPublishDecision(row)
+      ? 'Revert Decision'
+      : 'Grant Admission';
+  }
+
+  getDecisionActionIcon(row: AdmissionTableRow): string {
+    return this.isPendingPublishDecision(row)
+      ? 'bi bi-arrow-counterclockwise'
+      : 'bi bi-check';
+  }
+
+  isGrantAdmissionActionDisabled(row: AdmissionTableRow): boolean {
+    return row.decision_category === 'admitted';
+  }
+
+  isChangeProgrammeActionDisabled(row: AdmissionTableRow): boolean {
+    return row.decision_category === 'admitted';
+  }
+
+  private isPendingPublishDecision(row: AdmissionTableRow): boolean {
+    return row.decision_category === 'pending-publish';
+  }
+
+  private revertDecision(row: AdmissionTableRow): void {
+    this.notification.warn(
+      `Revert decision is not yet wired for ${row.full_name}.`,
+    );
+  }
+
+  private findRowByApplicationNo(
+    applicationNo: string,
+  ): AdmissionTableRow | undefined {
+    return this.app_summ.find((row) => row.application_no === applicationNo);
   }
 
   private performApplicantAction(

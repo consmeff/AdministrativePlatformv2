@@ -105,9 +105,12 @@
             </td>
             <td>
               <app-table-row-actions
-                shortlistTooltip="Grant Admission"
+                [shortlistTooltip]="getDecisionActionTooltip(rowData)"
+                [shortlistIconClass]="getDecisionActionIcon(rowData)"
+                [disableShortlist]="isGrantAdmissionActionDisabled(rowData)"
                 complianceTooltip="Change Programme"
-                complianceIconClass="bi bi-bezier2"
+                complianceIconClass="bi bi-arrow-repeat"
+                [disableCompliance]="isChangeProgrammeActionDisabled(rowData)"
                 (view)="viewProfile(rowData)"
                 (shortlist)="grantAdmissionFromTable(rowData)"
                 (compliance)="changeProgrammeFromTable(rowData)"

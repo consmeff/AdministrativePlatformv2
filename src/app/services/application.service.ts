@@ -135,6 +135,13 @@ export class ApplicationService {
     return this.http.post(url, payload);
   }
 
+  markAsAdmittedInternally(
+    payload: ApplicantActionPayload,
+  ): Observable<unknown> {
+    const url = `${this.apiRoot}/api/v1/applicants/mark-as-admitted-internally`;
+    return this.http.post(url, payload);
+  }
+
   rejectApplicants(payload: RejectApplicantPayload): Observable<unknown> {
     const url = `${this.apiRoot}/api/v1/applicants/reject-applicants`;
     return this.http.post(url, payload);
