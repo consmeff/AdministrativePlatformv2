@@ -1,13 +1,29 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PaginatorModule } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
+import {
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  finalize,
+  of,
+  Subject,
+  Subscription,
+  switchMap,
+  tap,
+} from 'rxjs';
+import { BusyIndicatorService } from '../../services/busy-indicator.service';
 import { NotificationService } from '../../services/notification.service';
+import { PaymentService } from '../../services/payment.service';
 import { PaymentReceiptModalComponent } from './receipt-modal/payment-receipt-modal.component';
 import {
   FilterOption,
+  PaymentDetailDto,
+  PaymentsListItemDto,
+  PaymentsListResponseDto,
   PaymentStatus,
   PaymentType,
   TransactionRow,
@@ -27,8 +43,12 @@ import {
   templateUrl: './payment-record.component.html',
   styleUrl: './payment-record.component.scss',
 })
-export class PaymentRecordComponent implements OnInit {
+export class PaymentRecordComponent implements OnInit, OnDestroy {
+  private readonly paymentService = inject(PaymentService);
+  private readonly busyService = inject(BusyIndicatorService);
   private readonly notification = inject(NotificationService);
+  private readonly searchChanged = new Subject<string>();
+  private readonly subscriptions = new Subscription();
   searchText = '';
 
   readonly sessionOptions: FilterOption[] = [
@@ -37,45 +57,19 @@ export class PaymentRecordComponent implements OnInit {
   ];
   selectedSession: FilterOption = this.sessionOptions[0];
 
-  readonly paymentTypeOptions: FilterOption[] = [
-    { label: 'All Payment Type', value: 'all' },
-    { label: 'Application Fees', value: 'application-fee' },
-    { label: 'Acceptance Fees', value: 'acceptance-fee' },
-    { label: 'School Fees', value: 'school-fees' },
-    { label: 'Other Fees', value: 'other' },
+  readonly orderingOptions: FilterOption[] = [
+    { label: 'Newest First', value: '-created_at' },
+    { label: 'Oldest First', value: 'created_at' },
+    { label: 'Amount (High to Low)', value: '-amount' },
+    { label: 'Amount (Low to High)', value: 'amount' },
   ];
-  selectedPaymentType: FilterOption = this.paymentTypeOptions[0];
-
-  readonly statusOptions: FilterOption[] = [
-    { label: 'All Status', value: 'all' },
-    { label: 'Successful', value: 'successful' },
-    { label: 'Failed', value: 'failed' },
-    { label: 'Pending', value: 'pending' },
-  ];
-  selectedStatus: FilterOption = this.statusOptions[0];
-
-  readonly programmeOptions: FilterOption[] = [
-    { label: 'All Programmes', value: 'all' },
-    { label: 'Nursing', value: 'Nursing' },
-    { label: 'Public Health', value: 'Public Health' },
-    { label: 'Midwifery', value: 'Midwifery' },
-    { label: 'Pharmacy', value: 'Pharmacy' },
-  ];
-  selectedProgramme: FilterOption = this.programmeOptions[0];
-
-  readonly dateOptions: FilterOption[] = [
-    { label: 'All Date', value: 'all' },
-    { label: '24 Jan 2026', value: '2026-01-24' },
-    { label: '23 Jan 2026', value: '2026-01-23' },
-    { label: '22 Jan 2026', value: '2026-01-22' },
-  ];
-  selectedDate: FilterOption = this.dateOptions[0];
+  selectedOrdering: FilterOption = this.orderingOptions[0];
 
   readonly rows = 10;
   first = 0;
+  totalRecords = 0;
 
   allTransactions: TransactionRow[] = [];
-  filteredTransactions: TransactionRow[] = [];
   selectedTransaction: TransactionRow | null = null;
 
   readonly summaryCards = [
@@ -86,45 +80,57 @@ export class PaymentRecordComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    this.allTransactions = this.buildMockTransactions();
-    this.applyFilters();
+    this.subscriptions.add(
+      this.searchChanged
+        .pipe(
+          debounceTime(400),
+          distinctUntilChanged(),
+          switchMap(() => this.fetchPayments()),
+        )
+        .subscribe(),
+    );
+    this.subscriptions.add(this.fetchPayments().subscribe());
   }
 
-  onSearchChange(): void {
-    this.first = 0;
-    this.applyFilters();
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 
-  onStatusChange(): void {
+  onSearchChange(text: string): void {
+    this.searchText = text;
     this.first = 0;
-    this.applyFilters();
+    this.searchChanged.next(text.trim());
   }
 
-  onPaymentTypeChange(): void {
+  onOrderingChange(): void {
     this.first = 0;
-    this.applyFilters();
-  }
-
-  onProgrammeChange(): void {
-    this.first = 0;
-    this.applyFilters();
-  }
-
-  onDateChange(): void {
-    this.first = 0;
-    this.applyFilters();
+    this.subscriptions.add(this.fetchPayments().subscribe());
   }
 
   onPageChange(event: { first?: number; rows?: number }): void {
     this.first = event.first ?? 0;
+    this.subscriptions.add(this.fetchPayments().subscribe());
   }
 
   get pagedTransactions(): TransactionRow[] {
-    return this.filteredTransactions.slice(this.first, this.first + this.rows);
+    return this.allTransactions;
   }
 
   openTransactionDetails(transaction: TransactionRow): void {
-    this.selectedTransaction = transaction;
+    this.busyService.show();
+    this.subscriptions.add(
+      this.paymentService.getPaymentByRefId(transaction.referenceNo).subscribe({
+        next: (detail) => {
+          this.selectedTransaction = this.mapPaymentDetail(detail, transaction);
+        },
+        error: () => {
+          this.notification.error('Unable to load payment details.');
+        },
+        complete: () => {
+          this.busyService.hide();
+        },
+      }),
+    );
   }
 
   closeTransactionDetails(): void {
@@ -159,128 +165,136 @@ export class PaymentRecordComponent implements OnInit {
     }).format(amount);
   }
 
-  private applyFilters(): void {
-    const keyword = this.searchText.trim().toLowerCase();
-
-    this.filteredTransactions = this.allTransactions.filter((row) => {
-      if (
-        this.selectedStatus.value !== 'all' &&
-        row.status !== this.selectedStatus.value
-      ) {
-        return false;
-      }
-
-      if (
-        this.selectedPaymentType.value !== 'all' &&
-        row.paymentType !== this.selectedPaymentType.value
-      ) {
-        return false;
-      }
-
-      if (
-        this.selectedProgramme.value !== 'all' &&
-        row.programme !== this.selectedProgramme.value
-      ) {
-        return false;
-      }
-
-      if (
-        this.selectedDate.value !== 'all' &&
-        row.dateGroup !== this.selectedDate.value
-      ) {
-        return false;
-      }
-
-      if (!keyword) {
-        return true;
-      }
-
-      return (
-        row.fullName.toLowerCase().includes(keyword) ||
-        row.referenceNo.toLowerCase().includes(keyword) ||
-        row.applicationNo.toLowerCase().includes(keyword)
+  private fetchPayments() {
+    const page = Math.floor(this.first / this.rows) + 1;
+    this.busyService.show();
+    return this.paymentService
+      .getPayments({
+        page,
+        search: this.searchText.trim() || undefined,
+        ordering: this.selectedOrdering.value || undefined,
+      })
+      .pipe(
+        tap((response: PaymentsListResponseDto) => {
+          this.totalRecords = Number(response.count ?? 0);
+          this.allTransactions = (response.results ?? []).map((item, index) =>
+            this.mapPaymentListItem(item, index),
+          );
+        }),
+        catchError(() => {
+          this.notification.error('Unable to load payment records.');
+          this.allTransactions = [];
+          this.totalRecords = 0;
+          return of(null);
+        }),
+        finalize(() => this.busyService.hide()),
       );
-    });
   }
 
-  private buildMockTransactions(): TransactionRow[] {
-    const names = [
-      'Gbadegesin Ishola Dada',
-      'Adebayo Tunde',
-      'Okafor Chika',
-      'Usman Aisha',
-      'Yakub Ajibade',
-      'Omotosho Bisi',
-    ];
-    const programmes = ['Nursing', 'Public Health', 'Midwifery', 'Pharmacy'];
-    const levels = ['OND 1', 'OND 2', 'HND 1', 'HND 2'];
-    const dates = [
-      { text: '24 Jan 2026', key: '2026-01-24' },
-      { text: '23 Jan 2026', key: '2026-01-23' },
-      { text: '22 Jan 2026', key: '2026-01-22' },
-    ];
-    const paymentTypes: {
-      type: PaymentType;
-      label: string;
-      installment?: string;
-      amount: number;
-    }[] = [
-      {
-        type: 'acceptance-fee',
-        label: 'Admission Acceptance',
-        amount: 10000,
-      },
-      {
-        type: 'school-fees',
-        label: 'School Fees',
-        installment: '1st Installment',
-        amount: 100000,
-      },
-      {
-        type: 'application-fee',
-        label: 'Application Fees',
-        amount: 5000,
-      },
-      {
-        type: 'other',
-        label: 'Other Fees',
-        amount: 15000,
-      },
-    ];
+  private mapPaymentListItem(
+    item: PaymentsListItemDto,
+    index: number,
+  ): TransactionRow {
+    const date = this.parseDate(item.created_at);
+    return {
+      id: `${index + 1}`,
+      dateText: this.formatDate(date),
+      timeText: this.formatTime(date),
+      fullName: item.applicant_name ?? 'N/A',
+      applicationNo: item.applicant_no ?? 'N/A',
+      paymentTypeLabel: item.payment_type ?? 'N/A',
+      referenceNo: item.ref_id ?? 'N/A',
+      summary: item.summary,
+      programme: item.programme ?? 'N/A',
+      amount: this.toNumber(item.amount),
+      amountPaid: this.toNumber(item.amount_paid),
+      status: this.normalizeStatus(item.status),
+      paymentDateTime: `${this.formatDate(date)}, ${this.formatTime(date)}`,
+      createdAt: item.created_at,
+      payerLevel: 'N/A',
+      email: 'N/A',
+      phoneNumber: 'N/A',
+      dateGroup: this.toDateGroup(date),
+      paymentType: this.normalizePaymentType(item.payment_type),
+    };
+  }
 
-    return Array.from({ length: 40 }).map((_, index) => {
-      const name = names[index % names.length];
-      const programme = programmes[index % programmes.length];
-      const level = levels[index % levels.length];
-      const dateInfo = dates[index % dates.length];
-      const paymentTypeInfo = paymentTypes[index % paymentTypes.length];
-      const statusSeed = index % 8;
-      const status: PaymentStatus =
-        statusSeed === 0
-          ? 'failed'
-          : statusSeed === 1
-            ? 'pending'
-            : 'successful';
+  private mapPaymentDetail(
+    detail: PaymentDetailDto,
+    base: TransactionRow,
+  ): TransactionRow {
+    const date = this.parseDate(detail.created_at);
+    return {
+      ...base,
+      paymentTypeLabel: detail.payment_type ?? base.paymentTypeLabel,
+      amount: this.toNumber(detail.amount),
+      amountPaid: this.toNumber(detail.amount_paid),
+      status: this.normalizeStatus(detail.status),
+      summary: detail.summary ?? base.summary,
+      dateText: this.formatDate(date),
+      timeText: this.formatTime(date),
+      paymentDateTime: `${this.formatDate(date)}, ${this.formatTime(date)}`,
+      createdAt: detail.created_at,
+      applicationNo: detail.applicant_no ?? base.applicationNo,
+      fullName: detail.applicant_name ?? base.fullName,
+      programme: detail.programme ?? base.programme,
+      email: detail.email ?? base.email,
+      phoneNumber: detail.phone_number ?? base.phoneNumber,
+      payerLevel: detail.level_of_study ?? base.payerLevel,
+      paymentType: this.normalizePaymentType(detail.payment_type),
+    };
+  }
 
-      return {
-        id: String(index + 1),
-        dateText: dateInfo.text,
-        timeText: `${(index % 12) + 1}:58 ${index % 2 === 0 ? 'AM' : 'PM'}`,
-        fullName: name,
-        applicationNo: `CONSMMEFS/ENT-2025/${String(index + 6).padStart(3, '0')}`,
-        paymentTypeLabel: paymentTypeInfo.label,
-        installmentLabel: paymentTypeInfo.installment,
-        referenceNo: `REF-9FL${String(300 + index).padStart(3, '0')}LYXX`,
-        programme,
-        amount: paymentTypeInfo.amount,
-        status,
-        paymentDateTime: `${dateInfo.text}, ${(index % 12) + 1}:58 ${index % 2 === 0 ? 'AM' : 'PM'}`,
-        payerLevel: level,
-        email: `${name.split(' ')[0].toLowerCase()}@gmail.com`,
-        phoneNumber: `0802${String(773600 + index).padStart(6, '0')}`,
-        dateGroup: dateInfo.key,
-        paymentType: paymentTypeInfo.type,
-      };
-    });
+  private normalizeStatus(status: string): PaymentStatus {
+    const value = (status ?? '').trim().toLowerCase();
+    if (value.includes('success')) {
+      return 'successful';
+    }
+    if (value.includes('fail')) {
+      return 'failed';
+    }
+    return 'pending';
+  }
+
+  private normalizePaymentType(value: string): PaymentType {
+    return (value ?? '').trim().toLowerCase().replace(/\s+/g, '-');
+  }
+
+  private toNumber(value: number | string | null | undefined): number {
+    if (typeof value === 'number') {
+      return value;
+    }
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  private parseDate(value: string): Date {
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) {
+      return new Date();
+    }
+    return parsed;
+  }
+
+  private formatDate(date: Date): string {
+    return new Intl.DateTimeFormat('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    }).format(date);
+  }
+
+  private formatTime(date: Date): string {
+    return new Intl.DateTimeFormat('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    }).format(date);
+  }
+
+  private toDateGroup(date: Date): string {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(
+      date.getDate(),
+    ).padStart(2, '0')}`;
   }
 }

@@ -68,7 +68,7 @@
 
 .filters-row {
   display: grid;
-  grid-template-columns: minmax(290px, 1fr) repeat(4, minmax(150px, 1fr));
+  grid-template-columns: minmax(290px, 1fr) minmax(220px, 320px);
   gap: 10px;
   margin-bottom: 12px;
 }

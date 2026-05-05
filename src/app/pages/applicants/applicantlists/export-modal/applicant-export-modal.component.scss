@@ -1,27 +1,9 @@
 :host ::ng-deep .export-list-modal {
   width: min(470px, calc(100vw - 2rem));
-  border-radius: 20px;
 }
 
-:host ::ng-deep .export-list-modal .p-dialog-header {
-  border-bottom: 1px solid #e5eefc;
-  padding: 1.6rem 1.6rem 1rem;
-}
-
-:host ::ng-deep .export-list-modal .p-dialog-content {
-  padding: 1.25rem 1.6rem 0.5rem;
-}
-
-:host ::ng-deep .export-list-modal .p-dialog-footer {
-  padding: 1rem 1.6rem 1.6rem;
-  border-top: none;
-}
-
-.export-modal-title {
-  margin: 0;
-  color: #0f1d4d;
+:host ::ng-deep .export-list-modal .app-modal-title {
   font-size: 2rem;
-  font-weight: 700;
 }
 
 .export-modal-content {

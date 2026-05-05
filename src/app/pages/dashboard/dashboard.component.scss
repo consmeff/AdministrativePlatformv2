@@ -17,6 +17,18 @@
   padding-top: 0.25rem;
 }
 
+.dashboard-head-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.set-cutoff-trigger {
+  min-width: 150px;
+}
+
 .status-body {
   margin-top: 0.9rem;
   max-width: 430px;

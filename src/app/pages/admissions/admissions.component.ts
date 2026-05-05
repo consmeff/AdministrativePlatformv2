@@ -37,6 +37,7 @@ import { TableRowActionsComponent } from '../../widgets/table-row-actions/table-
 import { ApplicantdetailComponent } from '../applicants/applicantdetail/applicantdetail.component';
 import { AdmissionsUploadFlowComponent } from './upload-flow/admissions-upload-flow.component';
 import { MetricCardComponent } from '../../widgets/metric-card/metric-card.component';
+import { ChangeProgrammeModalComponent } from './change-programme-modal/change-programme-modal.component';
 
 interface PagingEvent {
   first: number;
@@ -90,6 +91,7 @@ interface AdmissionFilterCard {
     ApplicantdetailComponent,
     AdmissionsUploadFlowComponent,
     MetricCardComponent,
+    ChangeProgrammeModalComponent,
   ],
   templateUrl: './admissions.component.html',
   styleUrl: './admissions.component.scss',
@@ -120,6 +122,10 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   hasCheckedCbtUploadStatus = false;
   isCbtResultsUploaded = false;
   isDocumentUploadFlowVisible = false;
+  isChangeProgrammeModalVisible = false;
+  changeProgrammeCurrentProgramme = 'N/A';
+  changeProgrammeApplicationNo = '';
+  changeProgrammeOptions: string[] = [];
   activeCardFilter: AdmissionDecisionFilter = 'all';
   readonly filterCards: AdmissionFilterCard[] = [
     { label: 'All Candidates', filter: 'all' },
@@ -353,24 +359,6 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
       .length;
   }
 
-  getPrimaryActionLabel(): string {
-    return this.activeCardFilter === 'pending-publish'
-      ? 'Publish Admission'
-      : 'Set Cutoff';
-  }
-
-  shouldShowPrimaryAction(): boolean {
-    return this.activeCardFilter !== 'admitted';
-  }
-
-  onPrimaryActionClick() {
-    if (this.activeCardFilter === 'pending-publish') {
-      this.notification.warn('Publish admission action is not yet wired.');
-      return;
-    }
-    this.notification.warn('Set cutoff action is not yet wired.');
-  }
-
   viewProfile(row: AdmissionTableRow) {
     this.selectedApplicationNo = row.application_no;
     this.isApplicantDrawerVisible = true;
@@ -400,10 +388,71 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     );
   }
 
-  changeProgrammeFromTable(row: AdmissionTableRow): void {
+  grantAdmissionFromDrawer(): void {
+    if (!this.selectedApplicationNo) {
+      return;
+    }
     this.notification.warn(
-      `Change programme is not yet wired for ${row.full_name}.`,
+      `Grant admission is not yet wired for ${this.selectedApplicationNo}.`,
     );
+  }
+
+  changeProgrammeFromTable(row: AdmissionTableRow): void {
+    this.openChangeProgrammeModal(row.application_no, row.program);
+  }
+
+  openChangeProgrammeFromDrawer(currentProgramme: string): void {
+    if (!this.selectedApplicationNo) {
+      this.notification.error(
+        'Application number is required for this action.',
+      );
+      return;
+    }
+    this.openChangeProgrammeModal(this.selectedApplicationNo, currentProgramme);
+  }
+
+  closeChangeProgrammeModal(): void {
+    this.isChangeProgrammeModalVisible = false;
+  }
+
+  submitChangeProgramme(newProgramme: string): void {
+    this.isChangeProgrammeModalVisible = false;
+    this.notification.success(
+      `Programme changed to ${newProgramme} for ${this.changeProgrammeApplicationNo}.`,
+    );
+  }
+
+  private openChangeProgrammeModal(
+    applicationNo: string,
+    currentProgramme: string,
+  ): void {
+    this.closeTransientOverlays();
+    this.changeProgrammeApplicationNo = applicationNo;
+    this.changeProgrammeCurrentProgramme = currentProgramme || 'N/A';
+    this.changeProgrammeOptions = this.buildProgrammeOptions(currentProgramme);
+    this.isChangeProgrammeModalVisible = true;
+  }
+
+  private buildProgrammeOptions(currentProgramme: string): string[] {
+    const seeded = this.app_summ
+      .map((row) => row.program)
+      .filter((value): value is string => Boolean(value))
+      .map((value) => value.trim())
+      .filter((value) => value.length > 0);
+
+    const defaults = ['Nursing', 'Midwifery', 'Public Health'];
+    const merged = Array.from(new Set([...seeded, ...defaults]));
+    const normalizedCurrent = (currentProgramme ?? '').trim().toLowerCase();
+
+    return merged.filter(
+      (value) => value.trim().toLowerCase() !== normalizedCurrent,
+    );
+  }
+
+  private closeTransientOverlays(): void {
+    this.isChangeProgrammeModalVisible = false;
+    this.isApplicantDrawerVisible = false;
+    this.selectedApplicationNo = null;
   }
 
   private performApplicantAction(

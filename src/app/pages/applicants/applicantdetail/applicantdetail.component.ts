@@ -56,6 +56,8 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
   @Input() embedded = false;
   @Input() embeddedMode: 'default' | 'admissions' = 'default';
   @Output() closed = new EventEmitter<void>();
+  @Output() changeProgrammeRequested = new EventEmitter<string>();
+  @Output() grantAdmissionRequested = new EventEmitter<void>();
 
   app_no: string | null = '';
   isIssuingCompliance = false;
@@ -83,10 +85,22 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
   documentRows: Record<string, unknown>[] = [];
 
   onChangeProgramme(): void {
+    if (this.embeddedMode === 'admissions') {
+      const department = this.application?.department;
+      const departmentName =
+        typeof department === 'string' ? department : (department?.name ?? '');
+      const programme = this.application?.program?.name || departmentName || '';
+      this.changeProgrammeRequested.emit(programme);
+      return;
+    }
     this.notification.warn('Change programme action is not yet wired.');
   }
 
   onGrantAdmission(): void {
+    if (this.embeddedMode === 'admissions') {
+      this.grantAdmissionRequested.emit();
+      return;
+    }
     this.notification.warn('Grant admission action is not yet wired.');
   }
 

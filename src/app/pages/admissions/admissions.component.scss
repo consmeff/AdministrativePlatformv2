@@ -6,7 +6,7 @@
 
 .cards-head {
   display: grid;
-  grid-template-columns: repeat(4, minmax(190px, 1fr)) auto;
+  grid-template-columns: repeat(4, minmax(190px, 1fr));
   gap: 14px;
   align-items: stretch;
 }
@@ -41,16 +41,6 @@
 .summary-card .label {
   font-size: 14px;
   font-weight: 500;
-}
-
-.primary-action {
-  border: 0;
-  border-radius: 12px;
-  background: var(--app-primary);
-  color: #fff;
-  min-width: 170px;
-  padding: 0 18px;
-  font-weight: 600;
 }
 
 .filters-head {

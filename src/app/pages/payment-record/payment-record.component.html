@@ -35,8 +35,8 @@
         <input
           type="text"
           class="search-input"
-          [(ngModel)]="searchText"
-          (ngModelChange)="onSearchChange()"
+          [ngModel]="searchText"
+          (ngModelChange)="onSearchChange($event)"
           placeholder="Search by name, reference no. or application no."
         />
         <button type="button" class="search-btn">
@@ -45,32 +45,11 @@
       </div>
 
       <p-select
-        [options]="paymentTypeOptions"
-        [(ngModel)]="selectedPaymentType"
+        [options]="orderingOptions"
+        [(ngModel)]="selectedOrdering"
         optionLabel="label"
         class="filter-select"
-        (onChange)="onPaymentTypeChange()"
-      />
-      <p-select
-        [options]="statusOptions"
-        [(ngModel)]="selectedStatus"
-        optionLabel="label"
-        class="filter-select"
-        (onChange)="onStatusChange()"
-      />
-      <p-select
-        [options]="programmeOptions"
-        [(ngModel)]="selectedProgramme"
-        optionLabel="label"
-        class="filter-select"
-        (onChange)="onProgrammeChange()"
-      />
-      <p-select
-        [options]="dateOptions"
-        [(ngModel)]="selectedDate"
-        optionLabel="label"
-        class="filter-select"
-        (onChange)="onDateChange()"
+        (onChange)="onOrderingChange()"
       />
     </div>
 
@@ -141,7 +120,7 @@
     <p-paginator
       [first]="first"
       [rows]="rows"
-      [totalRecords]="filteredTransactions.length"
+      [totalRecords]="totalRecords"
       [showCurrentPageReport]="true"
       currentPageReportTemplate="Showing {first} to {last} of {totalRecords} items"
       [rowsPerPageOptions]="[10]"

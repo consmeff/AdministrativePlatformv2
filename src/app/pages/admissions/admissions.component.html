@@ -25,15 +25,6 @@
           (cardClick)="setCardFilter(card.filter)"
         />
       }
-      @if (shouldShowPrimaryAction()) {
-        <button
-          type="button"
-          class="primary-action"
-          (click)="onPrimaryActionClick()"
-        >
-          {{ getPrimaryActionLabel() }}
-        </button>
-      }
     </div>
 
     <div class="filters-head">
@@ -147,6 +138,16 @@
       [embedded]="true"
       embeddedMode="admissions"
       (closed)="closeApplicantDrawer()"
+      (changeProgrammeRequested)="openChangeProgrammeFromDrawer($event)"
+      (grantAdmissionRequested)="grantAdmissionFromDrawer()"
     />
   }
 </p-drawer>
+
+<app-change-programme-modal
+  [visible]="isChangeProgrammeModalVisible"
+  [currentProgramme]="changeProgrammeCurrentProgramme"
+  [programmeOptions]="changeProgrammeOptions"
+  (closed)="closeChangeProgrammeModal()"
+  (changed)="submitChangeProgramme($event)"
+></app-change-programme-modal>

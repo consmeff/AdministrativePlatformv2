@@ -1,0 +1,76 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="true"
+  [dismissableMask]="true"
+  styleClass="app-modal-shell"
+  (onHide)="onClose()"
+>
+  <ng-template pTemplate="header">
+    <div>
+      <h2 class="title-small app-modal-title">Set Admission Cutoff Mark</h2>
+      <p class="body-small app-modal-subtitle">
+        Define minimum scores required for bulk admission decisions.
+      </p>
+    </div>
+  </ng-template>
+
+  <div class="app-modal-content">
+    <div class="app-modal-divider"></div>
+
+    <div class="app-modal-field">
+      <div class="label-small app-modal-label">Minimum CBT Score</div>
+      <input
+        class="app-modal-input"
+        type="number"
+        min="0"
+        max="400"
+        [(ngModel)]="minimumCbtScore"
+      />
+    </div>
+
+    <div class="app-modal-field">
+      <div class="label-small app-modal-label">Minimum JAMB Score</div>
+      <input
+        class="app-modal-input"
+        type="number"
+        min="0"
+        max="400"
+        [(ngModel)]="minimumJambScore"
+      />
+    </div>
+
+    <div class="app-modal-field">
+      <div class="label-small app-modal-label">Programme</div>
+      <p-select
+        [options]="programmeOptions"
+        [(ngModel)]="selectedProgramme"
+        optionLabel="label"
+        styleClass="app-modal-select"
+      />
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="app-modal-actions">
+      <app-button
+        variant="outline"
+        [disabled]="loading"
+        [fullWidth]="true"
+        (buttonClick)="onClose()"
+      >
+        Cancel
+      </app-button>
+      <app-button
+        variant="primary"
+        [disabled]="loading"
+        [fullWidth]="true"
+        (buttonClick)="onSave()"
+      >
+        Save Cutoff
+      </app-button>
+    </div>
+  </ng-template>
+</p-dialog>

@@ -77,18 +77,6 @@
   font-size: 0.95rem;
 }
 
-:host ::ng-deep .p-checkbox.p-highlight .p-checkbox-box,
-:host ::ng-deep .p-checkbox.p-checkbox-checked .p-checkbox-box,
-:host ::ng-deep .p-checkbox.p-checkbox-indeterminate .p-checkbox-box {
-  background: var(--app-primary);
-  border-color: var(--app-primary);
-}
-
-:host ::ng-deep .p-checkbox:not(.p-disabled) .p-checkbox-box.p-focus {
-  border-color: var(--app-primary);
-  box-shadow: 0 0 0 0.2rem rgba(21, 49, 167, 0.2);
-}
-
 .table-wrap {
   background: #fff;
   border: 1px solid #eef1f4;

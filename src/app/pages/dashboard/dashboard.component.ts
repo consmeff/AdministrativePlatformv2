@@ -25,7 +25,12 @@ import {
   StatusTone,
 } from '../../widgets/status-indicator/status-indicator.component';
 import { TableRowActionsComponent } from '../../widgets/table-row-actions/table-row-actions.component';
+import { ButtonComponent } from '../../widgets/button/button.component';
 import { ApplicantdetailComponent } from '../applicants/applicantdetail/applicantdetail.component';
+import {
+  SetCutoffModalComponent,
+  SetCutoffPayload,
+} from '../admissions/set-cutoff-modal/set-cutoff-modal.component';
 
 interface DashboardRow {
   id: number;
@@ -51,7 +56,9 @@ interface DashboardRow {
     MetricCardComponent,
     StatusIndicatorComponent,
     TableRowActionsComponent,
+    ButtonComponent,
     ApplicantdetailComponent,
+    SetCutoffModalComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
@@ -128,6 +135,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ];
   directiveSelectedReason = '';
   directiveSelectedDocuments: string[] = [];
+  isSetCutoffModalVisible = false;
 
   constructor() {
     this.dashInfoService.dashInfo$
@@ -223,6 +231,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   openComplianceForSingle(row: DashboardRow) {
+    this.closeTransientOverlays();
     this.pendingDirectiveApplicantId = row.id;
     this.reasonModalPrompt = `Issue compliance directive to ${row.applicant}?`;
     this.reasonModalInitialNote = '';
@@ -235,6 +244,30 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.isReasonModalVisible = false;
     this.pendingDirectiveApplicantId = null;
     this.reasonModalInitialNote = '';
+  }
+
+  openSetCutoffModal(): void {
+    this.closeTransientOverlays();
+    this.isSetCutoffModalVisible = true;
+  }
+
+  closeSetCutoffModal(): void {
+    this.isSetCutoffModalVisible = false;
+  }
+
+  saveCutoff(payload: SetCutoffPayload): void {
+    this.isSetCutoffModalVisible = false;
+    const programmeText = payload.programme ?? 'all programmes';
+    this.notification.success(
+      `Cutoff saved for ${programmeText} (CBT: ${payload.minimumCbtScore ?? '-'}, JAMB: ${payload.minimumJambScore ?? '-'}).`,
+    );
+  }
+
+  private closeTransientOverlays(): void {
+    this.isSetCutoffModalVisible = false;
+    this.isReasonModalVisible = false;
+    this.isApplicantDrawerVisible = false;
+    this.activeApplicationNo = null;
   }
 
   submitReasonModalPayload(payload: ActionModalPayload) {
