@@ -2,9 +2,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
   padding: 0.5rem 1rem;
   background-color: var(--app-surface-alt) !important;
   box-shadow: var(--app-shadow-sm);
+  border-bottom: 1px solid var(--app-border);
 }
 
 .burger-menu {
@@ -16,6 +18,10 @@
 
 .tb-icon {
   color: var(--app-text-secondary);
+}
+
+.top-title {
+  margin-left: 0.35rem;
 }
 
 .flex-column span:first-child {

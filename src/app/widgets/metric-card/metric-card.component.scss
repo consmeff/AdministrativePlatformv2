@@ -1,9 +1,15 @@
 .metric-card {
   border: 1px solid var(--app-border);
-  border-radius: 12px;
-  background-color: var(--app-surface);
-  padding: 0.85rem 1.05rem;
-  min-height: 92px;
+  border-radius: 8px;
+  background-color: var(--app-surface-alt);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.metric-card.clickable {
+  cursor: pointer;
 }
 
 .metric-card.active {
@@ -18,11 +24,12 @@
   align-items: center;
 }
 
-.metric-head h3 {
-  margin: 0;
-  font-size: 2rem;
-  font-weight: 700;
-  color: #0b1b54;
+.metric-card h3,
+.metric-card.filter-card h3.metric {
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 120%;
+  letter-spacing: 0%;
 }
 
 .metric-head img {
@@ -31,8 +38,7 @@
 }
 
 .metric-title {
-  margin: 0 0 0.5rem;
-  font-size: 1rem;
+  margin: 0;
   color: var(--app-text-secondary);
 }
 
@@ -42,4 +48,37 @@
 
 small {
   color: var(--app-text-muted);
+}
+
+.metric-card.filter-card .metric-subtext {
+  font-size: 12px;
+  line-height: 120%;
+  letter-spacing: 0%;
+  color: inherit;
+  opacity: 0.85;
+}
+
+.metric-card.filter-card {
+  border: 1px solid #dbe8ff;
+  border-radius: 12px;
+  background: #fff;
+  color: #1a2f59;
+  padding: 14px 16px;
+  text-align: left;
+  gap: 4px;
+}
+
+.metric-card.filter-card .metric-head {
+  display: block;
+}
+
+.metric-card.filter-card .metric-title.label {
+  font-weight: 500;
+  color: inherit;
+}
+
+.metric-card.filter-card.active {
+  background: var(--app-primary);
+  border-color: var(--app-primary);
+  color: #fff;
 }

@@ -1,3 +1,29 @@
 :host {
   display: block;
+  height: 100dvh;
+}
+
+.layout-shell {
+  display: flex;
+  height: 100dvh;
+  width: 100%;
+}
+
+.sidebar-pane {
+  flex: 0 0 auto;
+  height: 100%;
+}
+
+.content-shell {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+}
+
+.center-pane {
+  flex: 1;
+  overflow: auto;
+  padding: 1rem;
 }

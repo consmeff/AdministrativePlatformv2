@@ -10,6 +10,10 @@
   gap: 0.75rem;
 }
 
+.top-cards app-metric-card {
+  display: block;
+}
+
 .summary-card {
   border: 1px solid #dbe8ff;
   border-radius: 12px;
@@ -63,14 +67,14 @@
   min-width: 260px;
 }
 
-.ghost-btn {
-  border: 1px solid #d1d5db;
-  background: #fff;
-  color: #111827;
-  border-radius: 8px;
+:host ::ng-deep .filters-row app-button .app-btn {
   height: 40px;
-  padding: 0 0.85rem;
   font-size: 0.875rem;
+  border-radius: 8px;
+}
+
+:host ::ng-deep .filters-row app-button .app-btn i {
+  font-size: 0.95rem;
 }
 
 .table-wrap {
@@ -82,11 +86,18 @@
 
 .applicant-name {
   font-weight: 600;
+  font-size: 12px;
+  line-height: 120%;
+  letter-spacing: 0%;
+  color: var(--app-text-primary);
 }
 
 .application-no {
-  color: #6b7280;
-  font-size: 0.8rem;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 150%;
+  letter-spacing: 0%;
+  color: var(--app-text-secondary);
 }
 
 @media (max-width: 1200px) {
@@ -95,7 +106,7 @@
   }
 
   .filters-row {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

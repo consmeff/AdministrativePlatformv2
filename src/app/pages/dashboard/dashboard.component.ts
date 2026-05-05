@@ -12,6 +12,7 @@ import {
 } from '../../services/application.service';
 import { BusyIndicatorService } from '../../services/busy-indicator.service';
 import { DashboardinformationService } from '../../services/dashboardinformation.service';
+import { NotificationService } from '../../services/notification.service';
 import { DashboardInfo } from '../../model/dashboard/information.dto';
 import {
   ActionModalPayload,
@@ -24,7 +25,12 @@ import {
   StatusTone,
 } from '../../widgets/status-indicator/status-indicator.component';
 import { TableRowActionsComponent } from '../../widgets/table-row-actions/table-row-actions.component';
+import { ButtonComponent } from '../../widgets/button/button.component';
 import { ApplicantdetailComponent } from '../applicants/applicantdetail/applicantdetail.component';
+import {
+  SetCutoffModalComponent,
+  SetCutoffPayload,
+} from '../admissions/set-cutoff-modal/set-cutoff-modal.component';
 
 interface DashboardRow {
   id: number;
@@ -50,7 +56,9 @@ interface DashboardRow {
     MetricCardComponent,
     StatusIndicatorComponent,
     TableRowActionsComponent,
+    ButtonComponent,
     ApplicantdetailComponent,
+    SetCutoffModalComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
@@ -61,6 +69,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private readonly applicationService = inject(ApplicationService);
   private readonly dashInfoService = inject(DashboardinformationService);
   private readonly busyService = inject(BusyIndicatorService);
+  private readonly notification = inject(NotificationService);
 
   _dash: DashboardInfo = {} as DashboardInfo;
 
@@ -126,6 +135,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ];
   directiveSelectedReason = '';
   directiveSelectedDocuments: string[] = [];
+  isSetCutoffModalVisible = false;
 
   constructor() {
     this.dashInfoService.dashInfo$
@@ -221,6 +231,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   openComplianceForSingle(row: DashboardRow) {
+    this.closeTransientOverlays();
     this.pendingDirectiveApplicantId = row.id;
     this.reasonModalPrompt = `Issue compliance directive to ${row.applicant}?`;
     this.reasonModalInitialNote = '';
@@ -235,9 +246,33 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.reasonModalInitialNote = '';
   }
 
+  openSetCutoffModal(): void {
+    this.closeTransientOverlays();
+    this.isSetCutoffModalVisible = true;
+  }
+
+  closeSetCutoffModal(): void {
+    this.isSetCutoffModalVisible = false;
+  }
+
+  saveCutoff(payload: SetCutoffPayload): void {
+    this.isSetCutoffModalVisible = false;
+    const programmeText = payload.programme ?? 'all programmes';
+    this.notification.success(
+      `Cutoff saved for ${programmeText} (CBT: ${payload.minimumCbtScore ?? '-'}, JAMB: ${payload.minimumJambScore ?? '-'}).`,
+    );
+  }
+
+  private closeTransientOverlays(): void {
+    this.isSetCutoffModalVisible = false;
+    this.isReasonModalVisible = false;
+    this.isApplicantDrawerVisible = false;
+    this.activeApplicationNo = null;
+  }
+
   submitReasonModalPayload(payload: ActionModalPayload) {
     if (!this.pendingDirectiveApplicantId) {
-      window.alert('Applicant ID not found for this action.');
+      this.notification.error('Applicant ID not found for this action.');
       return;
     }
 
@@ -277,13 +312,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     request.subscribe({
       next: () => {
         onSuccess?.();
-        window.alert(successMessage);
+        this.notification.success(successMessage);
         this.loadDashboardData();
-      },
-      error: (err) => {
-        const message =
-          err?.error?.message || err?.error?.detail || 'Action failed.';
-        window.alert(message);
       },
       complete: () => {
         this.isReasonActionLoading = false;

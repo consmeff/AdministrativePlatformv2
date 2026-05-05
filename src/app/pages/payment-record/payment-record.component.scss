@@ -1,0 +1,208 @@
+.payment-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.page-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.page-title-row h2 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 700;
+  color: #10204f;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.total-revenue-card {
+  grid-column: span 1;
+}
+
+.metric-card {
+  border: 1px solid #e6eefb;
+  border-radius: 12px;
+  padding: 14px;
+  background: #fff;
+}
+
+.metric-title {
+  margin: 0 0 8px;
+  color: #7c8fb4;
+  font-size: 14px;
+}
+
+.metric-card h3 {
+  margin: 0 0 4px;
+  color: #10204f;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.metric-subtext {
+  color: #91a2c4;
+  font-size: 13px;
+}
+
+.section-divider {
+  border: 0;
+  border-top: 1px solid #edf2fb;
+  margin: 2px 0;
+}
+
+.transactions-wrap h3 {
+  margin: 0 0 12px;
+  color: #10204f;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.filters-row {
+  display: grid;
+  grid-template-columns: minmax(290px, 1fr) minmax(220px, 320px);
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.search-box {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+
+.search-input {
+  width: 100%;
+  height: 44px;
+  border: 1px solid #dbe8ff;
+  border-radius: 10px;
+  padding: 0 14px;
+}
+
+.search-input::placeholder {
+  color: #8fa0c0;
+}
+
+.search-btn {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--app-primary);
+  color: #fff;
+}
+
+.cell-primary {
+  color: #1a2f59;
+  font-weight: 600;
+}
+
+.cell-secondary {
+  color: #8fa0c0;
+  font-size: 13px;
+}
+
+.type-pill {
+  display: inline-flex;
+  border-radius: 8px;
+  padding: 4px 8px;
+  background: #f2f6fd;
+  color: #445e86;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.amount-cell {
+  font-weight: 700;
+  color: #14295e;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.status-successful {
+  color: #14a44d;
+}
+
+.status-failed {
+  color: #ef4444;
+}
+
+.status-pending {
+  color: #f59e0b;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.icon-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid #dbe8ff;
+  background: #fff;
+  color: #607ba7;
+}
+
+:host ::ng-deep .session-select .p-select,
+:host ::ng-deep .filter-select .p-select {
+  width: 100%;
+  min-height: 44px;
+  border-color: #dbe8ff;
+  border-radius: 10px;
+}
+
+:host ::ng-deep .session-select {
+  min-width: 140px;
+}
+
+:host ::ng-deep .p-datatable th {
+  background: #fff;
+  border-bottom: 1px solid #ecf1fb;
+  color: #5f7398;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+:host ::ng-deep .p-datatable td {
+  background: #fff;
+  border-bottom: 1px solid #f0f4fb;
+  color: #20335f;
+  font-size: 14px;
+  vertical-align: top;
+}
+
+:host ::ng-deep .p-paginator {
+  background: #fff;
+  border: 0;
+  border-top: 1px solid #edf2fb;
+}
+
+@media (max-width: 1180px) {
+  .metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .filters-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .search-box {
+    grid-column: 1 / -1;
+  }
+}

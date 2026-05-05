@@ -9,10 +9,7 @@ import {
 import { appstatus, Column } from '../../model/page.dto';
 import { DrawerModule } from 'primeng/drawer';
 import { TableModule } from 'primeng/table';
-import {
-  ApplicationService,
-  ComplianceDirectivePayload,
-} from '../../services/application.service';
+import { ApplicationService } from '../../services/application.service';
 import { Router } from '@angular/router';
 import {
   Application,
@@ -30,6 +27,7 @@ import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 import { FormsModule } from '@angular/forms';
 import { BusyIndicatorService } from '../../services/busy-indicator.service';
+import { NotificationService } from '../../services/notification.service';
 import {
   StatusIndicatorComponent,
   StatusTone,
@@ -38,6 +36,8 @@ import { SearchInputComponent } from '../../widgets/search-input/search-input.co
 import { TableRowActionsComponent } from '../../widgets/table-row-actions/table-row-actions.component';
 import { ApplicantdetailComponent } from '../applicants/applicantdetail/applicantdetail.component';
 import { AdmissionsUploadFlowComponent } from './upload-flow/admissions-upload-flow.component';
+import { MetricCardComponent } from '../../widgets/metric-card/metric-card.component';
+import { ChangeProgrammeModalComponent } from './change-programme-modal/change-programme-modal.component';
 
 interface PagingEvent {
   first: number;
@@ -70,6 +70,11 @@ type AdmissionDecisionFilter =
   | 'pending-publish'
   | 'admitted';
 
+interface AdmissionFilterCard {
+  label: string;
+  filter: AdmissionDecisionFilter;
+}
+
 @Component({
   selector: 'app-admissions',
 
@@ -85,6 +90,8 @@ type AdmissionDecisionFilter =
     TableRowActionsComponent,
     ApplicantdetailComponent,
     AdmissionsUploadFlowComponent,
+    MetricCardComponent,
+    ChangeProgrammeModalComponent,
   ],
   templateUrl: './admissions.component.html',
   styleUrl: './admissions.component.scss',
@@ -93,6 +100,7 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   _applicationService = inject(ApplicationService);
   router = inject(Router);
   busyService = inject(BusyIndicatorService);
+  notification = inject(NotificationService);
   cd = inject(ChangeDetectorRef);
   application!: Application[];
   subscriptions = new Subscription();
@@ -111,7 +119,20 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   selectedRows: AdmissionTableRow[] = [];
   selectedApplicationNo: string | null = null;
   isApplicantDrawerVisible = false;
+  hasCheckedCbtUploadStatus = false;
+  isCbtResultsUploaded = false;
+  isDocumentUploadFlowVisible = false;
+  isChangeProgrammeModalVisible = false;
+  changeProgrammeCurrentProgramme = 'N/A';
+  changeProgrammeApplicationNo = '';
+  changeProgrammeOptions: string[] = [];
   activeCardFilter: AdmissionDecisionFilter = 'all';
+  readonly filterCards: AdmissionFilterCard[] = [
+    { label: 'All Candidates', filter: 'all' },
+    { label: 'Pending Review', filter: 'pending-review' },
+    { label: 'Pending Publish', filter: 'pending-publish' },
+    { label: 'Admitted Candidates', filter: 'admitted' },
+  ];
   private searchTextChanged = new Subject<string>();
   searchKeyword: string | undefined = undefined;
 
@@ -139,13 +160,7 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.busyService.show();
-    this.fetchRecords().subscribe((data: ApplicationListResponse) => {
-      this.total_record_count = data.total;
-      this.applicationList = data.data;
-      this.populateSummary();
-      this.busyService.hide();
-    });
+    this.checkCbtUploadStatus();
     this.approval_status = [
       { name: 'All', code: 0 },
       { name: 'Pending', code: 1 },
@@ -344,24 +359,6 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
       .length;
   }
 
-  getPrimaryActionLabel(): string {
-    return this.activeCardFilter === 'pending-publish'
-      ? 'Publish Admission'
-      : 'Set Cutoff';
-  }
-
-  shouldShowPrimaryAction(): boolean {
-    return this.activeCardFilter !== 'admitted';
-  }
-
-  onPrimaryActionClick() {
-    if (this.activeCardFilter === 'pending-publish') {
-      window.alert('Publish admission action is not yet wired.');
-      return;
-    }
-    window.alert('Set cutoff action is not yet wired.');
-  }
-
   viewProfile(row: AdmissionTableRow) {
     this.selectedApplicationNo = row.application_no;
     this.isApplicantDrawerVisible = true;
@@ -372,24 +369,136 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     this.selectedApplicationNo = null;
   }
 
-  shortlistSingle(row: AdmissionTableRow) {
+  openDocumentUploadFlow(): void {
+    this.isDocumentUploadFlowVisible = true;
+  }
+
+  closeDocumentUploadFlow(): void {
+    this.isDocumentUploadFlowVisible = false;
+  }
+
+  onCbtUploadFlowCompleted(): void {
+    this.isCbtResultsUploaded = true;
+    this.loadAdmissionsRecords();
+  }
+
+  grantAdmissionFromTable(row: AdmissionTableRow): void {
+    if (this.isPendingPublishDecision(row)) {
+      this.revertDecision(row);
+      return;
+    }
     this.performApplicantAction(
-      this._applicationService.shortlistApplicants({
+      this._applicationService.markAsAdmittedInternally({
         applicant_ids: [row.id],
       }),
-      'Candidate shortlisted successfully.',
+      `Admission granted for ${row.full_name}.`,
     );
   }
 
-  openComplianceForSingle(row: AdmissionTableRow) {
-    const payload: ComplianceDirectivePayload = {
-      applicant_ids: [row.id],
-      extra_note: '',
-    };
-    this.performApplicantAction(
-      this._applicationService.issueComplianceDirective(payload),
-      'Compliance directive issued successfully.',
+  grantAdmissionFromDrawer(): void {
+    if (!this.selectedApplicationNo) {
+      return;
+    }
+    const row = this.findRowByApplicationNo(this.selectedApplicationNo);
+    if (!row) {
+      this.notification.error('Unable to resolve selected applicant record.');
+      return;
+    }
+    this.grantAdmissionFromTable(row);
+  }
+
+  changeProgrammeFromTable(row: AdmissionTableRow): void {
+    this.openChangeProgrammeModal(row.application_no, row.program);
+  }
+
+  openChangeProgrammeFromDrawer(currentProgramme: string): void {
+    if (!this.selectedApplicationNo) {
+      this.notification.error(
+        'Application number is required for this action.',
+      );
+      return;
+    }
+    this.openChangeProgrammeModal(this.selectedApplicationNo, currentProgramme);
+  }
+
+  closeChangeProgrammeModal(): void {
+    this.isChangeProgrammeModalVisible = false;
+  }
+
+  submitChangeProgramme(newProgramme: string): void {
+    this.isChangeProgrammeModalVisible = false;
+    this.notification.success(
+      `Programme changed to ${newProgramme} for ${this.changeProgrammeApplicationNo}.`,
     );
+  }
+
+  private openChangeProgrammeModal(
+    applicationNo: string,
+    currentProgramme: string,
+  ): void {
+    this.closeTransientOverlays();
+    this.changeProgrammeApplicationNo = applicationNo;
+    this.changeProgrammeCurrentProgramme = currentProgramme || 'N/A';
+    this.changeProgrammeOptions = this.buildProgrammeOptions(currentProgramme);
+    this.isChangeProgrammeModalVisible = true;
+  }
+
+  private buildProgrammeOptions(currentProgramme: string): string[] {
+    const seeded = this.app_summ
+      .map((row) => row.program)
+      .filter((value): value is string => Boolean(value))
+      .map((value) => value.trim())
+      .filter((value) => value.length > 0);
+
+    const defaults = ['Nursing', 'Midwifery', 'Public Health'];
+    const merged = Array.from(new Set([...seeded, ...defaults]));
+    const normalizedCurrent = (currentProgramme ?? '').trim().toLowerCase();
+
+    return merged.filter(
+      (value) => value.trim().toLowerCase() !== normalizedCurrent,
+    );
+  }
+
+  private closeTransientOverlays(): void {
+    this.isChangeProgrammeModalVisible = false;
+    this.isApplicantDrawerVisible = false;
+    this.selectedApplicationNo = null;
+  }
+
+  getDecisionActionTooltip(row: AdmissionTableRow): string {
+    return this.isPendingPublishDecision(row)
+      ? 'Revert Decision'
+      : 'Grant Admission';
+  }
+
+  getDecisionActionIcon(row: AdmissionTableRow): string {
+    return this.isPendingPublishDecision(row)
+      ? 'bi bi-arrow-counterclockwise'
+      : 'bi bi-check';
+  }
+
+  isGrantAdmissionActionDisabled(row: AdmissionTableRow): boolean {
+    return row.decision_category === 'admitted';
+  }
+
+  isChangeProgrammeActionDisabled(row: AdmissionTableRow): boolean {
+    return row.decision_category === 'admitted';
+  }
+
+  private isPendingPublishDecision(row: AdmissionTableRow): boolean {
+    return row.decision_category === 'pending-publish';
+  }
+
+  private revertDecision(row: AdmissionTableRow): void {
+    this.notification.warn(
+      `Revert decision is not yet wired for ${row.full_name}.`,
+    );
+  }
+
+  private findRowByApplicationNo(
+    applicationNo: string,
+  ): AdmissionTableRow | undefined {
+    return this.app_summ.find((row) => row.application_no === applicationNo);
   }
 
   private performApplicantAction(
@@ -399,17 +508,12 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     this.busyService.show();
     request.subscribe({
       next: () => {
-        window.alert(successMessage);
+        this.notification.success(successMessage);
         this.fetchRecords().subscribe((data: ApplicationListResponse) => {
           this.total_record_count = data.total;
           this.applicationList = data.data;
           this.populateSummary();
         });
-      },
-      error: (err) => {
-        const message =
-          err?.error?.message || err?.error?.detail || 'Action failed.';
-        window.alert(message);
       },
       complete: () => {
         this.busyService.hide();
@@ -417,7 +521,69 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     });
   }
 
+  private checkCbtUploadStatus(): void {
+    this._applicationService.getCbtResultsUploaded().subscribe({
+      next: (response: unknown) => {
+        this.isCbtResultsUploaded = this.resolveCbtUploadStatus(response);
+        if (this.isCbtResultsUploaded) {
+          this.loadAdmissionsRecords();
+        }
+      },
+      error: () => {
+        this.isCbtResultsUploaded = true;
+        this.notification.warn(
+          'Unable to verify CBT upload status. Showing admissions list.',
+        );
+        this.loadAdmissionsRecords();
+      },
+      complete: () => {
+        this.hasCheckedCbtUploadStatus = true;
+      },
+    });
+  }
+
+  private loadAdmissionsRecords(): void {
+    this.busyService.show();
+    this.fetchRecords().subscribe((data: ApplicationListResponse) => {
+      this.total_record_count = data.total;
+      this.applicationList = data.data;
+      this.populateSummary();
+      this.busyService.hide();
+    });
+  }
+
+  private resolveCbtUploadStatus(response: unknown): boolean {
+    if (typeof response === 'boolean') {
+      return response;
+    }
+    if (response && typeof response === 'object') {
+      const maybeObject = response as Record<string, unknown>;
+      const candidates = [
+        maybeObject['uploaded'],
+        maybeObject['is_uploaded'],
+        maybeObject['cbt_results_uploaded'],
+        maybeObject['status'],
+        maybeObject['data'],
+      ];
+      for (const value of candidates) {
+        if (typeof value === 'boolean') {
+          return value;
+        }
+        if (typeof value === 'string') {
+          const normalized = value.trim().toLowerCase();
+          if (normalized === 'true' || normalized === 'uploaded') {
+            return true;
+          }
+          if (normalized === 'false' || normalized === 'not_uploaded') {
+            return false;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
   get showEmptyState(): boolean {
-    return this.total_record_count === 0;
+    return this.hasCheckedCbtUploadStatus && !this.isCbtResultsUploaded;
   }
 }

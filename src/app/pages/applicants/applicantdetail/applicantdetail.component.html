@@ -8,8 +8,10 @@
           alt="Applicant photo"
         />
         <div class="hero-text">
-          <h2 class="hero-name">{{ getApplicantFullName() }}</h2>
-          <div class="hero-id">{{ application.application_no || "-----" }}</div>
+          <h2 class="hero-name title-large">{{ getApplicantFullName() }}</h2>
+          <div class="hero-id body-small">
+            {{ application.application_no || "-----" }}
+          </div>
           <span class="hero-status-pill" [ngClass]="getHeroStatusClass()">{{
             getDisplayStatus()
           }}</span>
@@ -24,30 +26,87 @@
       <div class="tab-wrap">
         <p-tabView>
           <p-tabPanel header="Personal Details">
-            <div class="table-responsive-md">
-              <app-reusable-table
-                [columns]="detailColumns"
-                [value]="personalDetailRows"
-                [showHeader]="false"
-              ></app-reusable-table>
+            <div class="detail-grid">
+              @for (
+                pair of getDetailPairRows(personalDetailRows);
+                track $index
+              ) {
+                <div class="detail-cell">
+                  <span class="detail-label body-small">{{
+                    pair.leftLabel
+                  }}</span>
+                  <span class="detail-value title-small">{{
+                    pair.leftValue
+                  }}</span>
+                </div>
+                @if (pair.rightLabel) {
+                  <div class="detail-cell">
+                    <span class="detail-label body-small">{{
+                      pair.rightLabel
+                    }}</span>
+                    <span class="detail-value title-small">{{
+                      pair.rightValue
+                    }}</span>
+                  </div>
+                } @else {
+                  <div class="detail-cell detail-cell-empty"></div>
+                }
+              }
             </div>
           </p-tabPanel>
           <p-tabPanel header="Next of Kin Details">
-            <div class="table-responsive-md">
-              <app-reusable-table
-                [columns]="detailColumns"
-                [value]="nextOfKinRows"
-                [showHeader]="false"
-              ></app-reusable-table>
+            <div class="detail-grid">
+              @for (pair of getDetailPairRows(nextOfKinRows); track $index) {
+                <div class="detail-cell">
+                  <span class="detail-label body-small">{{
+                    pair.leftLabel
+                  }}</span>
+                  <span class="detail-value title-small">{{
+                    pair.leftValue
+                  }}</span>
+                </div>
+                @if (pair.rightLabel) {
+                  <div class="detail-cell">
+                    <span class="detail-label body-small">{{
+                      pair.rightLabel
+                    }}</span>
+                    <span class="detail-value title-small">{{
+                      pair.rightValue
+                    }}</span>
+                  </div>
+                } @else {
+                  <div class="detail-cell detail-cell-empty"></div>
+                }
+              }
             </div>
           </p-tabPanel>
           <p-tabPanel header="Academic History">
-            <div class="table-responsive-md">
-              <app-reusable-table
-                [columns]="detailColumns"
-                [value]="academicHistoryRows"
-                [showHeader]="false"
-              ></app-reusable-table>
+            <div class="detail-grid">
+              @for (
+                pair of getDetailPairRows(academicHistoryRows);
+                track $index
+              ) {
+                <div class="detail-cell">
+                  <span class="detail-label body-small">{{
+                    pair.leftLabel
+                  }}</span>
+                  <span class="detail-value title-small">{{
+                    pair.leftValue
+                  }}</span>
+                </div>
+                @if (pair.rightLabel) {
+                  <div class="detail-cell">
+                    <span class="detail-label body-small">{{
+                      pair.rightLabel
+                    }}</span>
+                    <span class="detail-value title-small">{{
+                      pair.rightValue
+                    }}</span>
+                  </div>
+                } @else {
+                  <div class="detail-cell detail-cell-empty"></div>
+                }
+              }
             </div>
           </p-tabPanel>
           <p-tabPanel header="Documents">
@@ -59,7 +118,7 @@
               >
                 <ng-template #rowTemplate let-rowData>
                   <tr>
-                    <td class="fw-bold">{{ rowData["label"] }}</td>
+                    <td class="body-xs">{{ rowData["label"] }}</td>
                     <td>
                       @if (getDocumentFile(rowData); as file) {
                         <div class="d-flex flex-row">
@@ -100,29 +159,50 @@
     </div>
 
     <footer class="drawer-actions">
-      <app-button
-        variant="info"
-        [outline]="true"
-        iconClass="bi bi-exclamation-triangle"
-        [disabled]="isIssuingCompliance || !application.id"
-        (buttonClick)="issueComplianceDirective()"
-      >
-        {{
-          isIssuingCompliance
-            ? "Issuing Compliance Directive..."
-            : "Issue Compliance Directive"
-        }}
-      </app-button>
-      <app-button
-        variant="muted"
-        iconClass="bi bi-check"
-        [disabled]="
-          isShortlisting || !application.id || isComplianceBaseState()
-        "
-        (buttonClick)="shortlistApplicant()"
-      >
-        {{ isShortlisting ? "Shortlisting..." : "Shortlist" }}
-      </app-button>
+      @if (embeddedMode === "admissions") {
+        <app-button
+          [fullWidth]="true"
+          variant="outline"
+          [disabled]="!application.id"
+          (buttonClick)="onChangeProgramme()"
+        >
+          Change Programme
+        </app-button>
+        <app-button
+          variant="primary"
+          [fullWidth]="true"
+          [disabled]="!application.id"
+          (buttonClick)="onGrantAdmission()"
+        >
+          Grant Admission
+        </app-button>
+      } @else {
+        <app-button
+          [fullWidth]="true"
+          variant="info"
+          [outline]="true"
+          iconClass="bi bi-exclamation-triangle"
+          [disabled]="isIssuingCompliance || !application.id"
+          (buttonClick)="issueComplianceDirective()"
+        >
+          {{
+            isIssuingCompliance
+              ? "Issuing Compliance Directive..."
+              : "Issue Compliance Directive"
+          }}
+        </app-button>
+        <app-button
+          [fullWidth]="true"
+          variant="muted"
+          iconClass="bi bi-check"
+          [disabled]="
+            isShortlisting || !application.id || isComplianceBaseState()
+          "
+          (buttonClick)="shortlistApplicant()"
+        >
+          {{ isShortlisting ? "Shortlisting..." : "Shortlist" }}
+        </app-button>
+      }
     </footer>
   </section>
 } @else {
@@ -172,30 +252,87 @@
       <div class="tab-wrap">
         <p-tabView>
           <p-tabPanel header="Personal details">
-            <div class="table-responsive-md">
-              <app-reusable-table
-                [columns]="detailColumns"
-                [value]="personalDetailRows"
-                [showHeader]="false"
-              ></app-reusable-table>
+            <div class="detail-grid">
+              @for (
+                pair of getDetailPairRows(personalDetailRows);
+                track $index
+              ) {
+                <div class="detail-cell">
+                  <span class="detail-label body-small">{{
+                    pair.leftLabel
+                  }}</span>
+                  <span class="detail-value title-small">{{
+                    pair.leftValue
+                  }}</span>
+                </div>
+                @if (pair.rightLabel) {
+                  <div class="detail-cell">
+                    <span class="detail-label body-small">{{
+                      pair.rightLabel
+                    }}</span>
+                    <span class="detail-value title-small">{{
+                      pair.rightValue
+                    }}</span>
+                  </div>
+                } @else {
+                  <div class="detail-cell detail-cell-empty"></div>
+                }
+              }
             </div>
           </p-tabPanel>
           <p-tabPanel header="Next of Kin Details">
-            <div class="table-responsive-md">
-              <app-reusable-table
-                [columns]="detailColumns"
-                [value]="nextOfKinRows"
-                [showHeader]="false"
-              ></app-reusable-table>
+            <div class="detail-grid">
+              @for (pair of getDetailPairRows(nextOfKinRows); track $index) {
+                <div class="detail-cell">
+                  <span class="detail-label body-small">{{
+                    pair.leftLabel
+                  }}</span>
+                  <span class="detail-value title-small">{{
+                    pair.leftValue
+                  }}</span>
+                </div>
+                @if (pair.rightLabel) {
+                  <div class="detail-cell">
+                    <span class="detail-label body-small">{{
+                      pair.rightLabel
+                    }}</span>
+                    <span class="detail-value title-small">{{
+                      pair.rightValue
+                    }}</span>
+                  </div>
+                } @else {
+                  <div class="detail-cell detail-cell-empty"></div>
+                }
+              }
             </div>
           </p-tabPanel>
           <p-tabPanel header="Academic History">
-            <div class="table-responsive-md">
-              <app-reusable-table
-                [columns]="detailColumns"
-                [value]="academicHistoryRows"
-                [showHeader]="false"
-              ></app-reusable-table>
+            <div class="detail-grid">
+              @for (
+                pair of getDetailPairRows(academicHistoryRows);
+                track $index
+              ) {
+                <div class="detail-cell">
+                  <span class="detail-label body-small">{{
+                    pair.leftLabel
+                  }}</span>
+                  <span class="detail-value title-small">{{
+                    pair.leftValue
+                  }}</span>
+                </div>
+                @if (pair.rightLabel) {
+                  <div class="detail-cell">
+                    <span class="detail-label body-small">{{
+                      pair.rightLabel
+                    }}</span>
+                    <span class="detail-value title-small">{{
+                      pair.rightValue
+                    }}</span>
+                  </div>
+                } @else {
+                  <div class="detail-cell detail-cell-empty"></div>
+                }
+              }
             </div>
           </p-tabPanel>
           <p-tabPanel header="Documents">

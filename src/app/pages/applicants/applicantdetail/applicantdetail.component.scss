@@ -9,21 +9,21 @@
   justify-content: space-between;
   gap: 1rem;
   background: #000b8f;
-  border-radius: 0 0 30px 30px;
-  padding: 16px 24px 18px;
+  border-radius: 0 0 24px 24px;
+  padding: 24px;
   color: #fff;
 }
 
 .hero-left {
   display: flex;
-  gap: 20px;
+  gap: 16px;
   align-items: flex-start;
 }
 
 .hero-avatar {
-  width: 96px;
-  height: 96px;
-  border-radius: 14px;
+  width: 94px;
+  height: 94px;
+  border-radius: 8px;
   object-fit: cover;
   background: #fff;
 }
@@ -31,20 +31,11 @@
 .hero-text {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .hero-name {
   margin: 0;
-  font-size: 46px;
-  line-height: 1.05;
-  font-weight: 700;
-}
-
-.hero-id {
-  font-size: 22px;
-  line-height: 1.2;
-  font-weight: 500;
 }
 
 .hero-status-pill {
@@ -83,7 +74,6 @@
 }
 
 .breadcrum span {
-  font-family: Lato;
   font-weight: 400;
   font-size: 12px;
   line-height: 150%;
@@ -112,12 +102,37 @@
   background: #fff;
 }
 
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem 3rem;
+  padding: 0.5rem 0.25rem;
+}
+
+.detail-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.detail-label {
+  color: var(--app-text-secondary);
+}
+
+.detail-value {
+  color: var(--app-text-primary);
+}
+
+.detail-cell-empty {
+  visibility: hidden;
+}
+
 .drawer-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
   margin-top: auto;
-  padding: 16px 0 4px;
+  padding: 24px;
 }
 
 .breadcrum span:first-child:hover {
@@ -135,14 +150,12 @@
 }
 
 .b-name {
-  font-family: Lato;
   font-weight: 700;
   font-size: 18px;
   line-height: 100%;
 }
 
 .title-bold {
-  font-family: Lato;
   font-weight: 700;
   font-size: 18px;
   line-height: 100%;
@@ -161,7 +174,6 @@
   }
 
   .p-tab {
-    font-family: Lato;
     font-weight: 400;
     font-size: 14px;
     line-height: 150%;
@@ -172,13 +184,13 @@
   .p-drawer-header {
     display: none;
   }
+
   .p-drawer-content {
     padding: 0;
   }
 }
 
 table td:first-child {
-  font-family: Lato;
   font-weight: 400;
   font-size: 14px;
   line-height: 150%;
@@ -188,7 +200,6 @@ table td:first-child {
 }
 
 table td:last-child {
-  font-family: Lato;
   font-weight: 400;
   font-size: 14px;
   line-height: 150%;
@@ -276,7 +287,6 @@ table td:last-child {
 }
 
 .title-small {
-  font-family: Lato;
   font-weight: 600;
   font-size: 14px;
   line-height: 100%;
@@ -284,7 +294,6 @@ table td:last-child {
 }
 
 .size-text {
-  font-family: Lato;
   font-weight: 400;
   font-size: 13px;
   line-height: 100%;
@@ -335,16 +344,17 @@ table td:last-child {
 }
 
 @media (max-width: 900px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .detail-cell-empty {
+    display: none;
+  }
+
   .hero-avatar {
     width: 72px;
     height: 72px;
-  }
-
-  .hero-name {
-    font-size: 24px;
-  }
-
-  .hero-id {
-    font-size: 16px;
   }
 }

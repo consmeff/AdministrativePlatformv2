@@ -1,39 +1,68 @@
-@if (sidebarVisible) {
-  <div class="sidebar-shell">
-    <button type="button" class="collapse-btn" (click)="close()">
-      <i class="bi bi-chevron-left"></i>
-    </button>
-
+<div class="sidebar-shell" [class.is-collapsed]="!sidebarVisible">
+  <div class="sidebar-top-row">
     <div class="brand-wrap">
       <img src="../../../assets/sblogo.png" alt="School Logo" />
     </div>
-
-    <nav class="menu-list">
-      <a
-        routerLink="/pages/dashboard"
-        routerLinkActive="active-link"
-        [routerLinkActiveOptions]="{ exact: true }"
-      >
-        <i class="bi bi-house"></i>
-        <span>Dashboard</span>
-      </a>
-      <a routerLink="/pages/applicants" routerLinkActive="active-link">
-        <i class="bi bi-people"></i>
-        <span>Applicants</span>
-      </a>
-      <a routerLink="/pages/exam-management" routerLinkActive="active-link">
-        <i class="bi bi-journal-text"></i>
-        <span>Exam Management</span>
-      </a>
-      <a routerLink="/pages/admissions" routerLinkActive="active-link">
-        <i class="bi bi-mortarboard"></i>
-        <span>Admissions</span>
-      </a>
-    </nav>
-
-    <button type="button" class="logout-btn" (click)="logOut()">
-      <i class="bi bi-box-arrow-left"></i>
-      <span>LogOut</span>
+    <button type="button" class="collapse-btn" (click)="toggleSidebar()">
+      <i
+        class="bi"
+        [class.bi-chevron-left]="sidebarVisible"
+        [class.bi-chevron-right]="!sidebarVisible"
+      ></i>
     </button>
   </div>
-}
+
+  <nav class="menu-list">
+    @for (item of menuItems; track item.route) {
+      @if (item.children?.length) {
+        <div class="menu-group" [class.open]="isGroupOpen(item)">
+          <button
+            type="button"
+            class="menu-link group-toggle"
+            [class.active-link]="isRouteActive(item.route)"
+            [attr.data-tooltip]="item.label"
+            (click)="onGroupItemClick(item)"
+          >
+            <i [class]="item.iconClass"></i>
+            <span>{{ item.label }}</span>
+            <i class="bi bi-chevron-down submenu-arrow"></i>
+          </button>
+
+          <div class="submenu-list" [class.open]="isGroupOpen(item)">
+            @for (child of item.children; track child.label) {
+              <a
+                class="submenu-link"
+                [class.active-submenu-link]="isSubmenuActive(child)"
+                [routerLink]="child.route"
+                [queryParams]="child.queryParams"
+              >
+                <span>{{ child.label }}</span>
+              </a>
+            }
+          </div>
+        </div>
+      } @else {
+        <a
+          class="menu-link"
+          [routerLink]="item.route"
+          routerLinkActive="active-link"
+          [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+          [attr.data-tooltip]="item.label"
+        >
+          <i [class]="item.iconClass"></i>
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    }
+  </nav>
+
+  <button
+    type="button"
+    class="logout-btn"
+    data-tooltip="LogOut"
+    (click)="logOut()"
+  >
+    <i class="bi bi-box-arrow-left"></i>
+    <span>LogOut</span>
+  </button>
+</div>

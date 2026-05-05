@@ -12,13 +12,21 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeng/themes/aura';
 import { jwtInterceptor } from './services/jwtinterceptor';
-import { contentTypeInterceptor } from './core/http.interceptor';
+import {
+  contentTypeInterceptor,
+  errorInterceptor,
+} from './core/http.interceptor';
+import { MessageService } from 'primeng/api';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideHttpClient(
       withFetch(),
-      withInterceptors([contentTypeInterceptor, jwtInterceptor]),
+      withInterceptors([
+        contentTypeInterceptor,
+        jwtInterceptor,
+        errorInterceptor,
+      ]),
     ),
 
     provideAnimationsAsync(),
@@ -40,6 +48,7 @@ export const appConfig: ApplicationConfig = {
         },
       },
     }),
+    MessageService,
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
   ],

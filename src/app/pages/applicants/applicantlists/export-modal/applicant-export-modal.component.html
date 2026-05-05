@@ -1,0 +1,79 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="true"
+  [dismissableMask]="true"
+  styleClass="export-list-modal"
+  (onHide)="onClose()"
+>
+  <ng-template pTemplate="header">
+    <h2 class="title-small">Export List</h2>
+  </ng-template>
+
+  <div class="export-modal-content">
+    <section class="export-section">
+      <h3 class="label-small">Fields to add</h3>
+      <div class="export-options-grid">
+        @for (option of exportFieldOptions; track option.value) {
+          <label class="export-check-option">
+            <input
+              type="checkbox"
+              [checked]="isFieldChecked(option.value)"
+              (change)="toggleField(option.value, $any($event.target).checked)"
+            />
+            <span class="export-check-box">
+              <i class="bi bi-check-lg"></i>
+            </span>
+            <span>{{ option.label }}</span>
+          </label>
+        }
+      </div>
+    </section>
+
+    @if (isStatusFieldSelected()) {
+      <section class="export-section">
+        <h3 class="label-small">Status</h3>
+        <div class="export-options-grid">
+          @for (option of exportStatusOptions; track option.value) {
+            <label class="export-check-option">
+              <input
+                type="checkbox"
+                [checked]="isStatusChecked(option.value)"
+                (change)="
+                  toggleStatus(option.value, $any($event.target).checked)
+                "
+              />
+              <span class="export-check-box">
+                <i class="bi bi-check-lg"></i>
+              </span>
+              <span>{{ option.label }}</span>
+            </label>
+          }
+        </div>
+      </section>
+    }
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="export-modal-actions">
+      <app-button
+        variant="muted"
+        [disabled]="loading"
+        [fullWidth]="true"
+        (buttonClick)="onClose()"
+      >
+        Cancel
+      </app-button>
+      <app-button
+        variant="primary"
+        [disabled]="loading || selectedFields.length === 0"
+        [fullWidth]="true"
+        (buttonClick)="onExport()"
+      >
+        Export
+      </app-button>
+    </div>
+  </ng-template>
+</p-dialog>

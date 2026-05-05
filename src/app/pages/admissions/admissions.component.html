@@ -1,52 +1,29 @@
-@if (showEmptyState) {
-  <app-admissions-upload-flow />
+@if (!hasCheckedCbtUploadStatus) {
+  <section class="admissions-shell">
+    <p>Checking CBT upload status...</p>
+  </section>
+} @else if (showEmptyState) {
+  <app-admissions-upload-flow
+    mode="cbt"
+    (continueToAdmissions)="onCbtUploadFlowCompleted()"
+  />
+} @else if (isDocumentUploadFlowVisible) {
+  <app-admissions-upload-flow
+    mode="document"
+    (continueToAdmissions)="closeDocumentUploadFlow()"
+  />
 } @else {
   <section class="admissions-shell">
     <div class="cards-head">
-      <button
-        type="button"
-        class="summary-card"
-        [class.active]="isCardActive('all')"
-        (click)="setCardFilter('all')"
-      >
-        <span class="metric">{{ getCardCount("all") }}</span>
-        <span class="label">All Candidates</span>
-      </button>
-      <button
-        type="button"
-        class="summary-card"
-        [class.active]="isCardActive('pending-review')"
-        (click)="setCardFilter('pending-review')"
-      >
-        <span class="metric">{{ getCardCount("pending-review") }}</span>
-        <span class="label">Pending Review</span>
-      </button>
-      <button
-        type="button"
-        class="summary-card"
-        [class.active]="isCardActive('pending-publish')"
-        (click)="setCardFilter('pending-publish')"
-      >
-        <span class="metric">{{ getCardCount("pending-publish") }}</span>
-        <span class="label">Pending Publish</span>
-      </button>
-      <button
-        type="button"
-        class="summary-card"
-        [class.active]="isCardActive('admitted')"
-        (click)="setCardFilter('admitted')"
-      >
-        <span class="metric">{{ getCardCount("admitted") }}</span>
-        <span class="label">Admitted Candidates</span>
-      </button>
-      @if (shouldShowPrimaryAction()) {
-        <button
-          type="button"
-          class="primary-action"
-          (click)="onPrimaryActionClick()"
-        >
-          {{ getPrimaryActionLabel() }}
-        </button>
+      @for (card of filterCards; track card.filter) {
+        <app-metric-card
+          variant="filter"
+          [title]="card.label"
+          [value]="getCardCount(card.filter)"
+          [active]="isCardActive(card.filter)"
+          [clickable]="true"
+          (cardClick)="setCardFilter(card.filter)"
+        />
       }
     </div>
 
@@ -67,7 +44,11 @@
       <button type="button" class="outline-btn">
         Export List <i class="bi bi-download"></i>
       </button>
-      <button type="button" class="outline-btn">
+      <button
+        type="button"
+        class="outline-btn"
+        (click)="openDocumentUploadFlow()"
+      >
         Update with File <i class="bi bi-file-earmark-arrow-up"></i>
       </button>
     </div>
@@ -124,9 +105,15 @@
             </td>
             <td>
               <app-table-row-actions
+                [shortlistTooltip]="getDecisionActionTooltip(rowData)"
+                [shortlistIconClass]="getDecisionActionIcon(rowData)"
+                [disableShortlist]="isGrantAdmissionActionDisabled(rowData)"
+                complianceTooltip="Change Programme"
+                complianceIconClass="bi bi-arrow-repeat"
+                [disableCompliance]="isChangeProgrammeActionDisabled(rowData)"
                 (view)="viewProfile(rowData)"
-                (shortlist)="shortlistSingle(rowData)"
-                (compliance)="openComplianceForSingle(rowData)"
+                (shortlist)="grantAdmissionFromTable(rowData)"
+                (compliance)="changeProgrammeFromTable(rowData)"
               />
             </td>
           </tr>
@@ -152,7 +139,18 @@
     <app-applicantdetail
       [applicationNo]="selectedApplicationNo"
       [embedded]="true"
+      embeddedMode="admissions"
       (closed)="closeApplicantDrawer()"
+      (changeProgrammeRequested)="openChangeProgrammeFromDrawer($event)"
+      (grantAdmissionRequested)="grantAdmissionFromDrawer()"
     />
   }
 </p-drawer>
+
+<app-change-programme-modal
+  [visible]="isChangeProgrammeModalVisible"
+  [currentProgramme]="changeProgrammeCurrentProgramme"
+  [programmeOptions]="changeProgrammeOptions"
+  (closed)="closeChangeProgrammeModal()"
+  (changed)="submitChangeProgramme($event)"
+></app-change-programme-modal>

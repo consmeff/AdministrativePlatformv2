@@ -1,0 +1,94 @@
+:host ::ng-deep .export-list-modal {
+  width: min(470px, calc(100vw - 2rem));
+}
+
+:host ::ng-deep .export-list-modal .app-modal-title {
+  font-size: 2rem;
+}
+
+.export-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.export-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.export-section h3 {
+  margin: 0;
+  color: #0f1d4d;
+}
+
+.export-options-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem 1rem;
+}
+
+.export-check-option {
+  display: inline-flex;
+  align-items: start;
+  gap: 6px;
+  color: var(--app-neutral-600);
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 150%;
+  letter-spacing: 0%;
+  cursor: pointer;
+}
+
+.export-check-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.export-check-box {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.export-check-box i {
+  color: #fff;
+  font-size: 12px;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.2s ease;
+}
+
+.export-check-option input:checked + .export-check-box {
+  background: var(--app-primary);
+  border-color: var(--app-primary);
+}
+
+.export-check-option input:checked + .export-check-box i {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.export-modal-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+:host ::ng-deep .export-modal-actions {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .export-options-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

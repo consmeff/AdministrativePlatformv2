@@ -12,29 +12,6 @@
   display: none;
 }
 
-.flow-types {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.flow-type-chip {
-  border: 1px solid #dbe8ff;
-  background: #fff;
-  color: #395380;
-  border-radius: 999px;
-  padding: 8px 14px;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.flow-type-chip.active {
-  border-color: var(--app-primary);
-  background: var(--app-primary);
-  color: #fff;
-}
-
 .empty-title {
   margin: 0;
   font-size: 42px;

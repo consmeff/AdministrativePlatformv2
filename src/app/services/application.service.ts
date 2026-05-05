@@ -1,8 +1,11 @@
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ApplicationListResponse } from '../model/dashboard/applicant';
+import {
+  Application,
+  ApplicationListResponse,
+} from '../model/dashboard/applicant';
 import { AdminDashboardMetrics } from '../model/dashboard/admin-dashboard.dto';
 
 export interface ComplianceDirectivePayload {
@@ -16,6 +19,27 @@ export interface ApplicantActionPayload {
 
 export interface RejectApplicantPayload extends ApplicantActionPayload {
   extra_note: string;
+}
+
+export interface GetApplicantsQuery {
+  approval_status?: string;
+  form?: string;
+  ordering?: string;
+  payment_status?: string;
+  application_no?: string;
+  search?: string;
+}
+
+export interface ExportApplicantsPayload {
+  format?: 'xlsx' | 'csv';
+  fields?: string[];
+  applicant_ids?: number[];
+  keyword?: string;
+  payment_status?: string;
+  approval_status?: string;
+  application_no?: string;
+  form?: string;
+  ordering?: string;
 }
 
 @Injectable({
@@ -36,31 +60,67 @@ export class ApplicationService {
     page = 1,
     sortField?: string | undefined,
     sortOrder?: number | undefined,
+    query?: GetApplicantsQuery,
   ): Observable<ApplicationListResponse> {
     const baseUrl = `${this.apiRoot}/api/v1/applicants`;
-    const params = new URLSearchParams();
+    let params = new HttpParams();
 
-    if (keyword) params.append('keyword', keyword);
-    if (sortField)
-      params.append(
-        'ordering',
-        sortOrder && sortOrder > 0 ? '-' + sortField : sortField,
-      );
-    if (page_size) params.append('page_size', page_size.toString());
-    if (page) params.append('page', page.toString());
+    const effectiveSearch = query?.search ?? keyword;
+    if (effectiveSearch) {
+      params = params.set('search', effectiveSearch);
+    }
 
-    const url = `${baseUrl}?${params.toString()}`;
-    return this.http.get<ApplicationListResponse>(url);
+    const effectiveOrdering =
+      query?.ordering ??
+      (sortField
+        ? sortOrder && sortOrder > 0
+          ? `-${sortField}`
+          : sortField
+        : undefined);
+    if (effectiveOrdering) {
+      params = params.set('ordering', effectiveOrdering);
+    }
+
+    if (query?.approval_status) {
+      params = params.set('approval_status', query.approval_status);
+    }
+    if (query?.form) {
+      params = params.set('form', query.form);
+    }
+    if (query?.payment_status) {
+      params = params.set('payment_status', query.payment_status);
+    }
+    if (query?.application_no) {
+      params = params.set('application_no', query.application_no);
+    }
+    if (page_size) {
+      params = params.set('page_size', page_size.toString());
+    }
+    if (page) {
+      params = params.set('page', page.toString());
+    }
+
+    return this.http.get<ApplicationListResponse>(baseUrl, { params });
   }
 
-  getapplication(app_no: string): Observable<ApplicationListResponse> {
-    const Url = `${this.apiRoot}/api/v1/applicants?application_no=${app_no}`;
-    return this.http.get<ApplicationListResponse>(Url);
+  getapplication(
+    applicantNo: string,
+  ): Observable<ApplicationListResponse | Application> {
+    const url = `${this.apiRoot}/api/v1/applicants/single`;
+    const params = new HttpParams().set('applicant_no', applicantNo);
+    return this.http.get<ApplicationListResponse | Application>(url, {
+      params,
+    });
   }
 
   getAdminDashboardMetrics(): Observable<AdminDashboardMetrics> {
     const url = `${this.apiRoot}/api/v1/applicants/admin-dashboard`;
     return this.http.get<AdminDashboardMetrics>(url);
+  }
+
+  getCbtResultsUploaded(): Observable<unknown> {
+    const url = `${this.apiRoot}/api/v1/applicants/cbt-results-uploaded`;
+    return this.http.get<unknown>(url);
   }
 
   issueComplianceDirective(
@@ -75,8 +135,20 @@ export class ApplicationService {
     return this.http.post(url, payload);
   }
 
+  markAsAdmittedInternally(
+    payload: ApplicantActionPayload,
+  ): Observable<unknown> {
+    const url = `${this.apiRoot}/api/v1/applicants/mark-as-admitted-internally`;
+    return this.http.post(url, payload);
+  }
+
   rejectApplicants(payload: RejectApplicantPayload): Observable<unknown> {
     const url = `${this.apiRoot}/api/v1/applicants/reject-applicants`;
     return this.http.post(url, payload);
+  }
+
+  exportApplicants(payload: ExportApplicantsPayload): Observable<Blob> {
+    const url = `${this.apiRoot}/api/v1/applicants/export`;
+    return this.http.post(url, payload, { responseType: 'blob' });
   }
 }

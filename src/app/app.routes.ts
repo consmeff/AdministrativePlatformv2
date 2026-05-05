@@ -33,11 +33,16 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'exam-management',
+        path: 'payment-records',
         loadComponent: () =>
-          import('./pages/exam-management/exam-management.component').then(
-            (m) => m.ExamManagementComponent,
+          import('./pages/payment-record/payment-record.component').then(
+            (m) => m.PaymentRecordComponent,
           ),
+      },
+      {
+        path: 'exam-management',
+        redirectTo: 'payment-records',
+        pathMatch: 'full',
       },
       {
         path: 'applicants',

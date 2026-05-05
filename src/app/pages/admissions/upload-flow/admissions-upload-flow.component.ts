@@ -1,10 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { NotificationService } from '../../../services/notification.service';
 
-type AdmissionUploadType =
-  | 'cbt-results'
-  | 'document-review'
-  | 'admission-decision';
+type AdmissionUploadMode = 'cbt' | 'document';
 
 type AdmissionUploadStage =
   | 'upload'
@@ -13,9 +11,7 @@ type AdmissionUploadStage =
   | 'processing'
   | 'complete';
 
-interface UploadFlowOption {
-  type: AdmissionUploadType;
-  label: string;
+interface UploadFlowConfig {
   title: string;
   subtitle: string;
 }
@@ -28,31 +24,21 @@ interface UploadFlowOption {
   styleUrl: './admissions-upload-flow.component.scss',
 })
 export class AdmissionsUploadFlowComponent {
-  @Output() continueToAdmissions = new EventEmitter<AdmissionUploadType>();
+  private readonly notification = inject(NotificationService);
+  @Input() mode: AdmissionUploadMode = 'cbt';
+  @Output() continueToAdmissions = new EventEmitter<void>();
 
-  readonly options: UploadFlowOption[] = [
-    {
-      type: 'cbt-results',
-      label: 'CBT Results',
+  private readonly modeConfig: Record<AdmissionUploadMode, UploadFlowConfig> = {
+    cbt: {
       title: 'Upload CBT Results File',
       subtitle: 'Upload the Excel or CSV file received from the CBT centre.',
     },
-    {
-      type: 'document-review',
-      label: 'Document Review',
+    document: {
       title: 'Document Review Upload',
       subtitle: 'Upload the completed review template.',
     },
-    {
-      type: 'admission-decision',
-      label: 'Admission Decision',
-      title: 'Admission Decision Upload',
-      subtitle:
-        'Upload the completed decision template. Candidates marked "Admitted" will receive admission notifications.',
-    },
-  ];
+  };
 
-  activeType: AdmissionUploadType = 'cbt-results';
   stage: AdmissionUploadStage = 'upload';
   selectedFileName = '';
   selectedFileSize = '';
@@ -61,11 +47,8 @@ export class AdmissionsUploadFlowComponent {
   totalRows = 247;
   private flowTimerId: number | null = null;
 
-  get activeFlowOption(): UploadFlowOption {
-    return (
-      this.options.find((item) => item.type === this.activeType) ??
-      this.options[0]
-    );
+  get activeFlow(): UploadFlowConfig {
+    return this.modeConfig[this.mode];
   }
 
   get stageTitle(): string {
@@ -78,15 +61,7 @@ export class AdmissionsUploadFlowComponent {
     if (this.stage === 'complete') {
       return 'File Syncing complete';
     }
-    return this.activeFlowOption.title;
-  }
-
-  selectType(type: AdmissionUploadType, fileInput: HTMLInputElement): void {
-    if (this.activeType === type) {
-      return;
-    }
-    this.activeType = type;
-    this.resetFlow(fileInput);
+    return this.activeFlow.title;
   }
 
   triggerFileInput(fileInput: HTMLInputElement): void {
@@ -146,11 +121,11 @@ export class AdmissionsUploadFlowComponent {
   }
 
   continue(): void {
-    this.continueToAdmissions.emit(this.activeType);
+    this.continueToAdmissions.emit();
   }
 
   onDownloadTemplate(): void {
-    window.alert('Template download is not yet wired.');
+    this.notification.warn('Template download is not yet wired.');
   }
 
   private resetFlow(fileInput: HTMLInputElement): void {

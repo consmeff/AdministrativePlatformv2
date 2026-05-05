@@ -15,6 +15,7 @@ import {
   ComplianceDirectivePayload,
   RejectApplicantPayload,
 } from '../../../services/application.service';
+import { NotificationService } from '../../../services/notification.service';
 import {
   AcademicHistory,
   Application,
@@ -47,12 +48,16 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
   private readonly rejectAction = 'reject';
   private readonly complianceAction = 'compliance';
   _applicationservice = inject(ApplicationService);
+  notification = inject(NotificationService);
   application: Application = {} as Application;
   route = inject(ActivatedRoute);
 
   @Input() applicationNo: string | null = null;
   @Input() embedded = false;
+  @Input() embeddedMode: 'default' | 'admissions' = 'default';
   @Output() closed = new EventEmitter<void>();
+  @Output() changeProgrammeRequested = new EventEmitter<string>();
+  @Output() grantAdmissionRequested = new EventEmitter<void>();
 
   app_no: string | null = '';
   isIssuingCompliance = false;
@@ -79,6 +84,62 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
   academicHistoryRows: Record<string, unknown>[] = [];
   documentRows: Record<string, unknown>[] = [];
 
+  onChangeProgramme(): void {
+    if (this.embeddedMode === 'admissions') {
+      const department = this.application?.department;
+      const departmentName =
+        typeof department === 'string' ? department : (department?.name ?? '');
+      const programme = this.application?.program?.name || departmentName || '';
+      this.changeProgrammeRequested.emit(programme);
+      return;
+    }
+    this.notification.warn('Change programme action is not yet wired.');
+  }
+
+  onGrantAdmission(): void {
+    if (this.embeddedMode === 'admissions') {
+      this.grantAdmissionRequested.emit();
+      return;
+    }
+    this.notification.warn('Grant admission action is not yet wired.');
+  }
+
+  getDetailPairRows(rows: Record<string, unknown>[]): {
+    leftLabel: string;
+    leftValue: string;
+    rightLabel?: string;
+    rightValue?: string;
+  }[] {
+    const pairRows: {
+      leftLabel: string;
+      leftValue: string;
+      rightLabel?: string;
+      rightValue?: string;
+    }[] = [];
+
+    for (let index = 0; index < rows.length; index += 2) {
+      const left = rows[index];
+      const right = rows[index + 1];
+
+      pairRows.push({
+        leftLabel: this.getDisplayText(left?.['label']),
+        leftValue: this.getDisplayText(left?.['value']),
+        rightLabel: this.getDisplayText(right?.['label'], ''),
+        rightValue: this.getDisplayText(right?.['value'], ''),
+      });
+    }
+
+    return pairRows;
+  }
+
+  private getDisplayText(value: unknown, fallback = '-----'): string {
+    if (value === null || value === undefined) {
+      return fallback;
+    }
+    const normalized = String(value).trim();
+    return normalized.length > 0 ? normalized : fallback;
+  }
+
   ngOnInit(): void {
     this.loadApplication();
   }
@@ -99,12 +160,33 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
     this.app_no = rawApplicationNo.replaceAll('_', '/');
     this._applicationservice
       .getapplication(this.app_no!)
-      .subscribe((data: ApplicationListResponse) => {
-        if (data.data.length > 0) {
-          this.application = data.data[0];
-          this.buildDetailRows();
+      .subscribe((response: ApplicationListResponse | Application) => {
+        const applicant = this.resolveApplicantFromResponse(response);
+        if (!applicant) {
+          return;
         }
+        this.application = applicant;
+        this.buildDetailRows();
       });
+  }
+
+  private resolveApplicantFromResponse(
+    response: ApplicationListResponse | Application,
+  ): Application | null {
+    if (response && typeof response === 'object' && 'data' in response) {
+      if (Array.isArray(response.data)) {
+        return response.data.length > 0 ? response.data[0] : null;
+      }
+      if (
+        response.data &&
+        typeof response.data === 'object' &&
+        'application_no' in response.data
+      ) {
+        return response.data as unknown as Application;
+      }
+      return null;
+    }
+    return response ?? null;
   }
 
   getAcademicHistory(name: string): AcademicHistory | undefined {
@@ -337,7 +419,7 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
 
   submitReasonModal(note: string) {
     if (!this.application?.id || !this.pendingReasonAction) {
-      window.alert('Applicant ID not found for this action.');
+      this.notification.error('Applicant ID not found for this action.');
       return;
     }
 
@@ -398,13 +480,9 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
     request.subscribe({
       next: () => {
         onSuccess?.();
-        window.alert(successMessage);
+        this.notification.success(successMessage);
       },
-      error: (err) => {
-        const message =
-          err?.error?.message || err?.error?.detail || 'Action failed.';
-        window.alert(message);
-      },
+
       complete: () => {
         this.isReasonActionLoading = false;
         onComplete?.();

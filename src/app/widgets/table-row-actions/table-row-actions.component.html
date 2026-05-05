@@ -12,21 +12,21 @@
   <button
     class="action-btn"
     type="button"
-    aria-label="Shortlist"
-    data-tooltip="Shortlist"
+    [attr.aria-label]="shortlistTooltip"
+    [attr.data-tooltip]="shortlistTooltip"
     [disabled]="disableShortlist"
     (click)="shortlist.emit()"
   >
-    <i class="bi bi-check"></i>
+    <i [class]="shortlistIconClass"></i>
   </button>
   <button
     class="action-btn"
     type="button"
-    aria-label="Issue Compliance"
-    data-tooltip="Issue Compliance"
+    [attr.aria-label]="complianceTooltip"
+    [attr.data-tooltip]="complianceTooltip"
     [disabled]="disableCompliance || disableShortlist"
     (click)="compliance.emit()"
   >
-    <i class="bi bi-exclamation-triangle"></i>
+    <i [class]="complianceIconClass"></i>
   </button>
 </div>

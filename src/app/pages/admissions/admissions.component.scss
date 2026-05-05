@@ -6,9 +6,13 @@
 
 .cards-head {
   display: grid;
-  grid-template-columns: repeat(4, minmax(190px, 1fr)) auto;
+  grid-template-columns: repeat(4, minmax(190px, 1fr));
   gap: 14px;
   align-items: stretch;
+}
+
+.cards-head app-metric-card {
+  display: block;
 }
 
 .summary-card {
@@ -39,16 +43,6 @@
   font-weight: 500;
 }
 
-.primary-action {
-  border: 0;
-  border-radius: 12px;
-  background: var(--app-primary);
-  color: #fff;
-  min-width: 170px;
-  padding: 0 18px;
-  font-weight: 600;
-}
-
 .filters-head {
   display: grid;
   grid-template-columns: minmax(320px, 1fr) 220px auto auto;
@@ -76,10 +70,18 @@
 }
 
 .applicant-name {
-  font-weight: 700;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 120%;
+  letter-spacing: 0%;
+  color: var(--app-text-primary);
 }
 
 .application-no {
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 150%;
+  letter-spacing: 0%;
   color: var(--app-text-secondary);
 }
 

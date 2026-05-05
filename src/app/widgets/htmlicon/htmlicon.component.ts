@@ -5,9 +5,8 @@ import { Component, Input } from '@angular/core';
   selector: 'app-htmlicon',
   imports: [CommonModule],
   templateUrl: './htmlicon.component.html',
-  styleUrl: './htmlicon.component.scss'
+  styleUrl: './htmlicon.component.scss',
 })
 export class HtmliconComponent {
   @Input() iconClass!: string;
-
 }

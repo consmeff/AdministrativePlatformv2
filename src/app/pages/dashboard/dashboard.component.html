@@ -30,12 +30,24 @@
     </div>
   </div>
 
-  <section class="status-section">
-    <h3 class="section-title">Application Status</h3>
-    <div class="status-body">
-      <app-doughnut [chartData]="chartData"></app-doughnut>
-    </div>
-  </section>
+  <div class="dashboard-head-row">
+    <section class="status-section">
+      <h3 class="section-title">Application Status</h3>
+      <div class="status-body">
+        <app-doughnut [chartData]="chartData"></app-doughnut>
+      </div>
+    </section>
+
+    <app-button
+      variant="muted"
+      [outline]="true"
+      [fullWidth]="true"
+      class="set-cutoff-trigger"
+      (buttonClick)="openSetCutoffModal()"
+    >
+      Set Cutoff
+    </app-button>
+  </div>
 
   <section class="recent-section">
     <div class="recent-head">
@@ -82,6 +94,8 @@
             </td>
             <td>
               <app-table-row-actions
+                [disableCompliance]="row.status_text === 'Shortlisted'"
+                [disableShortlist]="row.status_text === 'Shortlisted'"
                 (view)="viewProfile(row)"
                 (shortlist)="shortlistSingle(row)"
                 (compliance)="openComplianceForSingle(row)"
@@ -133,3 +147,9 @@
   (closed)="closeReasonModal()"
   (submittedPayload)="submitReasonModalPayload($event)"
 ></app-action-note-modal>
+
+<app-set-cutoff-modal
+  [visible]="isSetCutoffModalVisible"
+  (closed)="closeSetCutoffModal()"
+  (saved)="saveCutoff($event)"
+></app-set-cutoff-modal>
