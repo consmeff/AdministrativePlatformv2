@@ -57,7 +57,7 @@
     <div class="app-modal-actions">
       <app-button
         variant="outline"
-        [disabled]="loading"
+        [disabled]="isBusy()"
         [fullWidth]="true"
         (buttonClick)="onClose()"
       >
@@ -65,7 +65,7 @@
       </app-button>
       <app-button
         variant="primary"
-        [disabled]="loading"
+        [disabled]="isBusy()"
         [fullWidth]="true"
         (buttonClick)="onSave()"
       >

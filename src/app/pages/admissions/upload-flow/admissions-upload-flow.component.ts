@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { ApplicationService } from '../../../services/application.service';
 import { NotificationService } from '../../../services/notification.service';
 
 type AdmissionUploadMode = 'cbt' | 'document';
@@ -25,6 +26,7 @@ interface UploadFlowConfig {
 })
 export class AdmissionsUploadFlowComponent {
   private readonly notification = inject(NotificationService);
+  private readonly applicationService = inject(ApplicationService);
   @Input() mode: AdmissionUploadMode = 'cbt';
   @Output() continueToAdmissions = new EventEmitter<void>();
 
@@ -46,6 +48,7 @@ export class AdmissionsUploadFlowComponent {
   processedRows = 0;
   totalRows = 247;
   private flowTimerId: number | null = null;
+  private selectedFile: File | null = null;
 
   get activeFlow(): UploadFlowConfig {
     return this.modeConfig[this.mode];
@@ -76,6 +79,7 @@ export class AdmissionsUploadFlowComponent {
     }
     this.selectedFileName = file.name;
     this.selectedFileSize = this.formatFileSize(file.size);
+    this.selectedFile = file;
     this.stage = 'file-selected';
     this.uploadProgress = 0;
     this.processedRows = 0;
@@ -95,7 +99,7 @@ export class AdmissionsUploadFlowComponent {
   }
 
   processUpdate(): void {
-    if (!this.selectedFileName) {
+    if (!this.selectedFileName || !this.selectedFile) {
       return;
     }
     this.stage = 'processing';
@@ -112,12 +116,32 @@ export class AdmissionsUploadFlowComponent {
         100,
         Math.round((this.processedRows / maxRows) * 100),
       );
-
-      if (this.processedRows >= maxRows) {
-        this.clearFlowTimer();
-        this.stage = 'complete';
-      }
     }, 160);
+
+    this.applicationService
+      .bulkUpdateApplicants({
+        file: this.selectedFile,
+        fields: 'post_utme_point',
+      })
+      .subscribe({
+        next: () => {
+          this.uploadProgress = 100;
+          this.processedRows = this.totalRows;
+          this.stage = 'complete';
+          this.notification.success(
+            this.mode === 'cbt'
+              ? 'CBT results uploaded successfully.'
+              : 'File update completed successfully.',
+          );
+        },
+        error: () => {
+          this.stage = 'file-selected';
+          this.notification.error('Failed to upload file. Please try again.');
+        },
+        complete: () => {
+          this.clearFlowTimer();
+        },
+      });
   }
 
   continue(): void {
@@ -134,6 +158,7 @@ export class AdmissionsUploadFlowComponent {
     this.selectedFileSize = '';
     this.uploadProgress = 0;
     this.processedRows = 0;
+    this.selectedFile = null;
     fileInput.value = '';
     this.clearFlowTimer();
   }

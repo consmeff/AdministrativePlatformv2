@@ -7,18 +7,13 @@
     mode="cbt"
     (continueToAdmissions)="onCbtUploadFlowCompleted()"
   />
-} @else if (isDocumentUploadFlowVisible) {
-  <app-admissions-upload-flow
-    mode="document"
-    (continueToAdmissions)="closeDocumentUploadFlow()"
-  />
 } @else {
   <section class="admissions-shell">
     <div class="cards-head">
       @for (card of filterCards; track card.filter) {
         <app-metric-card
           variant="filter"
-          [title]="card.label"
+          [subtext]="card.label"
           [value]="getCardCount(card.filter)"
           [active]="isCardActive(card.filter)"
           [clickable]="true"
@@ -149,8 +144,19 @@
 
 <app-change-programme-modal
   [visible]="isChangeProgrammeModalVisible"
+  [loading]="isChangingProgramme"
   [currentProgramme]="changeProgrammeCurrentProgramme"
-  [programmeOptions]="changeProgrammeOptions"
+  [programmeOptions]="changeProgrammeOptionLabels"
   (closed)="closeChangeProgrammeModal()"
   (changed)="submitChangeProgramme($event)"
 ></app-change-programme-modal>
+
+<app-update-file-modal
+  [visible]="isUpdateFileModalVisible"
+  [loading]="isUpdatingWithFile"
+  title="Update Applicants with File"
+  subtitle="Select fields to update, then upload your file."
+  [fieldOptions]="updateFileFields"
+  (closed)="closeUpdateFileModal()"
+  (submitted)="submitUpdateWithFile($event)"
+></app-update-file-modal>

@@ -38,6 +38,10 @@ import { ApplicantdetailComponent } from '../applicants/applicantdetail/applican
 import { AdmissionsUploadFlowComponent } from './upload-flow/admissions-upload-flow.component';
 import { MetricCardComponent } from '../../widgets/metric-card/metric-card.component';
 import { ChangeProgrammeModalComponent } from './change-programme-modal/change-programme-modal.component';
+import {
+  UpdateFileModalComponent,
+  UpdateFileSelection,
+} from '../../widgets/update-file-modal/update-file-modal.component';
 
 interface PagingEvent {
   first: number;
@@ -75,6 +79,18 @@ interface AdmissionFilterCard {
   filter: AdmissionDecisionFilter;
 }
 
+interface DepartmentOption {
+  label: string;
+  value: number;
+}
+
+interface ChangeProgrammeSelection {
+  programmeName: string;
+  approvedDepartmentId: number;
+}
+
+type ChangeProgrammeSelectionInput = ChangeProgrammeSelection | string;
+
 @Component({
   selector: 'app-admissions',
 
@@ -92,6 +108,7 @@ interface AdmissionFilterCard {
     AdmissionsUploadFlowComponent,
     MetricCardComponent,
     ChangeProgrammeModalComponent,
+    UpdateFileModalComponent,
   ],
   templateUrl: './admissions.component.html',
   styleUrl: './admissions.component.scss',
@@ -121,11 +138,20 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   isApplicantDrawerVisible = false;
   hasCheckedCbtUploadStatus = false;
   isCbtResultsUploaded = false;
-  isDocumentUploadFlowVisible = false;
+  isUpdateFileModalVisible = false;
+  isUpdatingWithFile = false;
+  readonly updateFileFields = [
+    { label: 'Approval Status', value: 'approval_status' },
+    { label: 'Post UTME Point', value: 'post_utme_point' },
+    { label: 'Approved Department Name', value: 'approved_department_name' },
+  ];
   isChangeProgrammeModalVisible = false;
+  isChangingProgramme = false;
   changeProgrammeCurrentProgramme = 'N/A';
   changeProgrammeApplicationNo = '';
-  changeProgrammeOptions: string[] = [];
+  changeProgrammeApplicantId: number | null = null;
+  changeProgrammeOptions: DepartmentOption[] = [];
+  changeProgrammeOptionLabels: string[] = [];
   activeCardFilter: AdmissionDecisionFilter = 'all';
   readonly filterCards: AdmissionFilterCard[] = [
     { label: 'All Candidates', filter: 'all' },
@@ -370,11 +396,33 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   }
 
   openDocumentUploadFlow(): void {
-    this.isDocumentUploadFlowVisible = true;
+    this.isUpdateFileModalVisible = true;
   }
 
-  closeDocumentUploadFlow(): void {
-    this.isDocumentUploadFlowVisible = false;
+  closeUpdateFileModal(): void {
+    this.isUpdateFileModalVisible = false;
+  }
+
+  submitUpdateWithFile(selection: UpdateFileSelection): void {
+    this.isUpdatingWithFile = true;
+    this._applicationService
+      .bulkUpdateApplicants({
+        file: selection.file,
+        fields: selection.fields.join(','),
+      })
+      .subscribe({
+        next: () => {
+          this.notification.success('Applicants updated successfully.');
+          this.isUpdateFileModalVisible = false;
+          this.loadAdmissionsRecords();
+        },
+        error: () => {
+          this.isUpdatingWithFile = false;
+        },
+        complete: () => {
+          this.isUpdatingWithFile = false;
+        },
+      });
   }
 
   onCbtUploadFlowCompleted(): void {
@@ -389,7 +437,7 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     }
     this.performApplicantAction(
       this._applicationService.markAsAdmittedInternally({
-        applicant_ids: [row.id],
+        data: [{ applicant_id: row.id }],
       }),
       `Admission granted for ${row.full_name}.`,
     );
@@ -423,13 +471,58 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
 
   closeChangeProgrammeModal(): void {
     this.isChangeProgrammeModalVisible = false;
+    this.changeProgrammeApplicantId = null;
   }
 
-  submitChangeProgramme(newProgramme: string): void {
-    this.isChangeProgrammeModalVisible = false;
-    this.notification.success(
-      `Programme changed to ${newProgramme} for ${this.changeProgrammeApplicationNo}.`,
-    );
+  submitChangeProgramme(selection: ChangeProgrammeSelectionInput): void {
+    if (!this.changeProgrammeApplicantId) {
+      this.notification.error(
+        'Applicant record is required to change programme.',
+      );
+      return;
+    }
+
+    const normalizedSelection =
+      this.normalizeChangeProgrammeSelection(selection);
+    if (!normalizedSelection) {
+      this.notification.error(
+        'Select a valid programme before submitting this action.',
+      );
+      return;
+    }
+
+    this.isChangingProgramme = true;
+    this.busyService.show();
+    this._applicationService
+      .markAsAdmittedInternally({
+        data: [
+          {
+            applicant_id: this.changeProgrammeApplicantId,
+            approved_department_id: normalizedSelection.approvedDepartmentId,
+          },
+        ],
+      })
+      .subscribe({
+        next: () => {
+          this.notification.success(
+            `Programme changed to ${normalizedSelection.programmeName} for ${this.changeProgrammeApplicationNo}.`,
+          );
+          this.isChangeProgrammeModalVisible = false;
+          this.fetchRecords().subscribe((data: ApplicationListResponse) => {
+            this.total_record_count = data.total;
+            this.applicationList = data.data;
+            this.populateSummary();
+          });
+        },
+        error: () => {
+          this.isChangingProgramme = false;
+          this.busyService.hide();
+        },
+        complete: () => {
+          this.isChangingProgramme = false;
+          this.busyService.hide();
+        },
+      });
   }
 
   private openChangeProgrammeModal(
@@ -439,30 +532,75 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     this.closeTransientOverlays();
     this.changeProgrammeApplicationNo = applicationNo;
     this.changeProgrammeCurrentProgramme = currentProgramme || 'N/A';
+    const row = this.findRowByApplicationNo(applicationNo);
+    this.changeProgrammeApplicantId = row?.id ?? null;
     this.changeProgrammeOptions = this.buildProgrammeOptions(currentProgramme);
+    this.changeProgrammeOptionLabels = this.changeProgrammeOptions.map(
+      (option) => option.label,
+    );
+    if (this.changeProgrammeOptions.length === 0) {
+      this.notification.warn(
+        'No department options available for change programme.',
+      );
+    }
     this.isChangeProgrammeModalVisible = true;
   }
 
-  private buildProgrammeOptions(currentProgramme: string): string[] {
-    const seeded = this.app_summ
-      .map((row) => row.program)
-      .filter((value): value is string => Boolean(value))
-      .map((value) => value.trim())
-      .filter((value) => value.length > 0);
+  private buildProgrammeOptions(currentProgramme: string): DepartmentOption[] {
+    const seeded = this.applicationList
+      .map((application) => {
+        if (
+          application.department &&
+          typeof application.department === 'object' &&
+          typeof application.department.id === 'number' &&
+          typeof application.department.name === 'string'
+        ) {
+          return {
+            label: application.department.name,
+            value: application.department.id,
+          };
+        }
+        return null;
+      })
+      .filter((value): value is DepartmentOption => value !== null);
 
-    const defaults = ['Nursing', 'Midwifery', 'Public Health'];
-    const merged = Array.from(new Set([...seeded, ...defaults]));
+    const merged = Array.from(
+      new Map(seeded.map((option) => [option.value, option])).values(),
+    );
     const normalizedCurrent = (currentProgramme ?? '').trim().toLowerCase();
 
     return merged.filter(
-      (value) => value.trim().toLowerCase() !== normalizedCurrent,
+      (value) => value.label.trim().toLowerCase() !== normalizedCurrent,
     );
   }
 
   private closeTransientOverlays(): void {
     this.isChangeProgrammeModalVisible = false;
+    this.changeProgrammeApplicantId = null;
+    this.changeProgrammeOptionLabels = [];
     this.isApplicantDrawerVisible = false;
     this.selectedApplicationNo = null;
+  }
+
+  private normalizeChangeProgrammeSelection(
+    selection: ChangeProgrammeSelectionInput,
+  ): ChangeProgrammeSelection | null {
+    if (typeof selection !== 'string') {
+      return selection;
+    }
+
+    const option = this.changeProgrammeOptions.find(
+      (item) => item.label === selection,
+    );
+
+    if (!option) {
+      return null;
+    }
+
+    return {
+      programmeName: option.label,
+      approvedDepartmentId: option.value,
+    };
   }
 
   getDecisionActionTooltip(row: AdmissionTableRow): string {
@@ -558,6 +696,9 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     }
     if (response && typeof response === 'object') {
       const maybeObject = response as Record<string, unknown>;
+      if (typeof maybeObject['cbt_results_uploaded'] === 'boolean') {
+        return maybeObject['cbt_results_uploaded'] as boolean;
+      }
       const candidates = [
         maybeObject['uploaded'],
         maybeObject['is_uploaded'],

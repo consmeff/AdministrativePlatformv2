@@ -41,6 +41,10 @@ import {
   ApplicantExportModalComponent,
   ApplicantExportSelection,
 } from './export-modal/applicant-export-modal.component';
+import {
+  UpdateFileModalComponent,
+  UpdateFileSelection,
+} from '../../../widgets/update-file-modal/update-file-modal.component';
 
 interface FilterOption {
   label: string;
@@ -88,6 +92,7 @@ type ApplicantCardFilter =
     ApplicantdetailComponent,
     MetricCardComponent,
     ApplicantExportModalComponent,
+    UpdateFileModalComponent,
   ],
   templateUrl: './applicantlists.component.html',
   styleUrl: './applicantlists.component.scss',
@@ -193,6 +198,12 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   directiveSelectedDocuments: string[] = [];
   isExportModalVisible = false;
   isExporting = false;
+  isUpdateFileModalVisible = false;
+  isUpdatingWithFile = false;
+  readonly updateFileFields = [
+    { label: 'Approval Status', value: 'approval_status' },
+    { label: 'Compliance Directive', value: 'compliance_directive' },
+  ];
 
   ngOnInit(): void {
     this.applicationService.getAdminDashboardMetrics().subscribe((metrics) => {
@@ -533,6 +544,36 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
 
   closeExportModal(): void {
     this.isExportModalVisible = false;
+  }
+
+  openUpdateFileModal(): void {
+    this.isUpdateFileModalVisible = true;
+  }
+
+  closeUpdateFileModal(): void {
+    this.isUpdateFileModalVisible = false;
+  }
+
+  submitUpdateWithFile(selection: UpdateFileSelection): void {
+    this.isUpdatingWithFile = true;
+    this.applicationService
+      .bulkUpdateApplicants({
+        file: selection.file,
+        fields: selection.fields.join(','),
+      })
+      .subscribe({
+        next: () => {
+          this.notification.success('Applicants updated successfully.');
+          this.isUpdateFileModalVisible = false;
+          this.fetchRecords();
+        },
+        error: () => {
+          this.isUpdatingWithFile = false;
+        },
+        complete: () => {
+          this.isUpdatingWithFile = false;
+        },
+      });
   }
 
   exportApplicantsList(selection: ApplicantExportSelection): void {

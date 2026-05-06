@@ -136,6 +136,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   directiveSelectedReason = '';
   directiveSelectedDocuments: string[] = [];
   isSetCutoffModalVisible = false;
+  isSavingCutoff = false;
 
   constructor() {
     this.dashInfoService.dashInfo$
@@ -256,11 +257,39 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   saveCutoff(payload: SetCutoffPayload): void {
-    this.isSetCutoffModalVisible = false;
-    const programmeText = payload.programme ?? 'all programmes';
-    this.notification.success(
-      `Cutoff saved for ${programmeText} (CBT: ${payload.minimumCbtScore ?? '-'}, JAMB: ${payload.minimumJambScore ?? '-'}).`,
-    );
+    if (
+      payload.minimumJambScore === undefined ||
+      payload.minimumCbtScore === undefined
+    ) {
+      this.notification.warn(
+        'Please provide both minimum JAMB and CBT scores.',
+      );
+      return;
+    }
+
+    this.isSavingCutoff = true;
+    this.applicationService
+      .setApplicationCutoff({
+        min_jamb_score: payload.minimumJambScore,
+        min_post_utme_score: payload.minimumCbtScore,
+        application: payload.programme ?? '',
+        all_application: !payload.programme,
+      })
+      .subscribe({
+        next: () => {
+          const programmeText = payload.programme ?? 'all applications';
+          this.notification.success(
+            `Cutoff saved for ${programmeText} successfully.`,
+          );
+          this.isSetCutoffModalVisible = false;
+        },
+        error: () => {
+          this.isSavingCutoff = false;
+        },
+        complete: () => {
+          this.isSavingCutoff = false;
+        },
+      });
   }
 
   private closeTransientOverlays(): void {
