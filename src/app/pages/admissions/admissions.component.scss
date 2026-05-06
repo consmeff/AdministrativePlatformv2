@@ -4,11 +4,18 @@
   gap: 18px;
 }
 
+.cards-row {
+  display: flex;
+  align-items: stretch;
+  gap: 14px;
+}
+
 .cards-head {
   display: grid;
   grid-template-columns: repeat(4, minmax(190px, 1fr));
   gap: 14px;
   align-items: stretch;
+  flex: 1;
 }
 
 .cards-head app-metric-card {
@@ -50,6 +57,19 @@
   align-items: center;
 }
 
+.bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.selected-count {
+  margin-right: auto;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
 .outline-btn {
   border: 1px solid #dbe8ff;
   border-radius: 12px;
@@ -58,6 +78,10 @@
   height: 48px;
   padding: 0 16px;
   font-weight: 600;
+}
+
+.publish-admission-btn {
+  align-self: flex-start;
 }
 
 .summary-table th {
@@ -99,6 +123,10 @@
 }
 
 @media (max-width: 1200px) {
+  .cards-row {
+    flex-direction: column;
+  }
+
   .cards-head {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -113,11 +141,32 @@
     grid-template-columns: 1fr;
   }
 
+  .publish-admission-btn {
+    width: 100%;
+  }
+
+  .bulk-actions {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .selected-count {
+    width: 100%;
+    margin-right: 0;
+  }
+
   .filters-head {
     grid-template-columns: 1fr;
   }
 
   .outline-btn {
     width: 100%;
+  }
+}
+
+@media (max-width: 575px) {
+  .bulk-actions {
+    flex-direction: column;
+    align-items: stretch;
   }
 }

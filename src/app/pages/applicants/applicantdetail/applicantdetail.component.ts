@@ -635,14 +635,27 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
 
   private getResolvedStatus(): {
     text: string;
-    tone: 'pending' | 'shortlisted' | 'directive' | 'resubmitted' | 'rejected';
+    tone:
+      | 'pending'
+      | 'shortlisted'
+      | 'directive'
+      | 'resubmitted'
+      | 'rejected'
+      | 'admitted';
   } {
     const status = this.getNormalizedApprovalStatus();
+    if (status.includes('admit') || status.includes('approved')) {
+      return { text: 'Admitted', tone: 'admitted' };
+    }
+    if (
+      status.includes('publish') ||
+      status.includes('pending publish') ||
+      status.includes('shortlist')
+    ) {
+      return { text: 'Pending Publish', tone: 'resubmitted' };
+    }
     if (status.includes('resubmit')) {
       return { text: 'Resubmitted', tone: 'resubmitted' };
-    }
-    if (status.includes('shortlist')) {
-      return { text: 'Shortlisted', tone: 'shortlisted' };
     }
     if (
       status.includes('compliance') ||
@@ -706,6 +719,9 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
 
   getHeroStatusClass(): string {
     const tone = this.getResolvedStatus().tone;
+    if (tone === 'admitted') {
+      return 'hero-status-shortlisted';
+    }
     if (tone === 'shortlisted') {
       return 'hero-status-shortlisted';
     }
@@ -722,6 +738,9 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
   }
 
   getStatusClassName(): string {
+    if (this.getResolvedStatus().tone === 'admitted') {
+      return 'status-shortlisted';
+    }
     if (this.isComplianceBaseState()) {
       return 'status-compliance';
     }

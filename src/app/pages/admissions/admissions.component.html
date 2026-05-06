@@ -9,18 +9,55 @@
   />
 } @else {
   <section class="admissions-shell">
-    <div class="cards-head">
-      @for (card of filterCards; track card.filter) {
-        <app-metric-card
-          variant="filter"
-          [subtext]="card.label"
-          [value]="getCardCount(card.filter)"
-          [active]="isCardActive(card.filter)"
-          [clickable]="true"
-          (cardClick)="setCardFilter(card.filter)"
-        />
+    <div class="cards-row">
+      <div class="cards-head">
+        @for (card of filterCards; track card.filter) {
+          <app-metric-card
+            variant="filter"
+            [subtext]="card.label"
+            [value]="getCardCount(card.filter)"
+            [active]="isCardActive(card.filter)"
+            [clickable]="true"
+            (cardClick)="setCardFilter(card.filter)"
+          />
+        }
+      </div>
+      @if (showPublishAdmissionButton) {
+        <app-button
+          variant="primary"
+          class="publish-admission-btn"
+          (buttonClick)="publishAdmissions()"
+          [disabled]="!canPublishAdmissions"
+        >
+          Publish Admission
+        </app-button>
       }
     </div>
+
+    @if (selectedRows.length > 0) {
+      <section class="bulk-actions">
+        <span class="selected-count"
+          >{{ selectedRows.length }} Candidates selected</span
+        >
+        <app-button
+          variant="info"
+          [outline]="true"
+          iconClass="bi bi-arrow-repeat"
+          (buttonClick)="openChangeProgrammeForSelected()"
+          [disabled]="!canBulkChangeProgramme"
+        >
+          Change Programme
+        </app-button>
+        <app-button
+          variant="primary"
+          iconClass="bi bi-check"
+          (buttonClick)="grantAdmissionForSelected()"
+          [disabled]="!canBulkGrantAdmission"
+        >
+          Grant Admission
+        </app-button>
+      </section>
+    }
 
     <div class="filters-head">
       <app-search-input
@@ -144,7 +181,7 @@
 
 <app-change-programme-modal
   [visible]="isChangeProgrammeModalVisible"
-  [loading]="isChangingProgramme"
+  [loading]="isChangingProgramme || isLoadingProgrammeOptions"
   [currentProgramme]="changeProgrammeCurrentProgramme"
   [programmeOptions]="changeProgrammeOptionLabels"
   (closed)="closeChangeProgrammeModal()"

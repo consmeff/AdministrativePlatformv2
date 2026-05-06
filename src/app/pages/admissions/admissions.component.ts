@@ -38,6 +38,7 @@ import { ApplicantdetailComponent } from '../applicants/applicantdetail/applican
 import { AdmissionsUploadFlowComponent } from './upload-flow/admissions-upload-flow.component';
 import { MetricCardComponent } from '../../widgets/metric-card/metric-card.component';
 import { ChangeProgrammeModalComponent } from './change-programme-modal/change-programme-modal.component';
+import { ButtonComponent } from '../../widgets/button/button.component';
 import {
   UpdateFileModalComponent,
   UpdateFileSelection,
@@ -108,6 +109,7 @@ type ChangeProgrammeSelectionInput = ChangeProgrammeSelection | string;
     AdmissionsUploadFlowComponent,
     MetricCardComponent,
     ChangeProgrammeModalComponent,
+    ButtonComponent,
     UpdateFileModalComponent,
   ],
   templateUrl: './admissions.component.html',
@@ -147,9 +149,12 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   ];
   isChangeProgrammeModalVisible = false;
   isChangingProgramme = false;
+  isLoadingProgrammeOptions = false;
   changeProgrammeCurrentProgramme = 'N/A';
   changeProgrammeApplicationNo = '';
   changeProgrammeApplicantId: number | null = null;
+  changeProgrammeApplicantIds: number[] = [];
+  departmentCatalog: DepartmentOption[] = [];
   changeProgrammeOptions: DepartmentOption[] = [];
   changeProgrammeOptionLabels: string[] = [];
   activeCardFilter: AdmissionDecisionFilter = 'all';
@@ -187,6 +192,7 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.checkCbtUploadStatus();
+    this.loadDepartmentCatalog();
     this.approval_status = [
       { name: 'All', code: 0 },
       { name: 'Pending', code: 1 },
@@ -443,6 +449,28 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     );
   }
 
+  grantAdmissionForSelected(): void {
+    const eligibleRows = this.getBulkEligibleRows();
+    if (eligibleRows.length === 0) {
+      this.notification.warn(
+        'Select at least one non-admitted candidate to grant admission.',
+      );
+      return;
+    }
+
+    this.notifySkippedBulkRows(eligibleRows.length);
+    this.performApplicantAction(
+      this._applicationService.markAsAdmittedInternally({
+        data: eligibleRows.map((row) => ({ applicant_id: row.id })),
+      }),
+      this.buildBulkSuccessMessage(
+        'Admission granted',
+        eligibleRows.length,
+        'candidate',
+      ),
+    );
+  }
+
   grantAdmissionFromDrawer(): void {
     if (!this.selectedApplicationNo) {
       return;
@@ -459,6 +487,27 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     this.openChangeProgrammeModal(row.application_no, row.program);
   }
 
+  openChangeProgrammeForSelected(): void {
+    const eligibleRows = this.getBulkEligibleRows();
+    if (eligibleRows.length === 0) {
+      this.notification.warn(
+        'Select at least one non-admitted candidate to change programme.',
+      );
+      return;
+    }
+
+    this.closeTransientOverlays();
+    this.notifySkippedBulkRows(eligibleRows.length);
+    this.changeProgrammeApplicationNo = `${eligibleRows.length} selected candidates`;
+    this.changeProgrammeCurrentProgramme =
+      eligibleRows.length === 1
+        ? eligibleRows[0].program
+        : 'Multiple programmes';
+    this.changeProgrammeApplicantId = eligibleRows[0]?.id ?? null;
+    this.changeProgrammeApplicantIds = eligibleRows.map((row) => row.id);
+    this.prepareChangeProgrammeOptions(this.changeProgrammeCurrentProgramme);
+  }
+
   openChangeProgrammeFromDrawer(currentProgramme: string): void {
     if (!this.selectedApplicationNo) {
       this.notification.error(
@@ -472,10 +521,11 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   closeChangeProgrammeModal(): void {
     this.isChangeProgrammeModalVisible = false;
     this.changeProgrammeApplicantId = null;
+    this.changeProgrammeApplicantIds = [];
   }
 
   submitChangeProgramme(selection: ChangeProgrammeSelectionInput): void {
-    if (!this.changeProgrammeApplicantId) {
+    if (this.changeProgrammeApplicantIds.length === 0) {
       this.notification.error(
         'Applicant record is required to change programme.',
       );
@@ -495,17 +545,17 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     this.busyService.show();
     this._applicationService
       .markAsAdmittedInternally({
-        data: [
-          {
-            applicant_id: this.changeProgrammeApplicantId,
-            approved_department_id: normalizedSelection.approvedDepartmentId,
-          },
-        ],
+        data: this.changeProgrammeApplicantIds.map((applicantId) => ({
+          applicant_id: applicantId,
+          approved_department_id: normalizedSelection.approvedDepartmentId,
+        })),
       })
       .subscribe({
         next: () => {
           this.notification.success(
-            `Programme changed to ${normalizedSelection.programmeName} for ${this.changeProgrammeApplicationNo}.`,
+            this.changeProgrammeApplicantIds.length === 1
+              ? `Programme changed to ${normalizedSelection.programmeName} for ${this.changeProgrammeApplicationNo}.`
+              : `${this.changeProgrammeApplicantIds.length} candidates moved to ${normalizedSelection.programmeName}.`,
           );
           this.isChangeProgrammeModalVisible = false;
           this.fetchRecords().subscribe((data: ApplicationListResponse) => {
@@ -534,19 +584,11 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     this.changeProgrammeCurrentProgramme = currentProgramme || 'N/A';
     const row = this.findRowByApplicationNo(applicationNo);
     this.changeProgrammeApplicantId = row?.id ?? null;
-    this.changeProgrammeOptions = this.buildProgrammeOptions(currentProgramme);
-    this.changeProgrammeOptionLabels = this.changeProgrammeOptions.map(
-      (option) => option.label,
-    );
-    if (this.changeProgrammeOptions.length === 0) {
-      this.notification.warn(
-        'No department options available for change programme.',
-      );
-    }
-    this.isChangeProgrammeModalVisible = true;
+    this.changeProgrammeApplicantIds = row?.id ? [row.id] : [];
+    this.prepareChangeProgrammeOptions(currentProgramme);
   }
 
-  private buildProgrammeOptions(currentProgramme: string): DepartmentOption[] {
+  private buildProgrammeOptionsFromApplicants(): DepartmentOption[] {
     const seeded = this.applicationList
       .map((application) => {
         if (
@@ -567,19 +609,226 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     const merged = Array.from(
       new Map(seeded.map((option) => [option.value, option])).values(),
     );
-    const normalizedCurrent = (currentProgramme ?? '').trim().toLowerCase();
 
-    return merged.filter(
+    return merged;
+  }
+
+  private filterProgrammeOptions(currentProgramme: string): DepartmentOption[] {
+    const normalizedCurrent = (currentProgramme ?? '').trim().toLowerCase();
+    const source =
+      this.departmentCatalog.length > 0
+        ? this.departmentCatalog
+        : this.buildProgrammeOptionsFromApplicants();
+
+    return source.filter(
       (value) => value.label.trim().toLowerCase() !== normalizedCurrent,
     );
+  }
+
+  private prepareChangeProgrammeOptions(currentProgramme: string): void {
+    if (this.departmentCatalog.length > 0) {
+      this.applyChangeProgrammeOptions(currentProgramme);
+      return;
+    }
+
+    this.loadDepartmentCatalog(() =>
+      this.applyChangeProgrammeOptions(currentProgramme),
+    );
+  }
+
+  private applyChangeProgrammeOptions(currentProgramme: string): void {
+    this.changeProgrammeOptions = this.filterProgrammeOptions(currentProgramme);
+    this.changeProgrammeOptionLabels = this.changeProgrammeOptions.map(
+      (option) => option.label,
+    );
+    if (this.changeProgrammeOptions.length === 0) {
+      this.notification.warn(
+        'No department options available for change programme.',
+      );
+    }
+    this.isChangeProgrammeModalVisible = true;
+  }
+
+  private loadDepartmentCatalog(onLoaded?: () => void): void {
+    this.isLoadingProgrammeOptions = true;
+    this._applicationService.getDepartments().subscribe({
+      next: (response: unknown) => {
+        const parsedOptions = this.parseDepartmentOptions(response);
+        this.departmentCatalog =
+          parsedOptions.length > 0
+            ? parsedOptions
+            : this.buildProgrammeOptionsFromApplicants();
+      },
+      error: () => {
+        this.departmentCatalog = this.buildProgrammeOptionsFromApplicants();
+        this.notification.warn(
+          'Unable to load departments. Using available programme options.',
+        );
+      },
+      complete: () => {
+        this.isLoadingProgrammeOptions = false;
+        onLoaded?.();
+      },
+    });
+  }
+
+  private parseDepartmentOptions(response: unknown): DepartmentOption[] {
+    const applicantOptions = this.buildProgrammeOptionsFromApplicants();
+    const applicantOptionMap = new Map(
+      applicantOptions.map((option) => [
+        option.label.trim().toLowerCase(),
+        option,
+      ]),
+    );
+    const collected = this.collectDepartmentEntries(response);
+    const normalizedOptions: DepartmentOption[] = [];
+
+    collected.forEach((entry) => {
+      if (
+        entry &&
+        typeof entry === 'object' &&
+        typeof entry['id'] === 'number' &&
+        typeof entry['name'] === 'string'
+      ) {
+        normalizedOptions.push({
+          label: entry['name'],
+          value: entry['id'],
+        });
+        return;
+      }
+
+      if (typeof entry === 'string') {
+        const matchedOption = applicantOptionMap.get(
+          entry.trim().toLowerCase(),
+        );
+        if (matchedOption) {
+          normalizedOptions.push(matchedOption);
+        }
+      }
+    });
+
+    return Array.from(
+      new Map(
+        normalizedOptions.map((option) => [option.value, option]),
+      ).values(),
+    );
+  }
+
+  private collectDepartmentEntries(
+    value: unknown,
+  ): (Record<string, unknown> | string)[] {
+    if (Array.isArray(value)) {
+      return value.flatMap((item) => this.collectDepartmentEntries(item));
+    }
+
+    if (typeof value === 'string') {
+      return [value];
+    }
+
+    if (!value || typeof value !== 'object') {
+      return [];
+    }
+
+    const maybeObject = value as Record<string, unknown>;
+    if (
+      typeof maybeObject['id'] === 'number' &&
+      typeof maybeObject['name'] === 'string'
+    ) {
+      return [maybeObject];
+    }
+
+    const nestedEntries: (Record<string, unknown> | string)[] = [];
+    if (Array.isArray(maybeObject['results'])) {
+      nestedEntries.push(
+        ...this.collectDepartmentEntries(maybeObject['results']),
+      );
+    }
+    if (Array.isArray(maybeObject['data'])) {
+      nestedEntries.push(...this.collectDepartmentEntries(maybeObject['data']));
+    }
+
+    return nestedEntries;
   }
 
   private closeTransientOverlays(): void {
     this.isChangeProgrammeModalVisible = false;
     this.changeProgrammeApplicantId = null;
+    this.changeProgrammeApplicantIds = [];
+    this.changeProgrammeOptions = [];
     this.changeProgrammeOptionLabels = [];
     this.isApplicantDrawerVisible = false;
     this.selectedApplicationNo = null;
+  }
+
+  get canBulkGrantAdmission(): boolean {
+    return this.getBulkEligibleRows().length > 0;
+  }
+
+  get canBulkChangeProgramme(): boolean {
+    return this.getBulkEligibleRows().length > 0;
+  }
+
+  get showPublishAdmissionButton(): boolean {
+    return this.activeCardFilter === 'pending-publish';
+  }
+
+  get canPublishAdmissions(): boolean {
+    return this.getPublishableRows().length > 0;
+  }
+
+  private getBulkEligibleRows(): AdmissionTableRow[] {
+    return this.selectedRows.filter(
+      (row) => row.decision_category !== 'admitted',
+    );
+  }
+
+  publishAdmissions(): void {
+    const publishableRows = this.getPublishableRows();
+    if (publishableRows.length === 0) {
+      this.notification.warn('No pending publish candidates available.');
+      return;
+    }
+
+    this.performApplicantAction(
+      this._applicationService.markAsAdmittedInternally({
+        data: publishableRows.map((row) => ({ applicant_id: row.id })),
+      }),
+      this.buildBulkSuccessMessage(
+        'Admission published',
+        publishableRows.length,
+        'candidate',
+      ),
+    );
+  }
+
+  private getPublishableRows(): AdmissionTableRow[] {
+    const selectedPendingPublishRows = this.selectedRows.filter((row) =>
+      this.isPendingPublishDecision(row),
+    );
+    if (selectedPendingPublishRows.length > 0) {
+      return selectedPendingPublishRows;
+    }
+    return this.filteredRows.filter((row) =>
+      this.isPendingPublishDecision(row),
+    );
+  }
+
+  private notifySkippedBulkRows(processedCount: number): void {
+    const skippedCount = this.selectedRows.length - processedCount;
+    if (skippedCount > 0) {
+      this.notification.warn(
+        `${skippedCount} admitted candidate${skippedCount === 1 ? '' : 's'} skipped.`,
+      );
+    }
+  }
+
+  private buildBulkSuccessMessage(
+    actionLabel: string,
+    count: number,
+    noun: string,
+  ): string {
+    const suffix = count === 1 ? noun : `${noun}s`;
+    return `${actionLabel} for ${count} ${suffix}.`;
   }
 
   private normalizeChangeProgrammeSelection(
@@ -647,6 +896,7 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     request.subscribe({
       next: () => {
         this.notification.success(successMessage);
+        this.selectedRows = [];
         this.fetchRecords().subscribe((data: ApplicationListResponse) => {
           this.total_record_count = data.total;
           this.applicationList = data.data;
