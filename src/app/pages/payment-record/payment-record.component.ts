@@ -195,7 +195,7 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
       .getPayments({
         page,
         search: this.searchText.trim() || undefined,
-        ordering: this.selectedOrdering.value || undefined,
+        // ordering: this.selectedOrdering.value || undefined,
       })
       .pipe(
         tap((response: PaymentsListResponseDto) => {
@@ -205,7 +205,7 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
           );
         }),
         catchError(() => {
-          this.notification.error('Unable to load payment records.');
+          // this.notification.error('Unable to load payment records.');
           this.allTransactions = [];
           this.totalRecords = 0;
           return of(null);

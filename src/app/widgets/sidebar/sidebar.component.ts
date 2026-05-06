@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, HostListener, inject } from '@angular/core';
 import { Params, Router, RouterModule } from '@angular/router';
 import { WidgetService } from '../../services/widget.service';
 import { sidebarStateDTO } from '../../model/page.dto';
@@ -26,6 +26,7 @@ interface SidebarMenuItem {
 })
 export class SidebarComponent {
   sidebarVisible = false;
+  isMobileViewport = false;
   _widgetService = inject(WidgetService);
   router = inject(Router);
   openGroupRoute: string | null = null;
@@ -81,7 +82,13 @@ export class SidebarComponent {
     this._widgetService.sidebarState$.subscribe((state: sidebarStateDTO) => {
       this.sidebarVisible = state.isvisible;
     });
+    this.updateViewportState();
     this.openGroupRoute = this.getDefaultOpenGroup();
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    this.updateViewportState();
   }
 
   toggleSidebar() {
@@ -107,11 +114,25 @@ export class SidebarComponent {
       return;
     }
 
-    if (!this.sidebarVisible) {
+    if (!this.sidebarVisible && !this.isMobileViewport) {
       return;
     }
 
     this.toggleGroup(item);
+  }
+
+  onNavigate(): void {
+    if (this.isMobileViewport) {
+      this.close();
+    }
+  }
+
+  get isDesktopCollapsed(): boolean {
+    return !this.sidebarVisible && !this.isMobileViewport;
+  }
+
+  get isMobileDrawerOpen(): boolean {
+    return this.isMobileViewport && this.sidebarVisible;
   }
 
   isGroupOpen(item: SidebarMenuItem): boolean {
@@ -151,6 +172,21 @@ export class SidebarComponent {
       (item) => item.children?.length && this.isRouteActive(item.route),
     );
     return matched?.route ?? null;
+  }
+
+  private updateViewportState(): void {
+    const mobileViewport = window.innerWidth <= 991;
+    const viewportChanged = mobileViewport !== this.isMobileViewport;
+    this.isMobileViewport = mobileViewport;
+
+    if (mobileViewport && (viewportChanged || this.sidebarVisible)) {
+      this._widgetService.setSidebarState({ isvisible: false });
+      return;
+    }
+
+    if (!mobileViewport && viewportChanged && !this.sidebarVisible) {
+      this._widgetService.setSidebarState({ isvisible: true });
+    }
   }
 
   logOut() {

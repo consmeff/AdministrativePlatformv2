@@ -1,5 +1,13 @@
 <div class="top-bar">
   <div class="d-flex align-items-center">
+    <button
+      type="button"
+      class="sidebar-trigger"
+      aria-label="Open sidebar"
+      (click)="toggleSidebar()"
+    >
+      <i class="bi bi-list"></i>
+    </button>
     <div class="top-title">{{ currentModuleName }}</div>
   </div>
   <div class="d-flex justify-content-end tb-icon">

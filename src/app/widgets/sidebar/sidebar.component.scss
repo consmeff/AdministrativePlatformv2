@@ -19,6 +19,14 @@
     border-color 0.2s ease;
 }
 
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  border: 0;
+  background: rgba(15, 23, 42, 0.45);
+  z-index: 29;
+}
+
 .sidebar-shell.is-collapsed {
   width: 5.25rem;
   padding: 12px 8px;
@@ -51,6 +59,7 @@
 .brand-wrap {
   display: flex;
   justify-content: flex-start;
+  flex: 1;
 }
 
 .brand-wrap img {
@@ -291,4 +300,79 @@
 .sidebar-shell.is-collapsed .menu-list > .menu-group > .menu-link:hover::after,
 .sidebar-shell.is-collapsed .logout-btn:hover::after {
   opacity: 1;
+}
+
+@media (max-width: 991px) {
+  .sidebar-shell {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: min(18rem, 84vw);
+    height: 100dvh;
+    transform: translateX(-100%);
+    padding: 16px;
+    overflow-y: auto;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.18);
+    z-index: 30;
+  }
+
+  .sidebar-shell.is-mobile-open {
+    transform: translateX(0);
+  }
+
+  .sidebar-shell.is-collapsed {
+    width: min(18rem, 84vw);
+    padding: 16px;
+    overflow-y: auto;
+  }
+
+  .sidebar-shell.is-collapsed .sidebar-top-row {
+    justify-content: space-between;
+    margin-bottom: 40px;
+  }
+
+  .sidebar-shell.is-collapsed .menu-list > a,
+  .sidebar-shell.is-collapsed .menu-list > .menu-group > .menu-link {
+    justify-content: flex-start;
+    padding: 8px;
+    border-radius: 0;
+  }
+
+  .sidebar-shell.is-collapsed .menu-list > a span,
+  .sidebar-shell.is-collapsed .menu-list > .menu-group > .menu-link span,
+  .sidebar-shell.is-collapsed .submenu-arrow,
+  .sidebar-shell.is-collapsed .logout-btn span {
+    display: inline;
+  }
+
+  .sidebar-shell.is-collapsed .submenu-list {
+    position: static;
+    left: auto;
+    top: auto;
+    min-width: 0;
+    max-height: 0;
+    opacity: 0;
+    visibility: visible;
+    pointer-events: none;
+    margin: 0;
+    padding-left: 32px;
+    gap: 0.12rem;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .sidebar-shell.is-collapsed .submenu-list.open {
+    max-height: 180px;
+    opacity: 1;
+    pointer-events: auto;
+    margin-top: 0.25rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .sidebar-shell.is-collapsed .menu-list > a::after,
+  .sidebar-shell.is-collapsed .menu-list > .menu-group > .menu-link::after,
+  .sidebar-shell.is-collapsed .logout-btn::after {
+    display: none;
+  }
 }

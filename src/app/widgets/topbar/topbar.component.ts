@@ -46,6 +46,10 @@ export class TopbarComponent implements OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
+  toggleSidebar(): void {
+    this._widgetService.setSidebarState({ isvisible: true });
+  }
+
   private resolveModuleName(url: string): string {
     if (url.includes('/pages/admissions')) {
       return 'Admissions';

@@ -65,6 +65,10 @@
   font-weight: 600;
 }
 
+.summary-table {
+  overflow-x: auto;
+}
+
 .summary-table tr {
   font-size: 13px;
 }
@@ -90,6 +94,30 @@
     height: 48px;
     border-radius: 12px;
     border-color: #dbe8ff;
+    width: 100%;
+  }
+}
+
+@media (max-width: 1200px) {
+  .cards-head {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .filters-head {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .cards-head {
+    grid-template-columns: 1fr;
+  }
+
+  .filters-head {
+    grid-template-columns: 1fr;
+  }
+
+  .outline-btn {
     width: 100%;
   }
 }

@@ -44,6 +44,12 @@ interface DashboardRow {
   status_tone: StatusTone;
 }
 
+interface DashboardMetricCard {
+  title: string;
+  value: number;
+  icon: string;
+}
+
 @Component({
   selector: 'app-dashboard',
   imports: [
@@ -147,6 +153,31 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.busyService.show();
     this.loadDashboardData();
+  }
+
+  get dashboardMetricCards(): DashboardMetricCard[] {
+    return [
+      {
+        title: 'Total Applications',
+        value: this.metrics.total_applicants,
+        icon: 'assets/dashboard/Capa_1.png',
+      },
+      {
+        title: 'Shortlisted Applications',
+        value: this.metrics.approval_status_breakdown.total_shortlisted,
+        icon: 'assets/dashboard/Layer_1.png',
+      },
+      {
+        title: 'Pending Reviews',
+        value: this.metrics.approval_status_breakdown.total_pending,
+        icon: 'assets/dashboard/Layer_2.png',
+      },
+      {
+        title: 'Admitted Candidates',
+        value: this.metrics.approval_status_breakdown.total_admitted,
+        icon: 'assets/dashboard/Layer_4.png',
+      },
+    ];
   }
 
   private updateMetricsViewModel(): void {
