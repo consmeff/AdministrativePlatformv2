@@ -14,8 +14,10 @@ import { ButtonComponent } from '../../../widgets/button/button.component';
 
 interface ProgrammeOption {
   label: string;
-  value: string;
+  value: number;
 }
+
+type ProgrammeInputOption = string | ProgrammeOption;
 
 @Component({
   selector: 'app-change-programme-modal',
@@ -34,15 +36,26 @@ export class ChangeProgrammeModalComponent implements OnChanges {
   @Input() visible = false;
   @Input() loading = false;
   @Input() currentProgramme = 'N/A';
-  @Input() programmeOptions: string[] = [];
+  @Input() programmeOptions: ProgrammeInputOption[] = [];
 
   @Output() closed = new EventEmitter<void>();
-  @Output() changed = new EventEmitter<string>();
+  @Output()
+  changed = new EventEmitter<{
+    programmeName: string;
+    approvedDepartmentId: number;
+  }>();
 
   selectedProgramme: ProgrammeOption | null = null;
 
   get mappedProgrammeOptions(): ProgrammeOption[] {
-    return this.programmeOptions.map((value) => ({ label: value, value }));
+    return this.programmeOptions
+      .map((option) => {
+        if (typeof option === 'string') {
+          return { label: option, value: 0 };
+        }
+        return option;
+      })
+      .filter((option) => typeof option.value === 'number');
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -52,8 +65,15 @@ export class ChangeProgrammeModalComponent implements OnChanges {
     ) {
       this.selectedProgramme =
         this.mappedProgrammeOptions.find(
-          (option) => option.value !== this.currentProgramme,
+          (option) => option.label !== this.currentProgramme,
         ) ?? this.mappedProgrammeOptions[0];
+      return;
+    }
+    if (
+      changes['programmeOptions'] &&
+      this.mappedProgrammeOptions.length === 0
+    ) {
+      this.selectedProgramme = null;
     }
   }
 
@@ -62,9 +82,12 @@ export class ChangeProgrammeModalComponent implements OnChanges {
   }
 
   submit(): void {
-    if (!this.selectedProgramme?.value) {
+    if (!this.selectedProgramme?.value || !this.selectedProgramme?.label) {
       return;
     }
-    this.changed.emit(this.selectedProgramme.value);
+    this.changed.emit({
+      programmeName: this.selectedProgramme.label,
+      approvedDepartmentId: this.selectedProgramme.value,
+    });
   }
 }

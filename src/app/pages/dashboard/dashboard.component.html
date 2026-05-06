@@ -150,6 +150,7 @@
 
 <app-set-cutoff-modal
   [visible]="isSetCutoffModalVisible"
+  [loading]="isSavingCutoff"
   (closed)="closeSetCutoffModal()"
   (saved)="saveCutoff($event)"
 ></app-set-cutoff-modal>

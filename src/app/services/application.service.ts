@@ -17,6 +17,15 @@ export interface ApplicantActionPayload {
   applicant_ids: number[];
 }
 
+export interface MarkAsAdmittedDataItem {
+  applicant_id: number;
+  approved_department_id?: number;
+}
+
+export interface MarkAsAdmittedPayload {
+  data: MarkAsAdmittedDataItem[];
+}
+
 export interface RejectApplicantPayload extends ApplicantActionPayload {
   extra_note: string;
 }
@@ -40,6 +49,25 @@ export interface ExportApplicantsPayload {
   application_no?: string;
   form?: string;
   ordering?: string;
+}
+
+export interface BulkUpdateApplicantsPayload {
+  file: File;
+  fields: string;
+}
+
+export interface SetCutoffRequestPayload {
+  min_jamb_score: number;
+  min_post_utme_score: number;
+  application: string;
+  all_application: boolean;
+}
+
+export interface SetCutoffResponsePayload {
+  min_jamb_score: number;
+  min_post_utme_score: number;
+  application: string;
+  all_application: boolean;
 }
 
 @Injectable({
@@ -136,7 +164,7 @@ export class ApplicationService {
   }
 
   markAsAdmittedInternally(
-    payload: ApplicantActionPayload,
+    payload: MarkAsAdmittedPayload,
   ): Observable<unknown> {
     const url = `${this.apiRoot}/api/v1/applicants/mark-as-admitted-internally`;
     return this.http.post(url, payload);
@@ -150,5 +178,25 @@ export class ApplicationService {
   exportApplicants(payload: ExportApplicantsPayload): Observable<Blob> {
     const url = `${this.apiRoot}/api/v1/applicants/export`;
     return this.http.post(url, payload, { responseType: 'blob' });
+  }
+
+  bulkUpdateApplicants(
+    payload: BulkUpdateApplicantsPayload,
+  ): Observable<unknown> {
+    const url = `${this.apiRoot}/api/v1/applicants/bulk-update`;
+    const formData = new FormData();
+    formData.append('file', payload.file);
+    formData.append('fields', payload.fields);
+    return this.http.post(url, formData);
+  }
+
+  setApplicationCutoff(payload: SetCutoffRequestPayload): Observable<unknown> {
+    const url = `${this.apiRoot}/api/v1/applications/cutoff`;
+    return this.http.put(url, payload);
+  }
+
+  getApplicationCutoff(): Observable<SetCutoffResponsePayload> {
+    const url = `${this.apiRoot}/api/v1/applications/cutoff`;
+    return this.http.get<SetCutoffResponsePayload>(url);
   }
 }

@@ -75,6 +75,7 @@
       [fullWidth]="true"
       iconClass="bi bi-file-earmark-arrow-up"
       iconPosition="right"
+      (buttonClick)="openUpdateFileModal()"
     >
       Update with File
     </app-button>
@@ -194,3 +195,13 @@
   (closed)="closeExportModal()"
   (exported)="exportApplicantsList($event)"
 />
+
+<app-update-file-modal
+  [visible]="isUpdateFileModalVisible"
+  [loading]="isUpdatingWithFile"
+  title="Update Applicants with File"
+  subtitle="Select fields to update, then upload your file."
+  [fieldOptions]="updateFileFields"
+  (closed)="closeUpdateFileModal()"
+  (submitted)="submitUpdateWithFile($event)"
+></app-update-file-modal>

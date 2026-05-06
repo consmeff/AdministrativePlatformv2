@@ -1,0 +1,80 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="true"
+  [dismissableMask]="true"
+  styleClass="app-modal-shell"
+  (onHide)="onClose()"
+>
+  <ng-template pTemplate="header">
+    <div>
+      <h2 class="title-small app-modal-title">{{ title }}</h2>
+      <p class="body-small app-modal-subtitle">{{ subtitle }}</p>
+    </div>
+  </ng-template>
+
+  <div class="app-modal-content">
+    <div class="app-modal-divider"></div>
+    <input
+      #fileInput
+      type="file"
+      class="hidden-file-input"
+      accept=".csv,.xls,.xlsx"
+      (change)="onFileSelected($event)"
+    />
+
+    <div class="app-modal-field">
+      <div class="label-small app-modal-label">Fields to update</div>
+      <div class="fields-grid">
+        @for (option of fieldOptions; track option.value) {
+          <label class="export-check-option">
+            <input
+              type="checkbox"
+              [checked]="isFieldChecked(option.value)"
+              (change)="toggleField(option.value, $any($event.target).checked)"
+            />
+            <span class="export-check-box">
+              <i class="bi bi-check-lg"></i>
+            </span>
+            <span>{{ option.label }}</span>
+          </label>
+        }
+      </div>
+    </div>
+
+    <div class="app-modal-field">
+      <div class="label-small app-modal-label">Upload file</div>
+      <button
+        type="button"
+        class="upload-btn"
+        [disabled]="loading"
+        (click)="triggerFileInput(fileInput)"
+      >
+        {{ selectedFile?.name || "Choose file (.csv, .xls, .xlsx)" }}
+      </button>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="app-modal-actions">
+      <app-button
+        variant="outline"
+        [fullWidth]="true"
+        [disabled]="loading"
+        (buttonClick)="onClose()"
+      >
+        Cancel
+      </app-button>
+      <app-button
+        variant="primary"
+        [fullWidth]="true"
+        [disabled]="loading || !selectedFile || selectedFields.length === 0"
+        (buttonClick)="submit()"
+      >
+        {{ loading ? "Updating..." : "Update" }}
+      </app-button>
+    </div>
+  </ng-template>
+</p-dialog>
