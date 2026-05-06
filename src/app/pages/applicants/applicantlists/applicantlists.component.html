@@ -19,7 +19,8 @@
           >{{ selectedApplicantIds.length }} Candidates selected</span
         >
         <app-button
-          variant="outline"
+          variant="info"
+          [outline]="true"
           iconClass="bi bi-exclamation-triangle"
           (buttonClick)="openComplianceForSelected()"
           [disabled]="selectedApplicantIds.length === 0"

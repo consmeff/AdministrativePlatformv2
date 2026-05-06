@@ -1,8 +1,24 @@
-<div class="sidebar-shell" [class.is-collapsed]="!sidebarVisible">
+@if (isMobileDrawerOpen) {
+  <button
+    type="button"
+    class="sidebar-backdrop"
+    aria-label="Close sidebar"
+    (click)="close()"
+  ></button>
+}
+
+<div
+  class="sidebar-shell"
+  [class.is-collapsed]="isDesktopCollapsed"
+  [class.is-mobile]="isMobileViewport"
+  [class.is-mobile-open]="isMobileDrawerOpen"
+>
   <div class="sidebar-top-row">
-    <div class="brand-wrap">
-      <img src="../../../assets/sblogo.png" alt="School Logo" />
-    </div>
+    @if (!isDesktopCollapsed) {
+      <div class="brand-wrap">
+        <img src="../../../assets/sblogo.png" alt="School Logo" />
+      </div>
+    }
     <button type="button" class="collapse-btn" (click)="toggleSidebar()">
       <i
         class="bi"
@@ -35,6 +51,7 @@
                 [class.active-submenu-link]="isSubmenuActive(child)"
                 [routerLink]="child.route"
                 [queryParams]="child.queryParams"
+                (click)="onNavigate()"
               >
                 <span>{{ child.label }}</span>
               </a>
@@ -48,6 +65,7 @@
           routerLinkActive="active-link"
           [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
           [attr.data-tooltip]="item.label"
+          (click)="onNavigate()"
         >
           <i [class]="item.iconClass"></i>
           <span>{{ item.label }}</span>

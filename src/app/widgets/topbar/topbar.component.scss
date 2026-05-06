@@ -9,11 +9,17 @@
   border-bottom: 1px solid var(--app-border);
 }
 
-.burger-menu {
-  margin-right: 1rem;
-  font-size: 30px;
-  cursor: pointer;
+.sidebar-trigger {
+  display: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-right: 0.75rem;
+  border: 1px solid var(--app-border);
+  border-radius: 0.5rem;
+  background: var(--app-surface);
   color: var(--app-text-secondary);
+  align-items: center;
+  justify-content: center;
 }
 
 .tb-icon {
@@ -40,4 +46,34 @@
 }
 .tb-icon .bi {
   font-size: 24px;
+}
+
+@media (max-width: 991px) {
+  .top-bar {
+    padding: 0.75rem 1rem;
+  }
+
+  .sidebar-trigger {
+    display: inline-flex;
+  }
+
+  .tb-icon {
+    gap: 0.5rem;
+  }
+
+  .tb-icon .mx-3 {
+    margin-left: 0.25rem !important;
+    margin-right: 0.25rem !important;
+  }
+}
+
+@media (max-width: 575px) {
+  .flex-column span:last-child {
+    display: none;
+  }
+
+  .top-title {
+    margin-left: 0;
+    font-size: 0.95rem;
+  }
 }

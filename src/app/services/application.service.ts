@@ -151,6 +151,11 @@ export class ApplicationService {
     return this.http.get<unknown>(url);
   }
 
+  getDepartments(): Observable<unknown> {
+    const url = `${this.apiRoot}/api/v1/setup/departments`;
+    return this.http.get<unknown>(url);
+  }
+
   issueComplianceDirective(
     payload: ComplianceDirectivePayload,
   ): Observable<unknown> {
