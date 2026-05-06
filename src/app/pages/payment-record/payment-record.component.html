@@ -1,6 +1,5 @@
 <section class="payment-page">
   <div class="page-title-row">
-    <h2>Payment Records</h2>
     <p-select
       [options]="sessionOptions"
       [(ngModel)]="selectedSession"
@@ -9,26 +8,22 @@
     />
   </div>
 
-  <div class="metrics-grid">
-    <article class="metric-card total-revenue-card">
-      <p class="metric-title">Total Revenue</p>
-      <h3>N684.3M</h3>
-      <span class="metric-subtext">1054 Transactions</span>
-    </article>
-
+  <div class="row g-3 first-cards">
     @for (card of summaryCards; track card.title) {
-      <article class="metric-card">
-        <p class="metric-title">{{ card.title }}</p>
-        <h3>{{ card.amountText }}</h3>
-        <span class="metric-subtext">{{ card.subText }}</span>
-      </article>
+      <div class="col-12 col-sm-6 col-lg-3">
+        <app-metric-card
+          [title]="card.title"
+          [value]="card.value"
+          [subtext]="card.subtext"
+        />
+      </div>
     }
   </div>
 
   <hr class="section-divider" />
 
   <section class="transactions-wrap">
-    <h3>All Transactions</h3>
+    <h3 class="title-small">All Transactions</h3>
 
     <div class="filters-row">
       <div class="search-box">

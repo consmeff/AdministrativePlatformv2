@@ -10,60 +10,10 @@
   align-items: center;
 }
 
-.page-title-row h2 {
-  margin: 0;
-  font-size: 30px;
-  font-weight: 700;
-  color: #10204f;
-}
-
-.metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.total-revenue-card {
-  grid-column: span 1;
-}
-
-.metric-card {
-  border: 1px solid #e6eefb;
-  border-radius: 12px;
-  padding: 14px;
-  background: #fff;
-}
-
-.metric-title {
-  margin: 0 0 8px;
-  color: #7c8fb4;
-  font-size: 14px;
-}
-
-.metric-card h3 {
-  margin: 0 0 4px;
-  color: #10204f;
-  font-size: 40px;
-  font-weight: 700;
-  line-height: 1.1;
-}
-
-.metric-subtext {
-  color: #91a2c4;
-  font-size: 13px;
-}
-
 .section-divider {
   border: 0;
   border-top: 1px solid #edf2fb;
   margin: 2px 0;
-}
-
-.transactions-wrap h3 {
-  margin: 0 0 12px;
-  color: #10204f;
-  font-size: 22px;
-  font-weight: 700;
 }
 
 .filters-row {
@@ -194,10 +144,6 @@
 }
 
 @media (max-width: 1180px) {
-  .metrics-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .filters-row {
     grid-template-columns: 1fr 1fr;
   }

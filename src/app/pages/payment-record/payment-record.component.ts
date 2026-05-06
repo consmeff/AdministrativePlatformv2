@@ -19,6 +19,7 @@ import { BusyIndicatorService } from '../../services/busy-indicator.service';
 import { NotificationService } from '../../services/notification.service';
 import { PaymentService } from '../../services/payment.service';
 import { PaymentReceiptModalComponent } from './receipt-modal/payment-receipt-modal.component';
+import { MetricCardComponent } from '../../widgets/metric-card/metric-card.component';
 import {
   FilterOption,
   PaymentDetailDto,
@@ -39,6 +40,7 @@ import {
     SelectModule,
     PaginatorModule,
     PaymentReceiptModalComponent,
+    MetricCardComponent,
   ],
   templateUrl: './payment-record.component.html',
   styleUrl: './payment-record.component.scss',
@@ -73,10 +75,31 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
   selectedTransaction: TransactionRow | null = null;
 
   readonly summaryCards = [
-    { title: 'Application Fees', amountText: 'N4.9M', subText: '247 payments' },
-    { title: 'Acceptance Fees', amountText: 'N2.7M', subText: '90 payments' },
-    { title: 'School Fees', amountText: 'N535.4M', subText: '893 students' },
-    { title: 'Other Fees', amountText: 'N10.3M', subText: '893 students' },
+    {
+      title: 'Total Revenue',
+      value: 'N684.3M',
+      subtext: '1054 Transactions',
+    },
+    {
+      title: 'Application Fees',
+      value: 'N4.9M',
+      subtext: '247 payments',
+    },
+    {
+      title: 'Acceptance Fees',
+      value: 'N2.7M',
+      subtext: '90 payments',
+    },
+    {
+      title: 'School Fees',
+      value: 'N535.4M',
+      subtext: '893 students',
+    },
+    {
+      title: 'Other Fees',
+      value: 'N10.3M',
+      subtext: '893 students',
+    },
   ];
 
   ngOnInit(): void {

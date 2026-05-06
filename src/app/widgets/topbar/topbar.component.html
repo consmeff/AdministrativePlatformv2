@@ -1,13 +1,6 @@
 <div class="top-bar">
   <div class="d-flex align-items-center">
-    <div class="top-title">
-      Current Session:
-      {{
-        dashinfo && dashinfo.academicsession != null
-          ? dashinfo.academicsession.split(" ")[0]
-          : ""
-      }}
-    </div>
+    <div class="top-title">{{ currentModuleName }}</div>
   </div>
   <div class="d-flex justify-content-end tb-icon">
     <i class="bi bi-bell mx-3"></i>
