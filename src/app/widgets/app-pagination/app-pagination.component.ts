@@ -10,6 +10,7 @@ import { PaginatorModule, PaginatorState } from 'primeng/paginator';
   styleUrl: './app-pagination.component.scss',
 })
 export class AppPaginationComponent {
+  @Input() visible = true;
   @Input() first = 0;
   @Input() rows = 10;
   @Input() totalRecords = 0;

@@ -130,6 +130,8 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   app_summ: AdmissionTableRow[] = [];
   filteredRows: AdmissionTableRow[] = [];
   total_record_count = 0;
+  nextPageUrl: string | null = null;
+  prevPageUrl: string | null = null;
   first = 0;
 
   rows = 100;
@@ -177,6 +179,8 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
         )
         .subscribe((data: ApplicationListResponse) => {
           this.total_record_count = data.total;
+          this.nextPageUrl = data.next_page_url ?? null;
+          this.prevPageUrl = data.prev_page_url ?? null;
           this.applicationList = data.data;
           this.populateSummary();
           this.busyService.hide();
@@ -233,6 +237,8 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     // Fetch new data based on updated pagination parameters
     this.fetchRecords().subscribe((data: ApplicationListResponse) => {
       this.total_record_count = data.total;
+      this.nextPageUrl = data.next_page_url ?? null;
+      this.prevPageUrl = data.prev_page_url ?? null;
       this.applicationList = data.data;
       this.populateSummary();
     });
@@ -246,6 +252,10 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
 
   isFirstPage(): boolean {
     return this.app_summ ? this.first === 0 : true;
+  }
+
+  get shouldShowPagination(): boolean {
+    return !!this.nextPageUrl || !!this.prevPageUrl;
   }
 
   onLazyLoad(event: LazyLoadEvent) {
@@ -264,6 +274,8 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     this.fetchRecords(sortField, sortOrder).subscribe(
       (data: ApplicationListResponse) => {
         this.total_record_count = data.total;
+        this.nextPageUrl = data.next_page_url ?? null;
+        this.prevPageUrl = data.prev_page_url ?? null;
         this.applicationList = data.data;
         this.populateSummary();
       },
@@ -301,6 +313,8 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     this.fetchRecords('approval_status').subscribe(
       (data: ApplicationListResponse) => {
         this.total_record_count = data.total;
+        this.nextPageUrl = data.next_page_url ?? null;
+        this.prevPageUrl = data.prev_page_url ?? null;
         this.applicationList = data.data;
         this.populateSummary();
       },
@@ -560,6 +574,8 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
           this.isChangeProgrammeModalVisible = false;
           this.fetchRecords().subscribe((data: ApplicationListResponse) => {
             this.total_record_count = data.total;
+            this.nextPageUrl = data.next_page_url ?? null;
+            this.prevPageUrl = data.prev_page_url ?? null;
             this.applicationList = data.data;
             this.populateSummary();
           });
@@ -899,6 +915,8 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
         this.selectedRows = [];
         this.fetchRecords().subscribe((data: ApplicationListResponse) => {
           this.total_record_count = data.total;
+          this.nextPageUrl = data.next_page_url ?? null;
+          this.prevPageUrl = data.prev_page_url ?? null;
           this.applicationList = data.data;
           this.populateSummary();
         });
@@ -934,6 +952,8 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     this.busyService.show();
     this.fetchRecords().subscribe((data: ApplicationListResponse) => {
       this.total_record_count = data.total;
+      this.nextPageUrl = data.next_page_url ?? null;
+      this.prevPageUrl = data.prev_page_url ?? null;
       this.applicationList = data.data;
       this.populateSummary();
       this.busyService.hide();

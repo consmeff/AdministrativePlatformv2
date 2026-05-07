@@ -75,6 +75,8 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
   readonly rows = 10;
   first = 0;
   totalRecords = 0;
+  nextPageUrl: string | null = null;
+  prevPageUrl: string | null = null;
 
   allTransactions: TransactionRow[] = [];
   selectedTransaction: TransactionRow | null = null;
@@ -142,6 +144,10 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
 
   get pagedTransactions(): TransactionRow[] {
     return this.allTransactions;
+  }
+
+  get shouldShowPagination(): boolean {
+    return !!this.nextPageUrl || !!this.prevPageUrl;
   }
 
   openTransactionDetails(transaction: TransactionRow): void {
@@ -215,6 +221,8 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
       .pipe(
         tap((response: PaymentsListResponseDto) => {
           this.totalRecords = Number(response.total ?? 0);
+          this.nextPageUrl = response.next_page_url ?? null;
+          this.prevPageUrl = response.prev_page_url ?? null;
           this.allTransactions = (response.data ?? []).map((item, index) =>
             this.mapPaymentListItem(item, index),
           );
@@ -223,6 +231,8 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
           // this.notification.error('Unable to load payment records.');
           this.allTransactions = [];
           this.totalRecords = 0;
+          this.nextPageUrl = null;
+          this.prevPageUrl = null;
           return of(null);
         }),
         finalize(() => this.busyService.hide()),

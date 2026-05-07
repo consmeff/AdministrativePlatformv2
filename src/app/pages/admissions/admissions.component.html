@@ -91,7 +91,7 @@
         dataKey="id"
         [(selection)]="selectedRows"
         [tableStyle]="{ 'min-width': '50rem' }"
-        [paginator]="true"
+        [paginator]="shouldShowPagination"
         [rows]="rows"
         [totalRecords]="
           activeCardFilter === 'all' ? total_record_count : filteredRows.length

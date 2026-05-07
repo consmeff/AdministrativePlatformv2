@@ -114,15 +114,17 @@
       </ng-template>
     </p-table>
 
-    <p-paginator
-      [first]="first"
-      [rows]="rows"
-      [totalRecords]="totalRecords"
-      [showCurrentPageReport]="true"
-      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} items"
-      [rowsPerPageOptions]="[10]"
-      (onPageChange)="onPageChange($event)"
-    />
+    @if (shouldShowPagination) {
+      <p-paginator
+        [first]="first"
+        [rows]="rows"
+        [totalRecords]="totalRecords"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} items"
+        [rowsPerPageOptions]="[10]"
+        (onPageChange)="onPageChange($event)"
+      />
+    }
   </section>
 </section>
 
