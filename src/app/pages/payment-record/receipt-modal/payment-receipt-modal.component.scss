@@ -31,15 +31,12 @@
 .details-modal h3 {
   margin: 0 0 12px;
   color: #10204f;
-  font-size: 32px;
-  font-weight: 700;
   border-bottom: 1px solid #edf2fb;
   padding-bottom: 10px;
 }
 
 .details-label {
   color: #7f93b7;
-  font-size: 14px;
 }
 
 .details-amount {
@@ -54,30 +51,15 @@
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 8px 18px;
+}
+
+.details-grid span {
   color: #7f93b7;
 }
 
 .details-grid strong {
   color: #1d325f;
   font-weight: 600;
-}
-
-.status-text {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.status-successful {
-  color: #14a44d;
-}
-
-.status-failed {
-  color: #ef4444;
-}
-
-.status-pending {
-  color: #f59e0b;
 }
 
 .payer-card {
@@ -90,7 +72,6 @@
 .payer-card h4 {
   margin: 0 0 8px;
   color: #13295b;
-  font-size: 22px;
 }
 
 .payer-row {
@@ -121,6 +102,4 @@
   border-radius: 10px;
   background: var(--app-primary);
   color: #fff;
-  font-weight: 700;
-  font-size: 20px;
 }
