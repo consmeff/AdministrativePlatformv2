@@ -9,7 +9,10 @@ import {
 import { appstatus, Column } from '../../model/page.dto';
 import { DrawerModule } from 'primeng/drawer';
 import { TableModule } from 'primeng/table';
-import { ApplicationService } from '../../services/application.service';
+import {
+  ApplicationService,
+  ApplicationSetupItem,
+} from '../../services/application.service';
 import { Router } from '@angular/router';
 import {
   Application,
@@ -80,17 +83,16 @@ interface AdmissionFilterCard {
   filter: AdmissionDecisionFilter;
 }
 
-interface DepartmentOption {
+interface ProgrammeOption {
   label: string;
   value: number;
+  programmeName: string;
 }
 
 interface ChangeProgrammeSelection {
   programmeName: string;
-  approvedDepartmentId: number;
+  applicationId: number;
 }
-
-type ChangeProgrammeSelectionInput = ChangeProgrammeSelection | string;
 
 @Component({
   selector: 'app-admissions',
@@ -156,9 +158,8 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   changeProgrammeApplicationNo = '';
   changeProgrammeApplicantId: number | null = null;
   changeProgrammeApplicantIds: number[] = [];
-  departmentCatalog: DepartmentOption[] = [];
-  changeProgrammeOptions: DepartmentOption[] = [];
-  changeProgrammeOptionLabels: string[] = [];
+  programmeCatalog: ProgrammeOption[] = [];
+  changeProgrammeOptions: ProgrammeOption[] = [];
   activeCardFilter: AdmissionDecisionFilter = 'all';
   readonly filterCards: AdmissionFilterCard[] = [
     { label: 'All Candidates', filter: 'all' },
@@ -196,7 +197,7 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.checkCbtUploadStatus();
-    this.loadDepartmentCatalog();
+    this.loadProgrammeCatalog();
     this.approval_status = [
       { name: 'All', code: 0 },
       { name: 'Pending', code: 1 },
@@ -538,7 +539,7 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     this.changeProgrammeApplicantIds = [];
   }
 
-  submitChangeProgramme(selection: ChangeProgrammeSelectionInput): void {
+  submitChangeProgramme(selection: ChangeProgrammeSelection): void {
     if (this.changeProgrammeApplicantIds.length === 0) {
       this.notification.error(
         'Applicant record is required to change programme.',
@@ -561,7 +562,7 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
       .markAsAdmittedInternally({
         data: this.changeProgrammeApplicantIds.map((applicantId) => ({
           applicant_id: applicantId,
-          approved_department_id: normalizedSelection.approvedDepartmentId,
+          application_id: normalizedSelection.applicationId,
         })),
       })
       .subscribe({
@@ -604,23 +605,19 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     this.prepareChangeProgrammeOptions(currentProgramme);
   }
 
-  private buildProgrammeOptionsFromApplicants(): DepartmentOption[] {
+  private buildProgrammeOptionsFromApplicants(): ProgrammeOption[] {
     const seeded = this.applicationList
       .map((application) => {
-        if (
-          application.department &&
-          typeof application.department === 'object' &&
-          typeof application.department.id === 'number' &&
-          typeof application.department.name === 'string'
-        ) {
+        if (application.program?.id && application.program?.name) {
           return {
-            label: application.department.name,
-            value: application.department.id,
+            label: application.program.name,
+            value: application.program.id,
+            programmeName: application.program.name,
           };
         }
         return null;
       })
-      .filter((value): value is DepartmentOption => value !== null);
+      .filter((value): value is ProgrammeOption => value !== null);
 
     const merged = Array.from(
       new Map(seeded.map((option) => [option.value, option])).values(),
@@ -629,56 +626,53 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     return merged;
   }
 
-  private filterProgrammeOptions(currentProgramme: string): DepartmentOption[] {
+  private filterProgrammeOptions(currentProgramme: string): ProgrammeOption[] {
     const normalizedCurrent = (currentProgramme ?? '').trim().toLowerCase();
     const source =
-      this.departmentCatalog.length > 0
-        ? this.departmentCatalog
+      this.programmeCatalog.length > 0
+        ? this.programmeCatalog
         : this.buildProgrammeOptionsFromApplicants();
 
     return source.filter(
-      (value) => value.label.trim().toLowerCase() !== normalizedCurrent,
+      (value) => value.programmeName.trim().toLowerCase() !== normalizedCurrent,
     );
   }
 
   private prepareChangeProgrammeOptions(currentProgramme: string): void {
-    if (this.departmentCatalog.length > 0) {
+    if (this.programmeCatalog.length > 0) {
       this.applyChangeProgrammeOptions(currentProgramme);
       return;
     }
 
-    this.loadDepartmentCatalog(() =>
+    this.loadProgrammeCatalog(() =>
       this.applyChangeProgrammeOptions(currentProgramme),
     );
   }
 
   private applyChangeProgrammeOptions(currentProgramme: string): void {
     this.changeProgrammeOptions = this.filterProgrammeOptions(currentProgramme);
-    this.changeProgrammeOptionLabels = this.changeProgrammeOptions.map(
-      (option) => option.label,
-    );
     if (this.changeProgrammeOptions.length === 0) {
       this.notification.warn(
-        'No department options available for change programme.',
+        'No programme options available for change programme.',
       );
     }
     this.isChangeProgrammeModalVisible = true;
   }
 
-  private loadDepartmentCatalog(onLoaded?: () => void): void {
+  private loadProgrammeCatalog(onLoaded?: () => void): void {
     this.isLoadingProgrammeOptions = true;
-    this._applicationService.getDepartments().subscribe({
-      next: (response: unknown) => {
-        const parsedOptions = this.parseDepartmentOptions(response);
-        this.departmentCatalog =
+    this._applicationService.getAvailableApplications().subscribe({
+      next: (response) => {
+        const parsedOptions = this.parseProgrammeOptions(response.data ?? []);
+        this.programmeCatalog =
           parsedOptions.length > 0
             ? parsedOptions
             : this.buildProgrammeOptionsFromApplicants();
       },
       error: () => {
-        this.departmentCatalog = this.buildProgrammeOptionsFromApplicants();
+        this.programmeCatalog = this.buildProgrammeOptionsFromApplicants();
         this.notification.warn(
-          'Unable to load departments. Using available programme options.',
+          'Unable to load application programmes. Using available programme options.',
         );
       },
       complete: () => {
@@ -688,40 +682,28 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     });
   }
 
-  private parseDepartmentOptions(response: unknown): DepartmentOption[] {
-    const applicantOptions = this.buildProgrammeOptionsFromApplicants();
-    const applicantOptionMap = new Map(
-      applicantOptions.map((option) => [
-        option.label.trim().toLowerCase(),
-        option,
-      ]),
-    );
-    const collected = this.collectDepartmentEntries(response);
-    const normalizedOptions: DepartmentOption[] = [];
-
-    collected.forEach((entry) => {
-      if (
-        entry &&
-        typeof entry === 'object' &&
-        typeof entry['id'] === 'number' &&
-        typeof entry['name'] === 'string'
-      ) {
-        normalizedOptions.push({
-          label: entry['name'],
-          value: entry['id'],
-        });
-        return;
-      }
-
-      if (typeof entry === 'string') {
-        const matchedOption = applicantOptionMap.get(
-          entry.trim().toLowerCase(),
-        );
-        if (matchedOption) {
-          normalizedOptions.push(matchedOption);
+  private parseProgrammeOptions(
+    applications: ApplicationSetupItem[],
+  ): ProgrammeOption[] {
+    const normalizedOptions = applications
+      .map((item) => {
+        if (!item?.id || !item.program?.name) {
+          return null;
         }
-      }
-    });
+
+        const programmeName = item.program.name.trim();
+        const levelName = item.level?.name?.trim();
+        const label = levelName
+          ? `${programmeName} (${levelName})`
+          : programmeName;
+
+        return {
+          label,
+          value: item.id,
+          programmeName,
+        };
+      })
+      .filter((value): value is ProgrammeOption => value !== null);
 
     return Array.from(
       new Map(
@@ -730,48 +712,11 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     );
   }
 
-  private collectDepartmentEntries(
-    value: unknown,
-  ): (Record<string, unknown> | string)[] {
-    if (Array.isArray(value)) {
-      return value.flatMap((item) => this.collectDepartmentEntries(item));
-    }
-
-    if (typeof value === 'string') {
-      return [value];
-    }
-
-    if (!value || typeof value !== 'object') {
-      return [];
-    }
-
-    const maybeObject = value as Record<string, unknown>;
-    if (
-      typeof maybeObject['id'] === 'number' &&
-      typeof maybeObject['name'] === 'string'
-    ) {
-      return [maybeObject];
-    }
-
-    const nestedEntries: (Record<string, unknown> | string)[] = [];
-    if (Array.isArray(maybeObject['results'])) {
-      nestedEntries.push(
-        ...this.collectDepartmentEntries(maybeObject['results']),
-      );
-    }
-    if (Array.isArray(maybeObject['data'])) {
-      nestedEntries.push(...this.collectDepartmentEntries(maybeObject['data']));
-    }
-
-    return nestedEntries;
-  }
-
   private closeTransientOverlays(): void {
     this.isChangeProgrammeModalVisible = false;
     this.changeProgrammeApplicantId = null;
     this.changeProgrammeApplicantIds = [];
     this.changeProgrammeOptions = [];
-    this.changeProgrammeOptionLabels = [];
     this.isApplicantDrawerVisible = false;
     this.selectedApplicationNo = null;
   }
@@ -848,24 +793,13 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   }
 
   private normalizeChangeProgrammeSelection(
-    selection: ChangeProgrammeSelectionInput,
+    selection: ChangeProgrammeSelection,
   ): ChangeProgrammeSelection | null {
-    if (typeof selection !== 'string') {
-      return selection;
-    }
-
-    const option = this.changeProgrammeOptions.find(
-      (item) => item.label === selection,
-    );
-
-    if (!option) {
+    if (!selection?.applicationId || !selection.programmeName) {
       return null;
     }
 
-    return {
-      programmeName: option.label,
-      approvedDepartmentId: option.value,
-    };
+    return selection;
   }
 
   getDecisionActionTooltip(row: AdmissionTableRow): string {

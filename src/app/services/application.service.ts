@@ -20,6 +20,7 @@ export interface ApplicantActionPayload {
 export interface MarkAsAdmittedDataItem {
   applicant_id: number;
   approved_department_id?: number;
+  application_id?: number;
 }
 
 export interface MarkAsAdmittedPayload {
@@ -59,15 +60,48 @@ export interface BulkUpdateApplicantsPayload {
 export interface SetCutoffRequestPayload {
   min_jamb_score: number;
   min_post_utme_score: number;
-  application: string;
+  application: number | string;
   all_application: boolean;
 }
 
 export interface SetCutoffResponsePayload {
   min_jamb_score: number;
   min_post_utme_score: number;
-  application: string;
+  application: number | string | null;
   all_application: boolean;
+}
+
+export interface ApplicationSetupItem {
+  id: number;
+  code: string;
+  session?: {
+    id: number;
+    name: string;
+    start_date: string;
+    end_date: string;
+  } | null;
+  program?: {
+    id: number;
+    name: string;
+    code: string;
+  } | null;
+  level?: {
+    id: number;
+    name: string;
+    is_active: boolean;
+  } | null;
+  opens_at?: string | null;
+  closes_at?: string | null;
+}
+
+export interface ApplicationSetupListResponse {
+  data: ApplicationSetupItem[];
+  page_size: number;
+  current_page: number;
+  last_page: number;
+  total: number;
+  next_page_url: string | null;
+  prev_page_url: string | null;
 }
 
 @Injectable({
@@ -151,9 +185,9 @@ export class ApplicationService {
     return this.http.get<unknown>(url);
   }
 
-  getDepartments(): Observable<unknown> {
-    const url = `${this.apiRoot}/api/v1/setup/departments`;
-    return this.http.get<unknown>(url);
+  getAvailableApplications(): Observable<ApplicationSetupListResponse> {
+    const url = `${this.apiRoot}/api/v1/setup/applications`;
+    return this.http.get<ApplicationSetupListResponse>(url);
   }
 
   issueComplianceDirective(
