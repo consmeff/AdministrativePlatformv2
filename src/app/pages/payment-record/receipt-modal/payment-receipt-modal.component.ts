@@ -1,11 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  StatusIndicatorComponent,
+  StatusTone,
+} from '../../../widgets/status-indicator/status-indicator.component';
 import { TransactionRow } from '../payment-record.types';
 
 @Component({
   selector: 'app-payment-receipt-modal',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, StatusIndicatorComponent],
   templateUrl: './payment-receipt-modal.component.html',
   styleUrl: './payment-receipt-modal.component.scss',
 })
@@ -22,10 +26,6 @@ export class PaymentReceiptModalComponent {
     this.download.emit(this.transaction);
   }
 
-  getStatusClass(status: TransactionRow['status']): string {
-    return `status-${status}`;
-  }
-
   getStatusLabel(status: TransactionRow['status']): string {
     if (status === 'successful') {
       return 'Successful';
@@ -34,6 +34,16 @@ export class PaymentReceiptModalComponent {
       return 'Failed';
     }
     return 'Pending';
+  }
+
+  getStatusTone(status: TransactionRow['status']): StatusTone {
+    if (status === 'successful') {
+      return 'shortlisted';
+    }
+    if (status === 'failed') {
+      return 'rejected';
+    }
+    return 'pending';
   }
 
   formatAmount(amount: number): string {

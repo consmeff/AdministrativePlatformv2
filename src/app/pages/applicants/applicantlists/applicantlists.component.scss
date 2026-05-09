@@ -88,6 +88,16 @@
   overflow-x: auto;
 }
 
+.cell-primary {
+  color: #1a2f59;
+  font-weight: 600;
+}
+
+.cell-secondary {
+  color: #8fa0c0;
+  font-size: 13px;
+}
+
 .applicant-name {
   font-weight: 600;
   font-size: 12px;
@@ -102,6 +112,32 @@
   line-height: 150%;
   letter-spacing: 0%;
   color: var(--app-text-secondary);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+:host ::ng-deep .p-datatable th {
+  background: #fff;
+  border-bottom: 1px solid #ecf1fb;
+  color: #5f7398;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+:host ::ng-deep .p-datatable td {
+  background: #fff;
+  border-bottom: 1px solid #f0f4fb;
+  color: #20335f;
+  font-size: 14px;
+  vertical-align: top;
+}
+
+:host ::ng-deep .p-datatable td .status-indicator.pill {
+  font-size: 12px;
 }
 
 @media (max-width: 1200px) {

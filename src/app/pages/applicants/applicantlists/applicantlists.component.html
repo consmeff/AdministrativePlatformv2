@@ -106,8 +106,10 @@
             <p-tableCheckbox [value]="row" />
           </td>
           <td>
-            <div class="applicant-name">{{ row.full_name }}</div>
-            <div class="application-no">{{ row.application_no }}</div>
+            <div class="cell-primary applicant-name">{{ row.full_name }}</div>
+            <div class="cell-secondary application-no">
+              {{ row.application_no }}
+            </div>
           </td>
           <td>
             <app-status-indicator
@@ -117,9 +119,13 @@
               [text]="row.jamb_score"
             />
           </td>
-          <td>{{ row.o_level }}</td>
-          <td>{{ row.submission_date }}</td>
-          <td>{{ row.programme }}</td>
+          <td class="cell-primary">{{ row.o_level }}</td>
+          <td>
+            <div class="cell-primary">{{ row.submission_date }}</div>
+          </td>
+          <td>
+            <div class="cell-primary">{{ row.programme }}</div>
+          </td>
           <td>
             <app-status-indicator
               [text]="row.status_text"
@@ -127,13 +133,15 @@
             />
           </td>
           <td>
-            <app-table-row-actions
-              [disableCompliance]="row.status_text === 'Shortlisted'"
-              [disableShortlist]="row.status_text === 'Shortlisted'"
-              (view)="viewProfile(row)"
-              (shortlist)="shortlistSingle(row)"
-              (compliance)="openComplianceForSingle(row)"
-            />
+            <div class="action-buttons">
+              <app-table-row-actions
+                [disableCompliance]="row.status_text === 'Shortlisted'"
+                [disableShortlist]="row.status_text === 'Shortlisted'"
+                (view)="viewProfile(row)"
+                (shortlist)="shortlistSingle(row)"
+                (compliance)="openComplianceForSingle(row)"
+              />
+            </div>
           </td>
         </tr>
       </ng-template>
@@ -141,6 +149,7 @@
   </section>
 
   <app-pagination
+    [visible]="shouldShowPagination"
     [first]="first"
     [rows]="rows"
     [totalRecords]="total_record_count"

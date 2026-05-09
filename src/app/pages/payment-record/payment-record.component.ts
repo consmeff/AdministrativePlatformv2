@@ -18,6 +18,10 @@ import {
 import { BusyIndicatorService } from '../../services/busy-indicator.service';
 import { NotificationService } from '../../services/notification.service';
 import { PaymentService } from '../../services/payment.service';
+import {
+  StatusIndicatorComponent,
+  StatusTone,
+} from '../../widgets/status-indicator/status-indicator.component';
 import { PaymentReceiptModalComponent } from './receipt-modal/payment-receipt-modal.component';
 import { MetricCardComponent } from '../../widgets/metric-card/metric-card.component';
 import {
@@ -41,6 +45,7 @@ import {
     PaginatorModule,
     PaymentReceiptModalComponent,
     MetricCardComponent,
+    StatusIndicatorComponent,
   ],
   templateUrl: './payment-record.component.html',
   styleUrl: './payment-record.component.scss',
@@ -70,6 +75,8 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
   readonly rows = 10;
   first = 0;
   totalRecords = 0;
+  nextPageUrl: string | null = null;
+  prevPageUrl: string | null = null;
 
   allTransactions: TransactionRow[] = [];
   selectedTransaction: TransactionRow | null = null;
@@ -139,6 +146,10 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
     return this.allTransactions;
   }
 
+  get shouldShowPagination(): boolean {
+    return !!this.nextPageUrl || !!this.prevPageUrl;
+  }
+
   openTransactionDetails(transaction: TransactionRow): void {
     this.busyService.show();
     this.subscriptions.add(
@@ -180,6 +191,16 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
     return 'Pending';
   }
 
+  getStatusTone(status: PaymentStatus): StatusTone {
+    if (status === 'successful') {
+      return 'shortlisted';
+    }
+    if (status === 'failed') {
+      return 'rejected';
+    }
+    return 'pending';
+  }
+
   formatAmount(amount: number): string {
     return new Intl.NumberFormat('en-NG', {
       style: 'currency',
@@ -199,8 +220,10 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
       })
       .pipe(
         tap((response: PaymentsListResponseDto) => {
-          this.totalRecords = Number(response.count ?? 0);
-          this.allTransactions = (response.results ?? []).map((item, index) =>
+          this.totalRecords = Number(response.total ?? 0);
+          this.nextPageUrl = response.next_page_url ?? null;
+          this.prevPageUrl = response.prev_page_url ?? null;
+          this.allTransactions = (response.data ?? []).map((item, index) =>
             this.mapPaymentListItem(item, index),
           );
         }),
@@ -208,6 +231,8 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
           // this.notification.error('Unable to load payment records.');
           this.allTransactions = [];
           this.totalRecords = 0;
+          this.nextPageUrl = null;
+          this.prevPageUrl = null;
           return of(null);
         }),
         finalize(() => this.busyService.hide()),
@@ -219,16 +244,20 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
     index: number,
   ): TransactionRow {
     const date = this.parseDate(item.created_at);
+    const summaryApplicationNo = this.extractApplicationNo(item.summary);
     return {
       id: `${index + 1}`,
       dateText: this.formatDate(date),
       timeText: this.formatTime(date),
-      fullName: item.applicant_name ?? 'N/A',
-      applicationNo: item.applicant_no ?? 'N/A',
+      fullName: this.normalizeDisplayText(item.applicant_name),
+      applicationNo:
+        this.normalizeDisplayText(item.applicant_no, '') ||
+        summaryApplicationNo ||
+        'N/A',
       paymentTypeLabel: item.payment_type ?? 'N/A',
       referenceNo: item.ref_id ?? 'N/A',
       summary: item.summary,
-      programme: item.programme ?? 'N/A',
+      programme: this.normalizeDisplayText(item.programme),
       amount: this.toNumber(item.amount),
       amountPaid: this.toNumber(item.amount_paid),
       status: this.normalizeStatus(item.status),
@@ -258,25 +287,46 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
       timeText: this.formatTime(date),
       paymentDateTime: `${this.formatDate(date)}, ${this.formatTime(date)}`,
       createdAt: detail.created_at,
-      applicationNo: detail.applicant_no ?? base.applicationNo,
-      fullName: detail.applicant_name ?? base.fullName,
-      programme: detail.programme ?? base.programme,
-      email: detail.email ?? base.email,
-      phoneNumber: detail.phone_number ?? base.phoneNumber,
-      payerLevel: detail.level_of_study ?? base.payerLevel,
+      applicationNo:
+        this.normalizeDisplayText(detail.applicant_no, '') ||
+        this.extractApplicationNo(detail.summary) ||
+        base.applicationNo,
+      fullName:
+        this.normalizeDisplayText(detail.applicant_name, '') || base.fullName,
+      programme:
+        this.normalizeDisplayText(detail.programme, '') || base.programme,
+      email: this.normalizeDisplayText(detail.email, '') || base.email,
+      phoneNumber:
+        this.normalizeDisplayText(detail.phone_number, '') || base.phoneNumber,
+      payerLevel:
+        this.normalizeDisplayText(detail.level_of_study, '') || base.payerLevel,
       paymentType: this.normalizePaymentType(detail.payment_type),
     };
   }
 
   private normalizeStatus(status: string): PaymentStatus {
     const value = (status ?? '').trim().toLowerCase();
-    if (value.includes('success')) {
+    if (value.includes('success') || value.includes('paid')) {
       return 'successful';
     }
     if (value.includes('fail')) {
       return 'failed';
     }
     return 'pending';
+  }
+
+  private normalizeDisplayText(
+    value: string | null | undefined,
+    fallback = 'N/A',
+  ): string {
+    const normalized = (value ?? '').trim();
+    return normalized.length > 0 ? normalized : fallback;
+  }
+
+  private extractApplicationNo(summary: string | null | undefined): string {
+    const normalizedSummary = (summary ?? '').trim();
+    const match = normalizedSummary.match(/#([A-Z0-9/.-]+)/i);
+    return match?.[1] ?? '';
   }
 
   private normalizePaymentType(value: string): PaymentType {

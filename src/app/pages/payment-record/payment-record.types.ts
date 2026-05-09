@@ -34,34 +34,37 @@ export interface PaymentsListItemDto {
   ref_id: string;
   payment_type: string;
   amount: number | string;
-  amount_paid: number | string;
+  amount_paid: number | string | null;
   status: string;
   summary: string;
   created_at: string;
-  applicant_no: string;
-  applicant_name: string;
-  programme: string;
+  applicant_no: string | null;
+  applicant_name: string | null;
+  programme?: string | null;
 }
 
 export interface PaymentsListResponseDto {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: PaymentsListItemDto[];
+  page_size: number;
+  current_page: number;
+  last_page: number;
+  total: number;
+  next_page_url: string | null;
+  prev_page_url: string | null;
+  data: PaymentsListItemDto[];
 }
 
 export interface PaymentDetailDto {
   ref_id: string;
   payment_type: string;
-  amount: number | string;
-  amount_paid: number | string;
+  amount: number | string | null;
+  amount_paid: number | string | null;
   status: string;
   summary: string;
   created_at: string;
-  applicant_no: string;
-  applicant_name: string;
-  programme: string;
-  email: string;
-  phone_number: string;
-  level_of_study: string;
+  applicant_no?: string | null;
+  applicant_name?: string | null;
+  programme?: string | null;
+  email?: string | null;
+  phone_number?: string | null;
+  level_of_study?: string | null;
 }

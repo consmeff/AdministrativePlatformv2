@@ -12,19 +12,24 @@ import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
 import { DialogModule } from 'primeng/dialog';
 import { SelectModule } from 'primeng/select';
-import { ApplicationService } from '../../../services/application.service';
+import {
+  ApplicationService,
+  ApplicationSetupItem,
+} from '../../../services/application.service';
 import { ButtonComponent } from '../../../widgets/button/button.component';
 import { NotificationService } from '../../../services/notification.service';
 
 interface OptionItem {
   label: string;
-  value: string;
+  value: number | 'all';
+  programmeName?: string;
 }
 
 export interface SetCutoffPayload {
   minimumCbtScore?: number;
   minimumJambScore?: number;
-  programme?: string;
+  applicationId?: number;
+  programmeLabel?: string;
 }
 
 @Component({
@@ -43,6 +48,10 @@ export interface SetCutoffPayload {
 export class SetCutoffModalComponent implements OnChanges {
   private readonly applicationService = inject(ApplicationService);
   private readonly notification = inject(NotificationService);
+  private readonly allProgrammesOption: OptionItem = {
+    label: 'All Programmes',
+    value: 'all',
+  };
 
   @Input() visible = false;
   @Input() loading = false;
@@ -50,22 +59,40 @@ export class SetCutoffModalComponent implements OnChanges {
   @Output() closed = new EventEmitter<void>();
   @Output() saved = new EventEmitter<SetCutoffPayload>();
 
-  readonly programmeOptions: OptionItem[] = [
-    { label: 'All Programmes', value: 'all' },
-    { label: 'Nursing', value: 'Nursing' },
-    { label: 'Midwifery', value: 'Midwifery' },
-    { label: 'Public Health', value: 'Public Health' },
-  ];
+  programmeOptions: OptionItem[] = [this.allProgrammesOption];
 
   selectedProgramme: OptionItem = this.programmeOptions[0];
   minimumCbtScore: number | null = null;
   minimumJambScore: number | null = null;
   isLoadingExistingCutoff = false;
+  isLoadingProgrammeOptions = false;
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visible']?.currentValue === true) {
-      this.loadExistingCutoff();
+      this.loadProgrammeOptions();
     }
+  }
+
+  private loadProgrammeOptions(): void {
+    this.isLoadingProgrammeOptions = true;
+    this.applicationService.getAvailableApplications().subscribe({
+      next: (response) => {
+        const options = (response.data ?? [])
+          .map((item) => this.toProgrammeOption(item))
+          .filter((item): item is OptionItem => item !== null);
+        this.programmeOptions = [this.allProgrammesOption, ...options];
+      },
+      error: () => {
+        this.programmeOptions = [this.allProgrammesOption];
+        this.notification.warn(
+          'Unable to load programme options. You can still set cutoff for all programmes.',
+        );
+      },
+      complete: () => {
+        this.isLoadingProgrammeOptions = false;
+        this.loadExistingCutoff();
+      },
+    });
   }
 
   private loadExistingCutoff(): void {
@@ -81,14 +108,10 @@ export class SetCutoffModalComponent implements OnChanges {
         next: (cutoff) => {
           this.minimumJambScore = cutoff.min_jamb_score ?? null;
           this.minimumCbtScore = cutoff.min_post_utme_score ?? null;
-          const desiredProgramme = cutoff.all_application
-            ? 'all'
-            : (cutoff.application ?? '').trim().toLowerCase();
-          this.selectedProgramme =
-            this.programmeOptions.find(
-              (option) =>
-                option.value.trim().toLowerCase() === desiredProgramme,
-            ) ?? this.programmeOptions[0];
+          this.selectedProgramme = this.resolveSelectedProgramme(
+            cutoff.application,
+            cutoff.all_application,
+          );
         },
         error: () => {
           this.minimumJambScore = null;
@@ -101,8 +124,46 @@ export class SetCutoffModalComponent implements OnChanges {
       });
   }
 
+  private resolveSelectedProgramme(
+    application: number | string | null,
+    allApplication: boolean,
+  ): OptionItem {
+    if (allApplication) {
+      return this.allProgrammesOption;
+    }
+
+    const normalizedValue = `${application ?? ''}`.trim().toLowerCase();
+    return (
+      this.programmeOptions.find(
+        (option) =>
+          `${option.value}`.trim().toLowerCase() === normalizedValue ||
+          option.label.trim().toLowerCase() === normalizedValue,
+      ) ?? this.allProgrammesOption
+    );
+  }
+
+  private toProgrammeOption(item: ApplicationSetupItem): OptionItem | null {
+    if (!item?.id || !item.program?.name) {
+      return null;
+    }
+
+    const programmeName = item.program.name.trim();
+    const levelName = item.level?.name?.trim();
+    const label = levelName ? `${programmeName} (${levelName})` : programmeName;
+
+    return {
+      label,
+      value: item.id,
+      programmeName,
+    };
+  }
+
   isBusy(): boolean {
-    return this.loading || this.isLoadingExistingCutoff;
+    return (
+      this.loading ||
+      this.isLoadingExistingCutoff ||
+      this.isLoadingProgrammeOptions
+    );
   }
 
   onClose(): void {
@@ -119,10 +180,14 @@ export class SetCutoffModalComponent implements OnChanges {
     this.saved.emit({
       minimumCbtScore: this.minimumCbtScore ?? undefined,
       minimumJambScore: this.minimumJambScore ?? undefined,
-      programme:
+      applicationId:
         this.selectedProgramme.value === 'all'
           ? undefined
           : this.selectedProgramme.value,
+      programmeLabel:
+        this.selectedProgramme.value === 'all'
+          ? 'All Programmes'
+          : this.selectedProgramme.label,
     });
   }
 }

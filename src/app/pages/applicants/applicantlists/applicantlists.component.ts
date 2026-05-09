@@ -179,6 +179,8 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   total_record_count = 0;
   first = 0;
   rows = 10;
+  nextPageUrl: string | null = null;
+  prevPageUrl: string | null = null;
   searchText = '';
   searchKeyword: string | undefined = undefined;
 
@@ -256,6 +258,8 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
       )
       .subscribe((data: ApplicationListResponse) => {
         this.total_record_count = data.total;
+        this.nextPageUrl = data.next_page_url ?? null;
+        this.prevPageUrl = data.prev_page_url ?? null;
         this.applicationList = data.data;
         this.populateSummary();
         this.applyLocalFilters();
@@ -285,6 +289,10 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
     this.first = event.first ?? 0;
     this.rows = event.rows ?? this.rows;
     this.fetchRecords();
+  }
+
+  get shouldShowPagination(): boolean {
+    return !!this.nextPageUrl || !!this.prevPageUrl;
   }
 
   private populateSummary() {

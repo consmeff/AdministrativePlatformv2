@@ -303,12 +303,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .setApplicationCutoff({
         min_jamb_score: payload.minimumJambScore,
         min_post_utme_score: payload.minimumCbtScore,
-        application: payload.programme ?? '',
-        all_application: !payload.programme,
+        application: payload.applicationId ?? '',
+        all_application: payload.applicationId === undefined,
       })
       .subscribe({
         next: () => {
-          const programmeText = payload.programme ?? 'all applications';
+          const programmeText = payload.programmeLabel ?? 'all applications';
           this.notification.success(
             `Cutoff saved for ${programmeText} successfully.`,
           );

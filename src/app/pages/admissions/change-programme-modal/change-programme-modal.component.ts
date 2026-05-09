@@ -15,9 +15,8 @@ import { ButtonComponent } from '../../../widgets/button/button.component';
 interface ProgrammeOption {
   label: string;
   value: number;
+  programmeName?: string;
 }
-
-type ProgrammeInputOption = string | ProgrammeOption;
 
 @Component({
   selector: 'app-change-programme-modal',
@@ -36,43 +35,31 @@ export class ChangeProgrammeModalComponent implements OnChanges {
   @Input() visible = false;
   @Input() loading = false;
   @Input() currentProgramme = 'N/A';
-  @Input() programmeOptions: ProgrammeInputOption[] = [];
+  @Input() programmeOptions: ProgrammeOption[] = [];
 
   @Output() closed = new EventEmitter<void>();
   @Output()
   changed = new EventEmitter<{
     programmeName: string;
-    approvedDepartmentId: number;
+    applicationId: number;
   }>();
 
   selectedProgramme: ProgrammeOption | null = null;
 
-  get mappedProgrammeOptions(): ProgrammeOption[] {
-    return this.programmeOptions
-      .map((option) => {
-        if (typeof option === 'string') {
-          return { label: option, value: 0 };
-        }
-        return option;
-      })
-      .filter((option) => typeof option.value === 'number');
-  }
-
   ngOnChanges(changes: SimpleChanges): void {
     if (
       (changes['programmeOptions'] || changes['visible']) &&
-      this.mappedProgrammeOptions.length > 0
+      this.programmeOptions.length > 0
     ) {
       this.selectedProgramme =
-        this.mappedProgrammeOptions.find(
-          (option) => option.label !== this.currentProgramme,
-        ) ?? this.mappedProgrammeOptions[0];
+        this.programmeOptions.find(
+          (option) =>
+            (option.programmeName ?? option.label).trim().toLowerCase() !==
+            this.currentProgramme.trim().toLowerCase(),
+        ) ?? this.programmeOptions[0];
       return;
     }
-    if (
-      changes['programmeOptions'] &&
-      this.mappedProgrammeOptions.length === 0
-    ) {
+    if (changes['programmeOptions'] && this.programmeOptions.length === 0) {
       this.selectedProgramme = null;
     }
   }
@@ -86,8 +73,9 @@ export class ChangeProgrammeModalComponent implements OnChanges {
       return;
     }
     this.changed.emit({
-      programmeName: this.selectedProgramme.label,
-      approvedDepartmentId: this.selectedProgramme.value,
+      programmeName:
+        this.selectedProgramme.programmeName ?? this.selectedProgramme.label,
+      applicationId: this.selectedProgramme.value,
     });
   }
 }
