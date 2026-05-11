@@ -165,7 +165,7 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   activeCardFilter: AdmissionDecisionFilter = 'all';
   readonly filterCards: AdmissionFilterCard[] = [
     { label: 'All Candidates', filter: 'all' },
-    { label: 'Pending Review', filter: 'pending-review' },
+    { label: 'Shortlisted', filter: 'pending-review' },
     { label: 'Pending Publish', filter: 'pending-publish' },
     { label: 'Admitted Candidates', filter: 'admitted' },
   ];
@@ -371,19 +371,27 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     category: AdmissionDecisionFilter;
   } {
     const value = (status ?? '').toLowerCase();
-    if (value.includes('admit') || value.includes('approved')) {
-      return { text: 'Admitted', tone: 'shortlisted', category: 'admitted' };
-    }
     if (
-      value.includes('publish') ||
-      value.includes('shortlist') ||
-      value.includes('pending publish')
+      value.includes('admitted internally') ||
+      value.includes('admit internally') ||
+      value.includes('pending publish') ||
+      value.includes('publish')
     ) {
       return {
         text: 'Pending Publish',
         tone: 'resubmitted',
         category: 'pending-publish',
       };
+    }
+    if (value.includes('shortlist')) {
+      return {
+        text: 'Shortlisted',
+        tone: 'shortlisted',
+        category: 'pending-review',
+      };
+    }
+    if (value.includes('admit') || value.includes('approved')) {
+      return { text: 'Admitted', tone: 'shortlisted', category: 'admitted' };
     }
     if (value.includes('reject')) {
       return { text: 'Rejected', tone: 'rejected', category: 'pending-review' };
@@ -419,14 +427,17 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   private getApprovalStatusForCardFilter(
     filter: AdmissionDecisionFilter,
   ): string | undefined {
+    if (filter === 'all') {
+      return undefined;
+    }
     if (filter === 'pending-review') {
-      return 'Pending';
+      return 'shortlisted';
     }
     if (filter === 'pending-publish') {
-      return 'Shortlisted';
+      return 'admitted_internally';
     }
     if (filter === 'admitted') {
-      return 'Approved';
+      return 'admitted';
     }
     return undefined;
   }
