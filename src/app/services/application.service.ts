@@ -27,6 +27,14 @@ export interface MarkAsAdmittedPayload {
   data: MarkAsAdmittedDataItem[];
 }
 
+export interface ApproveApplicantsDataItem {
+  applicant_id: number;
+}
+
+export interface ApproveApplicantsPayload {
+  data: ApproveApplicantsDataItem[];
+}
+
 export interface RejectApplicantPayload extends ApplicantActionPayload {
   extra_note: string;
 }
@@ -232,6 +240,11 @@ export class ApplicationService {
     payload: MarkAsAdmittedPayload,
   ): Observable<unknown> {
     const url = `${this.apiRoot}/api/v1/applicants/mark-as-admitted-internally`;
+    return this.http.post(url, payload);
+  }
+
+  approveApplicants(payload: ApproveApplicantsPayload): Observable<unknown> {
+    const url = `${this.apiRoot}/api/v1/applicants/approve-applicants`;
     return this.http.post(url, payload);
   }
 
