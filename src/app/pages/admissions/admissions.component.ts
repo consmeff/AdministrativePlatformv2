@@ -805,14 +805,17 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     }
 
     this.performApplicantAction(
-      this._applicationService.markAsAdmittedInternally({
-        data: publishableRows.map((row) => ({ applicant_id: row.id })),
+      this._applicationService.approveApplicants({
+        data: publishableRows.map((row) => ({
+          applicant_id: row.id,
+        })),
       }),
       this.buildBulkSuccessMessage(
         'Admission published',
         publishableRows.length,
         'candidate',
       ),
+      true,
     );
   }
 
@@ -895,12 +898,16 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   private performApplicantAction(
     request: Observable<unknown>,
     successMessage: string,
+    refreshMetrics = false,
   ) {
     this.busyService.show();
     request.subscribe({
       next: () => {
         this.notification.success(successMessage);
         this.selectedRows = [];
+        if (refreshMetrics) {
+          this.loadCardMetrics();
+        }
         this.fetchRecords().subscribe((data: ApplicationListResponse) => {
           this.total_record_count = data.total;
           this.nextPageUrl = data.next_page_url ?? null;
