@@ -10,12 +10,12 @@ import { appstatus, Column } from '../../model/page.dto';
 import { DrawerModule } from 'primeng/drawer';
 import { TableModule } from 'primeng/table';
 import {
+  AdmissionAdminDashboardResponse,
   ApplicationService,
   ApplicationSetupItem,
   GetApplicantsQuery,
 } from '../../services/application.service';
 import { Router } from '@angular/router';
-import { AdminDashboardMetrics } from '../../model/dashboard/admin-dashboard.dto';
 import {
   Application,
   ApplicationListResponse,
@@ -169,18 +169,12 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     { label: 'Pending Publish', filter: 'pending-publish' },
     { label: 'Admitted Candidates', filter: 'admitted' },
   ];
-  metrics: AdminDashboardMetrics = {
+  metrics: AdmissionAdminDashboardResponse = {
     total_applicants: 0,
-    top_5_courses: [],
-    approval_status_breakdown: {
-      total_pending: 0,
-      total_rejected: 0,
-      total_shortlisted: 0,
-      total_approved: 0,
-      total_admitted: 0,
-      total_compliance_required: 0,
-    },
-    payment_status_counts: [],
+    total_pending: 0,
+    pending_publish: 0,
+    total_approved: 0,
+    total_admitted: 0,
   };
   private searchTextChanged = new Subject<string>();
   searchKeyword: string | undefined = undefined;
@@ -438,19 +432,19 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   }
 
   getCardCount(filter: AdmissionDecisionFilter): number {
-    const breakdown = this.metrics.approval_status_breakdown;
+    const metrics = this.metrics;
 
     if (filter === 'all') {
-      return this.metrics.total_applicants || this.total_record_count;
+      return metrics.total_applicants || this.total_record_count;
     }
     if (filter === 'pending-review') {
-      return breakdown.total_pending ?? 0;
+      return metrics.total_pending ?? 0;
     }
     if (filter === 'pending-publish') {
-      return breakdown.total_shortlisted ?? 0;
+      return metrics.pending_publish ?? 0;
     }
     if (filter === 'admitted') {
-      return breakdown.total_admitted ?? 0;
+      return metrics.total_admitted ?? 0;
     }
     return 0;
   }
@@ -944,7 +938,7 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   }
 
   private loadCardMetrics(): void {
-    this._applicationService.getAdminDashboardMetrics().subscribe({
+    this._applicationService.getAdmissionAdminDashboard().subscribe({
       next: (metrics) => {
         this.metrics = metrics;
       },

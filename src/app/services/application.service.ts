@@ -104,6 +104,22 @@ export interface ApplicationSetupListResponse {
   prev_page_url: string | null;
 }
 
+export interface AdmissionAdminDashboardResponse {
+  total_applicants: number;
+  total_pending: number;
+  pending_publish: number;
+  total_approved: number;
+  total_admitted: number;
+}
+
+export interface ApplicationAdminDashboardResponse {
+  total_applicants: number;
+  total_pending: number;
+  total_shortlisted: number;
+  total_compliance_required: number;
+  total_resubmitted: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -178,6 +194,16 @@ export class ApplicationService {
   getAdminDashboardMetrics(): Observable<AdminDashboardMetrics> {
     const url = `${this.apiRoot}/api/v1/applicants/admin-dashboard`;
     return this.http.get<AdminDashboardMetrics>(url);
+  }
+
+  getAdmissionAdminDashboard(): Observable<AdmissionAdminDashboardResponse> {
+    const url = `${this.apiRoot}/api/v1/applicants/admission-admin-dashboard`;
+    return this.http.get<AdmissionAdminDashboardResponse>(url);
+  }
+
+  getApplicationAdminDashboard(): Observable<ApplicationAdminDashboardResponse> {
+    const url = `${this.apiRoot}/api/v1/applicants/application-admin-dashboard`;
+    return this.http.get<ApplicationAdminDashboardResponse>(url);
   }
 
   getCbtResultsUploaded(): Observable<unknown> {

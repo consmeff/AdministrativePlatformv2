@@ -10,7 +10,6 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
 import { DrawerModule } from 'primeng/drawer';
 import { TableModule } from 'primeng/table';
 import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
-import { AdminDashboardMetrics } from '../../../model/dashboard/admin-dashboard.dto';
 import {
   Application,
   ApplicationListResponse,
@@ -18,6 +17,7 @@ import {
 import { ActionModalPayload } from '../../../widgets/action-note-modal/action-note-modal.component';
 import {
   ApplicationService,
+  ApplicationAdminDashboardResponse,
   ComplianceDirectivePayload,
   ExportApplicantsPayload,
   GetApplicantsQuery,
@@ -159,18 +159,12 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
     { label: 'Resubmitted', filter: 'resubmitted' },
   ];
 
-  metrics: AdminDashboardMetrics = {
+  metrics: ApplicationAdminDashboardResponse = {
     total_applicants: 0,
-    top_5_courses: [],
-    approval_status_breakdown: {
-      total_pending: 0,
-      total_rejected: 0,
-      total_shortlisted: 0,
-      total_approved: 0,
-      total_admitted: 0,
-      total_compliance_required: 0,
-    },
-    payment_status_counts: [],
+    total_pending: 0,
+    total_shortlisted: 0,
+    total_compliance_required: 0,
+    total_resubmitted: 0,
   };
 
   applicationList: Application[] = [];
@@ -208,9 +202,11 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   ];
 
   ngOnInit(): void {
-    this.applicationService.getAdminDashboardMetrics().subscribe((metrics) => {
-      this.metrics = metrics;
-    });
+    this.applicationService
+      .getApplicationAdminDashboard()
+      .subscribe((metrics) => {
+        this.metrics = metrics;
+      });
 
     this.route.queryParamMap
       .pipe(takeUntil(this.destroy$))
@@ -339,10 +335,21 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   }
 
   getCardCount(filter: ApplicantCardFilter): number {
+    const metrics = this.metrics;
+
     if (filter === 'all') {
-      return this.metrics.total_applicants || this.total_record_count;
+      return metrics.total_applicants || this.total_record_count;
     }
-    return this.appRows.filter((row) => row.status_tone === filter).length;
+    if (filter === 'pending') {
+      return metrics.total_pending ?? 0;
+    }
+    if (filter === 'shortlisted') {
+      return metrics.total_shortlisted ?? 0;
+    }
+    if (filter === 'directive') {
+      return metrics.total_compliance_required ?? 0;
+    }
+    return metrics.total_resubmitted ?? 0;
   }
 
   private getCardFilterFromStatus(value: string): ApplicantCardFilter {
