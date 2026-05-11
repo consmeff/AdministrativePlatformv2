@@ -10,12 +10,12 @@ import { appstatus, Column } from '../../model/page.dto';
 import { DrawerModule } from 'primeng/drawer';
 import { TableModule } from 'primeng/table';
 import {
+  AdmissionAdminDashboardResponse,
   ApplicationService,
   ApplicationSetupItem,
   GetApplicantsQuery,
 } from '../../services/application.service';
 import { Router } from '@angular/router';
-import { AdminDashboardMetrics } from '../../model/dashboard/admin-dashboard.dto';
 import {
   Application,
   ApplicationListResponse,
@@ -165,22 +165,16 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   activeCardFilter: AdmissionDecisionFilter = 'all';
   readonly filterCards: AdmissionFilterCard[] = [
     { label: 'All Candidates', filter: 'all' },
-    { label: 'Pending Review', filter: 'pending-review' },
+    { label: 'Shortlisted', filter: 'pending-review' },
     { label: 'Pending Publish', filter: 'pending-publish' },
     { label: 'Admitted Candidates', filter: 'admitted' },
   ];
-  metrics: AdminDashboardMetrics = {
+  metrics: AdmissionAdminDashboardResponse = {
     total_applicants: 0,
-    top_5_courses: [],
-    approval_status_breakdown: {
-      total_pending: 0,
-      total_rejected: 0,
-      total_shortlisted: 0,
-      total_approved: 0,
-      total_admitted: 0,
-      total_compliance_required: 0,
-    },
-    payment_status_counts: [],
+    total_pending: 0,
+    pending_publish: 0,
+    total_approved: 0,
+    total_admitted: 0,
   };
   private searchTextChanged = new Subject<string>();
   searchKeyword: string | undefined = undefined;
@@ -377,19 +371,27 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     category: AdmissionDecisionFilter;
   } {
     const value = (status ?? '').toLowerCase();
-    if (value.includes('admit') || value.includes('approved')) {
-      return { text: 'Admitted', tone: 'shortlisted', category: 'admitted' };
-    }
     if (
-      value.includes('publish') ||
-      value.includes('shortlist') ||
-      value.includes('pending publish')
+      value.includes('admitted internally') ||
+      value.includes('admit internally') ||
+      value.includes('pending publish') ||
+      value.includes('publish')
     ) {
       return {
         text: 'Pending Publish',
         tone: 'resubmitted',
         category: 'pending-publish',
       };
+    }
+    if (value.includes('shortlist')) {
+      return {
+        text: 'Shortlisted',
+        tone: 'shortlisted',
+        category: 'pending-review',
+      };
+    }
+    if (value.includes('admit') || value.includes('approved')) {
+      return { text: 'Admitted', tone: 'shortlisted', category: 'admitted' };
     }
     if (value.includes('reject')) {
       return { text: 'Rejected', tone: 'rejected', category: 'pending-review' };
@@ -425,32 +427,35 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   private getApprovalStatusForCardFilter(
     filter: AdmissionDecisionFilter,
   ): string | undefined {
+    if (filter === 'all') {
+      return undefined;
+    }
     if (filter === 'pending-review') {
-      return 'Pending';
+      return 'shortlisted';
     }
     if (filter === 'pending-publish') {
-      return 'Shortlisted';
+      return 'admitted_internally';
     }
     if (filter === 'admitted') {
-      return 'Approved';
+      return 'admitted';
     }
     return undefined;
   }
 
   getCardCount(filter: AdmissionDecisionFilter): number {
-    const breakdown = this.metrics.approval_status_breakdown;
+    const metrics = this.metrics;
 
     if (filter === 'all') {
-      return this.metrics.total_applicants || this.total_record_count;
+      return metrics.total_applicants || this.total_record_count;
     }
     if (filter === 'pending-review') {
-      return breakdown.total_pending ?? 0;
+      return metrics.total_pending ?? 0;
     }
     if (filter === 'pending-publish') {
-      return breakdown.total_shortlisted ?? 0;
+      return metrics.pending_publish ?? 0;
     }
     if (filter === 'admitted') {
-      return breakdown.total_admitted ?? 0;
+      return metrics.total_admitted ?? 0;
     }
     return 0;
   }
@@ -944,7 +949,7 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   }
 
   private loadCardMetrics(): void {
-    this._applicationService.getAdminDashboardMetrics().subscribe({
+    this._applicationService.getAdmissionAdminDashboard().subscribe({
       next: (metrics) => {
         this.metrics = metrics;
       },
