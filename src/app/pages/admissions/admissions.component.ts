@@ -12,8 +12,10 @@ import { TableModule } from 'primeng/table';
 import {
   ApplicationService,
   ApplicationSetupItem,
+  GetApplicantsQuery,
 } from '../../services/application.service';
 import { Router } from '@angular/router';
+import { AdminDashboardMetrics } from '../../model/dashboard/admin-dashboard.dto';
 import {
   Application,
   ApplicationListResponse,
@@ -167,6 +169,19 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     { label: 'Pending Publish', filter: 'pending-publish' },
     { label: 'Admitted Candidates', filter: 'admitted' },
   ];
+  metrics: AdminDashboardMetrics = {
+    total_applicants: 0,
+    top_5_courses: [],
+    approval_status_breakdown: {
+      total_pending: 0,
+      total_rejected: 0,
+      total_shortlisted: 0,
+      total_approved: 0,
+      total_admitted: 0,
+      total_compliance_required: 0,
+    },
+    payment_status_counts: [],
+  };
   private searchTextChanged = new Subject<string>();
   searchKeyword: string | undefined = undefined;
 
@@ -198,6 +213,7 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.checkCbtUploadStatus();
     this.loadProgrammeCatalog();
+    this.loadCardMetrics();
     this.approval_status = [
       { name: 'All', code: 0 },
       { name: 'Pending', code: 1 },
@@ -287,14 +303,20 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     sortField?: string,
     sortOrder?: number,
   ): Observable<ApplicationListResponse> {
+    const query: GetApplicantsQuery = {
+      search: this.searchKeyword,
+      approval_status: this.getApprovalStatusForCardFilter(
+        this.activeCardFilter,
+      ),
+    };
+
     return this._applicationService.getapplications(
-      this.searchKeyword, // Search keyword
-      // Filters (if applicable)
-      this.rows, // Rows per page
-      // Include additional data (if needed)
-      this.first + 1, // First record index
-      sortField, // Field to sort by
-      sortOrder, // Sort order (1 for ascending, -1 for descending)
+      undefined,
+      this.rows,
+      this.first + 1,
+      sortField,
+      sortOrder,
+      query,
     );
   }
 
@@ -381,7 +403,9 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
 
   setCardFilter(filter: AdmissionDecisionFilter) {
     this.activeCardFilter = filter;
-    this.applyCardFilter();
+    this.first = 0;
+    this.selectedRows = [];
+    this.loadAdmissionsRecords();
   }
 
   private applyCardFilter() {
@@ -398,12 +422,37 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     return this.activeCardFilter === filter;
   }
 
-  getCardCount(filter: AdmissionDecisionFilter): number {
-    if (filter === 'all') {
-      return this.total_record_count || this.app_summ.length;
+  private getApprovalStatusForCardFilter(
+    filter: AdmissionDecisionFilter,
+  ): string | undefined {
+    if (filter === 'pending-review') {
+      return 'Pending';
     }
-    return this.app_summ.filter((row) => row.decision_category === filter)
-      .length;
+    if (filter === 'pending-publish') {
+      return 'Shortlisted';
+    }
+    if (filter === 'admitted') {
+      return 'Approved';
+    }
+    return undefined;
+  }
+
+  getCardCount(filter: AdmissionDecisionFilter): number {
+    const breakdown = this.metrics.approval_status_breakdown;
+
+    if (filter === 'all') {
+      return this.metrics.total_applicants || this.total_record_count;
+    }
+    if (filter === 'pending-review') {
+      return breakdown.total_pending ?? 0;
+    }
+    if (filter === 'pending-publish') {
+      return breakdown.total_shortlisted ?? 0;
+    }
+    if (filter === 'admitted') {
+      return breakdown.total_admitted ?? 0;
+    }
+    return 0;
   }
 
   viewProfile(row: AdmissionTableRow) {
@@ -891,6 +940,14 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
       this.applicationList = data.data;
       this.populateSummary();
       this.busyService.hide();
+    });
+  }
+
+  private loadCardMetrics(): void {
+    this._applicationService.getAdminDashboardMetrics().subscribe({
+      next: (metrics) => {
+        this.metrics = metrics;
+      },
     });
   }
 

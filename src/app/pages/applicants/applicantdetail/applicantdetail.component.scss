@@ -282,7 +282,17 @@ table td:last-child {
   cursor: not-allowed;
 }
 
-.action div:hover {
+.document-action-btn {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.document-action-btn:hover {
   cursor: pointer;
 }
 
