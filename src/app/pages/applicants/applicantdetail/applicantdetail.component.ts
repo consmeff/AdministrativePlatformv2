@@ -31,6 +31,15 @@ import { Observable } from 'rxjs';
 import { ActionNoteModalComponent } from '../../../widgets/action-note-modal/action-note-modal.component';
 import { ButtonComponent } from '../../../widgets/button/button.component';
 
+type ApplicantDocumentFile =
+  | Certificate
+  | {
+      file_url: string;
+      file_name: string;
+      file_size: number;
+      file_type: string;
+    };
+
 @Component({
   selector: 'app-applicantdetail',
   imports: [
@@ -281,18 +290,7 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
     return text || input; // Fallback to original if empty
   }
 
-  getfileName(
-    fileobj:
-      | Certificate
-      | {
-          file_url: string;
-          file_name: string;
-          file_size: number;
-          file_type: string;
-        }
-      | null
-      | undefined,
-  ): string {
+  getfileName(fileobj: ApplicantDocumentFile | null | undefined): string {
     let extension = '';
 
     if (!fileobj) return '';
@@ -334,16 +332,48 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
   }
 
   getDocumentFile(row: Record<string, unknown>) {
-    const file = row['file'] as
-      | Certificate
-      | {
-          file_url: string;
-          file_name: string;
-          file_size: number;
-          file_type: string;
-        }
-      | undefined;
+    const file = row['file'] as ApplicantDocumentFile | undefined;
     return file ?? null;
+  }
+
+  viewDocument(row: Record<string, unknown>): void {
+    const file = this.getDocumentFile(row);
+    const fileUrl = this.getDocumentUrl(file);
+
+    if (!fileUrl) {
+      this.notification.warn('This document is not available to view.');
+      return;
+    }
+
+    const openedWindow = window.open(fileUrl, '_blank', 'noopener,noreferrer');
+    if (!openedWindow) {
+      this.notification.warn('Unable to open this document right now.');
+    }
+  }
+
+  downloadDocument(row: Record<string, unknown>): void {
+    const file = this.getDocumentFile(row);
+    const fileUrl = this.getDocumentUrl(file);
+
+    if (!fileUrl) {
+      this.notification.warn('This document is not available for download.');
+      return;
+    }
+
+    const link = document.createElement('a');
+    link.href = fileUrl;
+    link.download = this.getfileName(file) || 'document';
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  private getDocumentUrl(
+    file: ApplicantDocumentFile | null | undefined,
+  ): string {
+    return file?.file_url?.trim() ?? '';
   }
 
   issueComplianceDirective() {

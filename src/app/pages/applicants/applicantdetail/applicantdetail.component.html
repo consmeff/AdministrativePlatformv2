@@ -143,10 +143,20 @@
                     </td>
                     <td>
                       <div class="d-flex flex-row action justify-content-end">
-                        <div>View <i class="bi bi-eye"></i></div>
-                        <div class="mx-3">
+                        <button
+                          type="button"
+                          class="document-action-btn"
+                          (click)="viewDocument(rowData)"
+                        >
+                          View <i class="bi bi-eye"></i>
+                        </button>
+                        <button
+                          type="button"
+                          class="document-action-btn mx-3"
+                          (click)="downloadDocument(rowData)"
+                        >
                           Download <i class="bi bi-download"></i>
-                        </div>
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -369,10 +379,20 @@
                     </td>
                     <td>
                       <div class="d-flex flex-row action justify-content-end">
-                        <div>View <i class="bi bi-eye"></i></div>
-                        <div class="mx-3">
+                        <button
+                          type="button"
+                          class="document-action-btn"
+                          (click)="viewDocument(rowData)"
+                        >
+                          View <i class="bi bi-eye"></i>
+                        </button>
+                        <button
+                          type="button"
+                          class="document-action-btn mx-3"
+                          (click)="downloadDocument(rowData)"
+                        >
                           Download <i class="bi bi-download"></i>
-                        </div>
+                        </button>
                       </div>
                     </td>
                   </tr>
