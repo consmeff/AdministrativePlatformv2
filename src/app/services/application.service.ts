@@ -1,6 +1,11 @@
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpEvent,
+  HttpHeaders,
+  HttpParams,
+} from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
   Application,
@@ -261,11 +266,20 @@ export class ApplicationService {
   bulkUpdateApplicants(
     payload: BulkUpdateApplicantsPayload,
   ): Observable<unknown> {
+    const formData = this.buildBulkUpdateFormData(payload);
     const url = `${this.apiRoot}/api/v1/applicants/bulk-update`;
-    const formData = new FormData();
-    formData.append('file', payload.file);
-    formData.append('fields', payload.fields);
     return this.http.post(url, formData);
+  }
+
+  bulkUpdateApplicantsWithProgress(
+    payload: BulkUpdateApplicantsPayload,
+  ): Observable<HttpEvent<unknown>> {
+    const formData = this.buildBulkUpdateFormData(payload);
+    const url = `${this.apiRoot}/api/v1/applicants/bulk-update`;
+    return this.http.post(url, formData, {
+      observe: 'events',
+      reportProgress: true,
+    });
   }
 
   setApplicationCutoff(payload: SetCutoffRequestPayload): Observable<unknown> {
@@ -276,5 +290,14 @@ export class ApplicationService {
   getApplicationCutoff(): Observable<SetCutoffResponsePayload> {
     const url = `${this.apiRoot}/api/v1/applications/cutoff`;
     return this.http.get<SetCutoffResponsePayload>(url);
+  }
+
+  private buildBulkUpdateFormData(
+    payload: BulkUpdateApplicantsPayload,
+  ): FormData {
+    const formData = new FormData();
+    formData.append('file', payload.file);
+    formData.append('fields', payload.fields);
+    return formData;
   }
 }
