@@ -250,6 +250,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.isApplicantDrawerVisible = true;
   }
 
+  onApplicantActionCompleted(): void {
+    this.loadDashboardData();
+  }
+
   closeApplicantDrawer(): void {
     this.isApplicantDrawerVisible = false;
     this.activeApplicationNo = null;

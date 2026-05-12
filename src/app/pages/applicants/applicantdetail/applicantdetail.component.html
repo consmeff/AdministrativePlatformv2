@@ -192,7 +192,9 @@
           variant="info"
           [outline]="true"
           iconClass="bi bi-exclamation-triangle"
-          [disabled]="isIssuingCompliance || !application.id"
+          [disabled]="
+            isIssuingCompliance || !application.id || isShortlistedForExam()
+          "
           (buttonClick)="issueComplianceDirective()"
         >
           {{
@@ -420,7 +422,9 @@
         variant="info"
         [outline]="true"
         iconClass="bi bi-exclamation-triangle"
-        [disabled]="isIssuingCompliance || !application.id"
+        [disabled]="
+          isIssuingCompliance || !application.id || isShortlistedForExam()
+        "
         (buttonClick)="issueComplianceDirective()"
       >
         {{
@@ -467,7 +471,9 @@
           class="mx-5"
           variant="muted"
           iconClass="bi bi-check"
-          [disabled]="isShortlisting || !application.id"
+          [disabled]="
+            isShortlisting || !application.id || isShortlistedForExam()
+          "
           (buttonClick)="shortlistApplicant()"
         >
           {{ isShortlisting ? "Shortlisting..." : "Shortlist" }}

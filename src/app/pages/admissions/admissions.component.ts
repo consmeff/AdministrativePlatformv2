@@ -489,6 +489,7 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
         next: () => {
           this.notification.success('Applicants updated successfully.');
           this.isUpdateFileModalVisible = false;
+          this.loadCardMetrics();
           this.loadAdmissionsRecords();
         },
         error: () => {
@@ -502,6 +503,7 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
 
   onCbtUploadFlowCompleted(): void {
     this.isCbtResultsUploaded = true;
+    this.loadCardMetrics();
     this.loadAdmissionsRecords();
   }
 
@@ -627,6 +629,7 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
               : `${this.changeProgrammeApplicantIds.length} candidates moved to ${normalizedSelection.programmeName}.`,
           );
           this.isChangeProgrammeModalVisible = false;
+          this.loadCardMetrics();
           this.fetchRecords().subscribe((data: ApplicationListResponse) => {
             this.total_record_count = data.total;
             this.nextPageUrl = data.next_page_url ?? null;
@@ -898,7 +901,7 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   private performApplicantAction(
     request: Observable<unknown>,
     successMessage: string,
-    refreshMetrics = false,
+    refreshMetrics = true,
   ) {
     this.busyService.show();
     request.subscribe({
