@@ -67,6 +67,7 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
   @Output() closed = new EventEmitter<void>();
   @Output() changeProgrammeRequested = new EventEmitter<string>();
   @Output() grantAdmissionRequested = new EventEmitter<void>();
+  @Output() actionCompleted = new EventEmitter<void>();
 
   app_no: string | null = '';
   isIssuingCompliance = false;
@@ -380,7 +381,8 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
     if (
       !this.application?.id ||
       this.isIssuingCompliance ||
-      this.isComplianceIssued()
+      this.isComplianceIssued() ||
+      this.isShortlistedForExam()
     ) {
       return;
     }
@@ -510,6 +512,7 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
     request.subscribe({
       next: () => {
         onSuccess?.();
+        this.actionCompleted.emit();
         this.notification.success(successMessage);
       },
 

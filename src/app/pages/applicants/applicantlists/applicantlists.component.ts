@@ -202,11 +202,7 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   ];
 
   ngOnInit(): void {
-    this.applicationService
-      .getApplicationAdminDashboard()
-      .subscribe((metrics) => {
-        this.metrics = metrics;
-      });
+    this.loadCardMetrics();
 
     this.route.queryParamMap
       .pipe(takeUntil(this.destroy$))
@@ -580,6 +576,7 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
         next: () => {
           this.notification.success('Applicants updated successfully.');
           this.isUpdateFileModalVisible = false;
+          this.loadCardMetrics();
           this.fetchRecords();
         },
         error: () => {
@@ -681,11 +678,25 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
         onSuccess?.();
         this.notification.success(successMessage);
         this.selectedApplicantIds = [];
+        this.loadCardMetrics();
         this.fetchRecords();
       },
       complete: () => {
         this.isReasonActionLoading = false;
         this.busyService.hide();
+      },
+    });
+  }
+
+  onApplicantActionCompleted(): void {
+    this.loadCardMetrics();
+    this.fetchRecords();
+  }
+
+  private loadCardMetrics(): void {
+    this.applicationService.getApplicationAdminDashboard().subscribe({
+      next: (metrics) => {
+        this.metrics = metrics;
       },
     });
   }
