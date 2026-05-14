@@ -121,7 +121,7 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
     { label: 'Pending', value: 'Pending' },
     { label: 'Shortlisted', value: 'Shortlisted' },
     { label: 'Compliance Required', value: 'Complaince Required' },
-    { label: 'Resubmitted', value: 'Resubmited' },
+    { label: 'Resubmitted', value: 'Resubmitted' },
     { label: 'Rejected', value: 'Rejected' },
     { label: 'Admitted', value: 'Admitted' },
     { label: 'Approved', value: 'Approved' },
@@ -379,7 +379,7 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
       return 'Complaince Required';
     }
     if (filter === 'resubmitted') {
-      return 'Resubmited';
+      return 'Resubmitted';
     }
     return 'all';
   }

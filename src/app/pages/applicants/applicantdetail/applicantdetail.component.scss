@@ -127,6 +127,146 @@
   visibility: hidden;
 }
 
+.academic-history-layout {
+  display: flex;
+  flex-direction: column;
+}
+
+.academic-section {
+  border-top: 1px solid var(--app-border);
+  padding: 1.5rem;
+}
+
+.academic-section:first-child {
+  border-top: 0;
+}
+
+.academic-section-title {
+  margin: 0 0 0.875rem;
+  font-size: 20px;
+  font-weight: 600;
+  color: #4a5875;
+}
+
+.academic-score-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem 3rem;
+}
+
+.academic-score-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.academic-score-card-wide {
+  grid-column: 1 / -1;
+}
+
+.academic-score-value {
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--app-text-primary);
+}
+
+.academic-text-value {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--app-text-primary);
+  line-height: 1.4;
+}
+
+.academic-meta-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  color: var(--app-text-secondary);
+}
+
+.academic-meta-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #c9d1df;
+}
+
+.academic-attempt-count {
+  color: #10a362;
+}
+
+.academic-point-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 132px;
+  min-height: 56px;
+  margin-bottom: 1.25rem;
+  padding: 0.875rem 1rem;
+  border-radius: 14px;
+  background: #eef2f7;
+  font-size: 20px;
+  font-weight: 700;
+  color: #4a5875;
+}
+
+.academic-attempt-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem 4rem;
+}
+
+.academic-attempt-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.academic-grade-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.academic-grade-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  min-height: 40px;
+  padding: 0.5rem 0.875rem;
+  border-radius: 12px;
+  background: #eef2f7;
+  font-size: 16px;
+  font-weight: 600;
+  color: #4a5875;
+}
+
+.academic-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem 3rem;
+}
+
+.academic-detail-wide {
+  grid-column: 1 / -1;
+}
+
+.academic-qualification-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.academic-qualification-card + .academic-qualification-card {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--app-border);
+}
+
 .drawer-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -383,6 +523,29 @@ table td:last-child {
 
   .drawer-actions {
     grid-template-columns: 1fr;
+  }
+
+  .academic-section {
+    padding: 1.25rem 1rem;
+  }
+
+  .academic-score-grid,
+  .academic-attempt-grid,
+  .academic-details-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .academic-score-value {
+    font-size: 30px;
+  }
+
+  .academic-text-value {
+    font-size: 16px;
+  }
+
+  .academic-grade-row {
+    align-items: flex-start;
   }
 }
 

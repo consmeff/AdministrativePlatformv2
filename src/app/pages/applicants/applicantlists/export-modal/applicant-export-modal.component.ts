@@ -56,7 +56,7 @@ export class ApplicantExportModalComponent {
     { label: 'Pending Review', value: 'Pending' },
     { label: 'Shortlisted Candidates', value: 'Shortlisted' },
     { label: 'Directive Issued', value: 'Complaince Required' },
-    { label: 'Resubmitted', value: 'Resubmited' },
+    { label: 'Resubmitted', value: 'Resubmitted' },
   ];
 
   selectedFields: string[] = [
