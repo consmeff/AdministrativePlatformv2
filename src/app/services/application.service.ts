@@ -5,6 +5,7 @@ import {
   HttpEvent,
   HttpHeaders,
   HttpParams,
+  HttpResponse,
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
@@ -222,6 +223,14 @@ export class ApplicationService {
   getCbtResultsUploaded(): Observable<unknown> {
     const url = `${this.apiRoot}/api/v1/applicants/cbt-results-uploaded`;
     return this.http.get<unknown>(url);
+  }
+
+  downloadCbtResultsTemplate(): Observable<HttpResponse<Blob>> {
+    const url = `${this.apiRoot}/api/v1/applicants/cbt-results-template`;
+    return this.http.get(url, {
+      observe: 'response',
+      responseType: 'blob',
+    });
   }
 
   getAvailableApplications(): Observable<ApplicationSetupListResponse> {

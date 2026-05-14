@@ -81,33 +81,7 @@
             </div>
           </p-tabPanel>
           <p-tabPanel header="Academic History">
-            <div class="detail-grid">
-              @for (
-                pair of getDetailPairRows(academicHistoryRows);
-                track $index
-              ) {
-                <div class="detail-cell">
-                  <span class="detail-label body-small">{{
-                    pair.leftLabel
-                  }}</span>
-                  <span class="detail-value title-small">{{
-                    pair.leftValue
-                  }}</span>
-                </div>
-                @if (pair.rightLabel) {
-                  <div class="detail-cell">
-                    <span class="detail-label body-small">{{
-                      pair.rightLabel
-                    }}</span>
-                    <span class="detail-value title-small">{{
-                      pair.rightValue
-                    }}</span>
-                  </div>
-                } @else {
-                  <div class="detail-cell detail-cell-empty"></div>
-                }
-              }
-            </div>
+            <ng-container [ngTemplateOutlet]="academicHistoryContent" />
           </p-tabPanel>
           <p-tabPanel header="Documents">
             <div class="table-responsive-md">
@@ -319,33 +293,7 @@
             </div>
           </p-tabPanel>
           <p-tabPanel header="Academic History">
-            <div class="detail-grid">
-              @for (
-                pair of getDetailPairRows(academicHistoryRows);
-                track $index
-              ) {
-                <div class="detail-cell">
-                  <span class="detail-label body-small">{{
-                    pair.leftLabel
-                  }}</span>
-                  <span class="detail-value title-small">{{
-                    pair.leftValue
-                  }}</span>
-                </div>
-                @if (pair.rightLabel) {
-                  <div class="detail-cell">
-                    <span class="detail-label body-small">{{
-                      pair.rightLabel
-                    }}</span>
-                    <span class="detail-value title-small">{{
-                      pair.rightValue
-                    }}</span>
-                  </div>
-                } @else {
-                  <div class="detail-cell detail-cell-empty"></div>
-                }
-              }
-            </div>
+            <ng-container [ngTemplateOutlet]="academicHistoryContent" />
           </p-tabPanel>
           <p-tabPanel header="Documents">
             <div class="table-responsive-md">
@@ -494,3 +442,148 @@
   (closed)="closeReasonModal()"
   (submitted)="submitReasonModal($event)"
 ></app-action-note-modal>
+
+<ng-template #academicHistoryContent>
+  <section class="academic-history-layout">
+    <section class="academic-section">
+      <h3 class="academic-section-title">Examination Score</h3>
+      <div class="academic-score-grid">
+        <div class="academic-score-card">
+          <span class="detail-label body-small">JAMB Score:</span>
+          <span class="academic-score-value">{{ getJambScoreDisplay() }}</span>
+        </div>
+        <div class="academic-score-card">
+          <span class="detail-label body-small">CBT Score:</span>
+          <span class="academic-score-value">{{ getCbtScoreDisplay() }}</span>
+        </div>
+        <div class="academic-score-card academic-score-card-wide">
+          <span class="detail-label body-small">JAMB Registration No.:</span>
+          <span class="academic-text-value">{{
+            getUtmeRegistrationNumber()
+          }}</span>
+        </div>
+      </div>
+    </section>
+
+    @if (oLevelResults.length > 0) {
+      <section class="academic-section">
+        <h3 class="academic-section-title">O Level Grades</h3>
+        <div class="academic-meta-row body-small">
+          @if (getYear(); as examinationYear) {
+            <span>{{ examinationYear }}</span>
+            <span class="academic-meta-dot"></span>
+          }
+          <span>SSCE</span>
+          <span class="academic-meta-dot"></span>
+          <span>{{ getExamName() }}</span>
+          <span class="academic-meta-dot"></span>
+          <span class="academic-attempt-count">{{
+            getAttemptCountLabel()
+          }}</span>
+        </div>
+
+        <div class="academic-point-badge">
+          {{ getOLevelPointDisplay() }} Points
+        </div>
+
+        <div class="academic-attempt-grid">
+          @for (result of oLevelResults; track $index) {
+            <section class="academic-attempt-column">
+              @for (subject of result.subjects; track subject.subject) {
+                <div class="academic-grade-row">
+                  <span class="detail-label body-small"
+                    >{{ formatSubjectName(subject.subject) }}:</span
+                  >
+                  <span class="academic-grade-pill">{{
+                    subject.grade.toUpperCase()
+                  }}</span>
+                </div>
+              }
+            </section>
+          }
+        </div>
+      </section>
+    }
+
+    <section class="academic-section">
+      <h3 class="academic-section-title">Other Details</h3>
+      <div class="academic-details-grid">
+        <div class="detail-cell">
+          <span class="detail-label body-small">Primary School:</span>
+          <span class="academic-text-value">{{
+            formatValue(primaryAcademicHistory?.institution)
+          }}</span>
+        </div>
+        <div class="detail-cell">
+          <span class="detail-label body-small">Duration:</span>
+          <span class="academic-text-value">{{
+            formatDateRange(
+              primaryAcademicHistory?.from_date,
+              primaryAcademicHistory?.to_date
+            )
+          }}</span>
+        </div>
+        <div class="detail-cell">
+          <span class="detail-label body-small">Secondary School:</span>
+          <span class="academic-text-value">{{
+            formatValue(secondaryAcademicHistory?.institution)
+          }}</span>
+        </div>
+        <div class="detail-cell">
+          <span class="detail-label body-small">Duration:</span>
+          <span class="academic-text-value">{{
+            formatDateRange(
+              secondaryAcademicHistory?.from_date,
+              secondaryAcademicHistory?.to_date
+            )
+          }}</span>
+        </div>
+        <div class="detail-cell academic-detail-wide">
+          <span class="detail-label body-small">Address:</span>
+          <span class="academic-text-value">{{
+            formatValue(application.residential_address?.address)
+          }}</span>
+        </div>
+      </div>
+    </section>
+
+    @if (otherQualifications.length > 0) {
+      <section class="academic-section">
+        <h3 class="academic-section-title">Other Qualifications</h3>
+        <div class="academic-qualification-list">
+          @for (qualification of otherQualifications; track $index) {
+            <section class="academic-qualification-card">
+              <div class="academic-details-grid">
+                <div class="detail-cell">
+                  <span class="detail-label body-small"
+                    >Qualification Name:</span
+                  >
+                  <span class="academic-text-value">{{
+                    formatValue(qualification.institution)
+                  }}</span>
+                </div>
+                <div class="detail-cell">
+                  <span class="detail-label body-small"
+                    >Qualification Type:</span
+                  >
+                  <span class="academic-text-value">{{
+                    formatValue(qualification.certificate_type)
+                  }}</span>
+                </div>
+                <div class="detail-cell academic-detail-wide">
+                  <span class="detail-label body-small">Duration:</span>
+                  <span class="academic-text-value">{{
+                    formatDateRange(
+                      qualification.from_date,
+                      qualification.to_date
+                    )
+                  }}</span>
+                </div>
+              </div>
+            </section>
+          }
+        </div>
+      </section>
+    }
+  </section>
+</ng-template>

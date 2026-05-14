@@ -26,8 +26,6 @@ interface UploadFlowConfig {
   styleUrl: './admissions-upload-flow.component.scss',
 })
 export class AdmissionsUploadFlowComponent {
-  private static readonly CBT_TEMPLATE_PATH = 'assets/templates/cbt-upload.csv';
-
   private readonly notification = inject(NotificationService);
   private readonly applicationService = inject(ApplicationService);
   @Input() mode: AdmissionUploadMode = 'cbt';
@@ -154,10 +152,25 @@ export class AdmissionsUploadFlowComponent {
   }
 
   onDownloadTemplate(): void {
-    const link = document.createElement('a');
-    link.href = AdmissionsUploadFlowComponent.CBT_TEMPLATE_PATH;
-    link.download = 'cbt-upload.csv';
-    link.click();
+    this.applicationService.downloadCbtResultsTemplate().subscribe({
+      next: (response) => {
+        const filename =
+          this.extractDownloadFilename(
+            response.headers.get('content-disposition'),
+          ) ?? 'cbt-upload.csv';
+        const blob = response.body;
+
+        if (!blob) {
+          this.notification.error('Template download failed.');
+          return;
+        }
+
+        this.downloadBlob(blob, filename);
+      },
+      error: () => {
+        this.notification.error('Unable to download CBT template.');
+      },
+    });
   }
 
   private resetFlow(fileInput: HTMLInputElement): void {
@@ -204,5 +217,32 @@ export class AdmissionsUploadFlowComponent {
       this.totalRows,
       Math.round((percent / 100) * this.totalRows),
     );
+  }
+
+  private extractDownloadFilename(
+    contentDisposition: string | null,
+  ): string | null {
+    if (!contentDisposition) {
+      return null;
+    }
+
+    const utf8Match = contentDisposition.match(/filename\*=UTF-8''([^;]+)/i);
+    if (utf8Match?.[1]) {
+      return decodeURIComponent(utf8Match[1]);
+    }
+
+    const standardMatch = contentDisposition.match(/filename="?([^"]+)"?/i);
+    return standardMatch?.[1] ?? null;
+  }
+
+  private downloadBlob(blob: Blob, filename: string): void {
+    const objectUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = objectUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(objectUrl);
   }
 }
