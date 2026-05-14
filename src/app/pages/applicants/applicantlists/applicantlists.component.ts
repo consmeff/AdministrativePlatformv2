@@ -49,7 +49,11 @@ import {
   APPLICATION_STATUS_LABELS,
   APPLICATION_STATUS_OPTIONS,
 } from '../../../constants/application-status.constants';
-import { getApplicationStatusDefinition } from '../../../constants/application-status.utils';
+import {
+  getApplicationStatusDefinition,
+  shouldDisableComplianceAction,
+  shouldDisableShortlistAction,
+} from '../../../constants/application-status.utils';
 
 interface FilterOption {
   label: string;
@@ -68,6 +72,8 @@ interface ApplicationListRow {
   status_tone: StatusTone;
   status_description: string;
   status_key: string;
+  disable_compliance: boolean;
+  disable_shortlist: boolean;
 }
 
 interface ApplicantFilterCard {
@@ -307,6 +313,8 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
         status_tone: status.tone,
         status_description: status.description,
         status_key: status.key,
+        disable_compliance: shouldDisableComplianceAction(status.key),
+        disable_shortlist: shouldDisableShortlistAction(status.key),
       };
     });
   }

@@ -6,6 +6,14 @@ import {
 
 type StatusAliasMap = Record<string, ApplicationStatusKey>;
 
+const APPLICATION_ACTION_DISABLED_STATUS_KEYS: ApplicationStatusKey[] = [
+  'shortlisted',
+  'compliance_required',
+  'admitted',
+  'auto_rejected',
+  'admitted_internally',
+];
+
 const APPLICATION_STATUS_ALIASES: StatusAliasMap = {
   submitted: 'submitted',
   approved: 'approved',
@@ -90,4 +98,18 @@ export function getApplicationStatusDefinition(
 ): ApplicationStatusDefinition {
   const normalizedStatusKey = normalizeApplicationStatusKey(status);
   return APPLICATION_STATUS_DEFINITIONS[normalizedStatusKey];
+}
+
+export function shouldDisableComplianceAction(
+  status: string | null | undefined,
+): boolean {
+  const normalizedStatusKey = normalizeApplicationStatusKey(status);
+  return APPLICATION_ACTION_DISABLED_STATUS_KEYS.includes(normalizedStatusKey);
+}
+
+export function shouldDisableShortlistAction(
+  status: string | null | undefined,
+): boolean {
+  const normalizedStatusKey = normalizeApplicationStatusKey(status);
+  return APPLICATION_ACTION_DISABLED_STATUS_KEYS.includes(normalizedStatusKey);
 }

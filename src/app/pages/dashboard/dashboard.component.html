@@ -76,8 +76,8 @@
             </td>
             <td>
               <app-table-row-actions
-                [disableCompliance]="row.status_key === 'shortlisted'"
-                [disableShortlist]="row.status_key === 'shortlisted'"
+                [disableCompliance]="row.disable_compliance"
+                [disableShortlist]="row.disable_shortlist"
                 (view)="viewProfile(row)"
                 (shortlist)="shortlistSingle(row)"
                 (compliance)="openComplianceForSingle(row)"
