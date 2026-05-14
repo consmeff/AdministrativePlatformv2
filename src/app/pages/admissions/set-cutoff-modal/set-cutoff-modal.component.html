@@ -19,7 +19,15 @@
 
   <div class="app-modal-content">
     <div class="app-modal-divider"></div>
-
+    <div class="app-modal-field">
+      <div class="label-small app-modal-label">Programme</div>
+      <p-select
+        [options]="programmeOptions"
+        [(ngModel)]="selectedProgramme"
+        optionLabel="label"
+        styleClass="app-modal-select"
+      />
+    </div>
     <div class="app-modal-field">
       <div class="label-small app-modal-label">Minimum CBT Score</div>
       <input
@@ -39,16 +47,6 @@
         min="0"
         max="400"
         [(ngModel)]="minimumJambScore"
-      />
-    </div>
-
-    <div class="app-modal-field">
-      <div class="label-small app-modal-label">Programme</div>
-      <p-select
-        [options]="programmeOptions"
-        [(ngModel)]="selectedProgramme"
-        optionLabel="label"
-        styleClass="app-modal-select"
       />
     </div>
   </div>

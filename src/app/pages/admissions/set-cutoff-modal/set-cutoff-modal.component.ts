@@ -9,7 +9,6 @@ import {
   inject,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { finalize } from 'rxjs';
 import { DialogModule } from 'primeng/dialog';
 import { SelectModule } from 'primeng/select';
 import {
@@ -64,11 +63,13 @@ export class SetCutoffModalComponent implements OnChanges {
   selectedProgramme: OptionItem = this.programmeOptions[0];
   minimumCbtScore: number | null = null;
   minimumJambScore: number | null = null;
-  isLoadingExistingCutoff = false;
   isLoadingProgrammeOptions = false;
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visible']?.currentValue === true) {
+      this.selectedProgramme = this.allProgrammesOption;
+      this.minimumCbtScore = null;
+      this.minimumJambScore = null;
       this.loadProgrammeOptions();
     }
   }
@@ -90,56 +91,8 @@ export class SetCutoffModalComponent implements OnChanges {
       },
       complete: () => {
         this.isLoadingProgrammeOptions = false;
-        this.loadExistingCutoff();
       },
     });
-  }
-
-  private loadExistingCutoff(): void {
-    this.isLoadingExistingCutoff = true;
-    this.applicationService
-      .getApplicationCutoff()
-      .pipe(
-        finalize(() => {
-          this.isLoadingExistingCutoff = false;
-        }),
-      )
-      .subscribe({
-        next: (cutoff) => {
-          this.minimumJambScore = cutoff.min_jamb_score ?? null;
-          this.minimumCbtScore = cutoff.min_post_utme_score ?? null;
-          this.selectedProgramme = this.resolveSelectedProgramme(
-            cutoff.application,
-            cutoff.all_application,
-          );
-        },
-        error: () => {
-          this.minimumJambScore = null;
-          this.minimumCbtScore = null;
-          this.selectedProgramme = this.programmeOptions[0];
-          this.notification.warn(
-            'Unable to load existing cutoff. You can still set a new one.',
-          );
-        },
-      });
-  }
-
-  private resolveSelectedProgramme(
-    application: number | string | null,
-    allApplication: boolean,
-  ): OptionItem {
-    if (allApplication) {
-      return this.allProgrammesOption;
-    }
-
-    const normalizedValue = `${application ?? ''}`.trim().toLowerCase();
-    return (
-      this.programmeOptions.find(
-        (option) =>
-          `${option.value}`.trim().toLowerCase() === normalizedValue ||
-          option.label.trim().toLowerCase() === normalizedValue,
-      ) ?? this.allProgrammesOption
-    );
   }
 
   private toProgrammeOption(item: ApplicationSetupItem): OptionItem | null {
@@ -159,11 +112,7 @@ export class SetCutoffModalComponent implements OnChanges {
   }
 
   isBusy(): boolean {
-    return (
-      this.loading ||
-      this.isLoadingExistingCutoff ||
-      this.isLoadingProgrammeOptions
-    );
+    return this.loading || this.isLoadingProgrammeOptions;
   }
 
   onClose(): void {

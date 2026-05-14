@@ -307,7 +307,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .setApplicationCutoff({
         min_jamb_score: payload.minimumJambScore,
         min_post_utme_score: payload.minimumCbtScore,
-        application: payload.applicationId ?? '',
+        application_id: payload.applicationId,
         all_application: payload.applicationId === undefined,
       })
       .subscribe({
