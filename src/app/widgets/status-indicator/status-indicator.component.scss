@@ -43,6 +43,16 @@
   --tone-bg: rgba(192, 38, 211, 0.14);
 }
 
+[data-tone="approved"] {
+  --tone-color: #175cd3;
+  --tone-bg: rgba(23, 92, 211, 0.14);
+}
+
+[data-tone="admitted"] {
+  --tone-color: #027a48;
+  --tone-bg: rgba(2, 122, 72, 0.14);
+}
+
 [data-tone="rejected"] {
   --tone-color: #d92d20;
   --tone-bg: rgba(217, 45, 32, 0.14);

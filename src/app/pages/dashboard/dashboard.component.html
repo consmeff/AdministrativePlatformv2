@@ -71,12 +71,13 @@
               <app-status-indicator
                 [text]="row.status_text"
                 [tone]="row.status_tone"
+                [tooltip]="row.status_description"
               />
             </td>
             <td>
               <app-table-row-actions
-                [disableCompliance]="row.status_text === 'Shortlisted'"
-                [disableShortlist]="row.status_text === 'Shortlisted'"
+                [disableCompliance]="row.status_key === 'shortlisted'"
+                [disableShortlist]="row.status_key === 'shortlisted'"
                 (view)="viewProfile(row)"
                 (shortlist)="shortlistSingle(row)"
                 (compliance)="openComplianceForSingle(row)"

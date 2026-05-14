@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { DialogModule } from 'primeng/dialog';
+import { APPLICATION_STATUS_OPTIONS } from '../../../../constants/application-status.constants';
 import { ButtonComponent } from '../../../../widgets/button/button.component';
 
 interface ExportOption {
@@ -53,10 +54,7 @@ export class ApplicantExportModalComponent {
 
   readonly exportStatusOptions: ExportOption[] = [
     { label: 'All Status', value: 'all' },
-    { label: 'Pending Review', value: 'Pending' },
-    { label: 'Shortlisted Candidates', value: 'Shortlisted' },
-    { label: 'Directive Issued', value: 'Complaince Required' },
-    { label: 'Resubmitted', value: 'Resubmitted' },
+    ...APPLICATION_STATUS_OPTIONS,
   ];
 
   selectedFields: string[] = [

@@ -45,6 +45,11 @@ import {
   UpdateFileModalComponent,
   UpdateFileSelection,
 } from '../../../widgets/update-file-modal/update-file-modal.component';
+import {
+  APPLICATION_STATUS_LABELS,
+  APPLICATION_STATUS_OPTIONS,
+} from '../../../constants/application-status.constants';
+import { getApplicationStatusDefinition } from '../../../constants/application-status.utils';
 
 interface FilterOption {
   label: string;
@@ -61,6 +66,8 @@ interface ApplicationListRow {
   programme: string;
   status_text: string;
   status_tone: StatusTone;
+  status_description: string;
+  status_key: string;
 }
 
 interface ApplicantFilterCard {
@@ -118,14 +125,7 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
 
   readonly statusOptions: FilterOption[] = [
     { label: 'All Status', value: 'all' },
-    { label: 'Pending', value: 'Pending' },
-    { label: 'Shortlisted', value: 'Shortlisted' },
-    { label: 'Compliance Required', value: 'Complaince Required' },
-    { label: 'Resubmitted', value: 'Resubmitted' },
-    { label: 'Rejected', value: 'Rejected' },
-    { label: 'Admitted', value: 'Admitted' },
-    { label: 'Approved', value: 'Approved' },
-    { label: 'Submitted', value: 'Submitted' },
+    ...APPLICATION_STATUS_OPTIONS,
   ];
   readonly orderingOptions: FilterOption[] = [
     { label: 'Newest First', value: '-created_at' },
@@ -153,10 +153,13 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   activeCardFilter: ApplicantCardFilter = 'all';
   readonly filterCards: ApplicantFilterCard[] = [
     { label: 'All Applicants', filter: 'all' },
-    { label: 'Pending Review', filter: 'pending' },
-    { label: 'Shortlisted', filter: 'shortlisted' },
-    { label: 'Directive Issued', filter: 'directive' },
-    { label: 'Resubmitted', filter: 'resubmitted' },
+    { label: APPLICATION_STATUS_LABELS.pending, filter: 'pending' },
+    { label: APPLICATION_STATUS_LABELS.shortlisted, filter: 'shortlisted' },
+    {
+      label: APPLICATION_STATUS_LABELS.compliance_required,
+      filter: 'directive',
+    },
+    { label: APPLICATION_STATUS_LABELS.resubmitted, filter: 'resubmitted' },
   ];
 
   metrics: ApplicationAdminDashboardResponse = {
@@ -302,6 +305,8 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
         programme: this.getProgrammeName(item),
         status_text: status.text,
         status_tone: status.tone,
+        status_description: status.description,
+        status_key: status.key,
       };
     });
   }
@@ -349,20 +354,16 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   }
 
   private getCardFilterFromStatus(value: string): ApplicantCardFilter {
-    const normalized = value.toLowerCase();
-    if (normalized.includes('shortlist')) {
+    if (value === 'shortlisted') {
       return 'shortlisted';
     }
-    if (
-      normalized.includes('complaince') ||
-      normalized.includes('compliance')
-    ) {
+    if (value === 'compliance_required') {
       return 'directive';
     }
-    if (normalized.includes('resub')) {
+    if (value === 'resubmitted') {
       return 'resubmitted';
     }
-    if (normalized.includes('pending')) {
+    if (value === 'pending') {
       return 'pending';
     }
     return 'all';
@@ -370,16 +371,16 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
 
   private getApprovalStatusForCardFilter(filter: ApplicantCardFilter): string {
     if (filter === 'pending') {
-      return 'Pending';
+      return 'pending';
     }
     if (filter === 'shortlisted') {
-      return 'Shortlisted';
+      return 'shortlisted';
     }
     if (filter === 'directive') {
-      return 'Complaince Required';
+      return 'compliance_required';
     }
     if (filter === 'resubmitted') {
-      return 'Resubmitted';
+      return 'resubmitted';
     }
     return 'all';
   }
@@ -393,25 +394,19 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
     this.currentFormLevel = undefined;
   }
 
-  private resolveStatus(status: string): { text: string; tone: StatusTone } {
-    const value = (status ?? '').toLowerCase();
-    if (value.includes('resubmit')) {
-      return { text: 'Resubmitted', tone: 'resubmitted' };
-    }
-    if (value.includes('shortlist')) {
-      return { text: 'Shortlisted', tone: 'shortlisted' };
-    }
-    if (
-      value.includes('compliance') ||
-      value.includes('complaince') ||
-      value.includes('directive')
-    ) {
-      return { text: 'Directive Issued', tone: 'directive' };
-    }
-    if (value.includes('reject')) {
-      return { text: 'Rejected', tone: 'rejected' };
-    }
-    return { text: 'Pending Review', tone: 'pending' };
+  private resolveStatus(status: string): {
+    text: string;
+    tone: StatusTone;
+    description: string;
+    key: string;
+  } {
+    const statusDefinition = getApplicationStatusDefinition(status);
+    return {
+      text: statusDefinition.label,
+      tone: statusDefinition.tone,
+      description: statusDefinition.description,
+      key: statusDefinition.key,
+    };
   }
 
   private getProgrammeName(item: Application): string {

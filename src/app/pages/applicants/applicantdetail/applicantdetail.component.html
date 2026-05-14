@@ -12,9 +12,13 @@
           <div class="hero-id body-small">
             {{ application.application_no || "-----" }}
           </div>
-          <span class="hero-status-pill" [ngClass]="getHeroStatusClass()">{{
-            getDisplayStatus()
-          }}</span>
+          <span
+            class="hero-status-pill"
+            [ngClass]="getHeroStatusClass()"
+            [attr.title]="getDisplayStatusDescription()"
+          >
+            {{ getDisplayStatus() }}
+          </span>
         </div>
       </div>
       <button type="button" class="drawer-close-btn" (click)="closed.emit()">
@@ -215,7 +219,12 @@
         </div>
         <div class="body-small">
           Status:
-          <span [ngClass]="getStatusClassName()">{{ getDisplayStatus() }}</span>
+          <span
+            [ngClass]="getStatusClassName()"
+            [attr.title]="getDisplayStatusDescription()"
+          >
+            {{ getDisplayStatus() }}
+          </span>
         </div>
       </div>
     </div>

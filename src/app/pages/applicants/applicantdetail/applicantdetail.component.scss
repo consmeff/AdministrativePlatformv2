@@ -58,6 +58,16 @@
   color: #009866;
 }
 
+.hero-status-admitted {
+  background: #dcffea;
+  color: #009866;
+}
+
+.hero-status-approved {
+  background: rgba(23, 92, 211, 0.14);
+  color: #175cd3;
+}
+
 .hero-status-directive {
   background: #ffeceb;
   color: #ef2c23;
@@ -457,6 +467,14 @@ table td:last-child {
 
 .status-shortlisted {
   color: var(--app-success);
+}
+
+.status-admitted {
+  color: var(--app-success);
+}
+
+.status-approved {
+  color: var(--app-primary);
 }
 
 .status-compliance {
