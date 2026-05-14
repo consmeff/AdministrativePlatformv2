@@ -74,7 +74,7 @@ export interface BulkUpdateApplicantsPayload {
 export interface SetCutoffRequestPayload {
   min_jamb_score: number;
   min_post_utme_score: number;
-  application: number | string;
+  application_id?: number;
   all_application: boolean;
 }
 
@@ -293,7 +293,7 @@ export class ApplicationService {
 
   setApplicationCutoff(payload: SetCutoffRequestPayload): Observable<unknown> {
     const url = `${this.apiRoot}/api/v1/applications/cutoff`;
-    return this.http.put(url, payload);
+    return this.http.patch(url, payload);
   }
 
   getApplicationCutoff(): Observable<SetCutoffResponsePayload> {
