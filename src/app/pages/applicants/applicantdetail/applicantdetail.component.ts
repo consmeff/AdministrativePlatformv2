@@ -320,6 +320,23 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
     return file ?? null;
   }
 
+  private formatAddressDisplay(): string {
+    const residentialAddress = this.application.residential_address;
+    if (!residentialAddress) {
+      return '-----';
+    }
+
+    const addressParts = [
+      residentialAddress.address,
+      residentialAddress.lga?.name,
+      residentialAddress.state?.name,
+    ]
+      .map((addressPart) => addressPart?.trim() ?? '')
+      .filter((addressPart) => addressPart.length > 0);
+
+    return addressParts.length > 0 ? addressParts.join(', ') : '-----';
+  }
+
   viewDocument(row: Record<string, unknown>): void {
     const file = this.getDocumentFile(row);
     const fileUrl = this.getDocumentUrl(file);
@@ -365,7 +382,7 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
   }
 
   getJambScoreDisplay(): string {
-    return this.formatValue(this.application.utme_score);
+    return this.formatValue(this.application.utme_result?.score);
   }
 
   getCbtScoreDisplay(): string {
@@ -373,10 +390,7 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
       string,
       unknown
     >;
-    return this.formatValue(
-      applicationRecord['post_utme_point'] ??
-        this.application.utme_result?.score,
-    );
+    return this.formatValue(applicationRecord['post_utme_point'] || '0');
   }
 
   getUtmeRegistrationNumber(): string {
@@ -606,7 +620,7 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
       { label: 'Specified disability', value: this.application.disability },
       {
         label: 'Address',
-        value: this.application.residential_address?.address,
+        value: this.formatAddressDisplay(),
       },
     ];
 
@@ -672,6 +686,11 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
         file: hasOLevelResults
           ? this.application.o_level_result?.[0]?.file
           : null,
+        actions: 'View, Download',
+      },
+      {
+        label: 'Certificate of Origin',
+        file: this.application.certificate_of_origin ?? null,
         actions: 'View, Download',
       },
       {
