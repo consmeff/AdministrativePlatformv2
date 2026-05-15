@@ -9,12 +9,16 @@
         />
         <div class="hero-text">
           <h2 class="hero-name title-large">{{ getApplicantFullName() }}</h2>
-          <div class="hero-id body-small">
+          <div class="hero-id body-xs">
             {{ application.application_no || "-----" }}
           </div>
-          <span class="hero-status-pill" [ngClass]="getHeroStatusClass()">{{
-            getDisplayStatus()
-          }}</span>
+          <span
+            class="hero-status-pill"
+            [ngClass]="getHeroStatusClass()"
+            [attr.title]="getDisplayStatusDescription()"
+          >
+            {{ getDisplayStatus() }}
+          </span>
         </div>
       </div>
       <button type="button" class="drawer-close-btn" (click)="closed.emit()">
@@ -32,16 +36,14 @@
                 track $index
               ) {
                 <div class="detail-cell">
-                  <span class="detail-label body-small">{{
-                    pair.leftLabel
-                  }}</span>
+                  <span class="detail-label body-xs">{{ pair.leftLabel }}</span>
                   <span class="detail-value title-small">{{
                     pair.leftValue
                   }}</span>
                 </div>
                 @if (pair.rightLabel) {
                   <div class="detail-cell">
-                    <span class="detail-label body-small">{{
+                    <span class="detail-label body-xs">{{
                       pair.rightLabel
                     }}</span>
                     <span class="detail-value title-small">{{
@@ -58,16 +60,14 @@
             <div class="detail-grid">
               @for (pair of getDetailPairRows(nextOfKinRows); track $index) {
                 <div class="detail-cell">
-                  <span class="detail-label body-small">{{
-                    pair.leftLabel
-                  }}</span>
+                  <span class="detail-label body-xs">{{ pair.leftLabel }}</span>
                   <span class="detail-value title-small">{{
                     pair.leftValue
                   }}</span>
                 </div>
                 @if (pair.rightLabel) {
                   <div class="detail-cell">
-                    <span class="detail-label body-small">{{
+                    <span class="detail-label body-xs">{{
                       pair.rightLabel
                     }}</span>
                     <span class="detail-value title-small">{{
@@ -210,12 +210,17 @@
           {{ application.first_name }}, {{ application.last_name }}
           {{ application.other_names }}
         </div>
-        <div class="body-small" *ngIf="application.program">
+        <div class="body-xs" *ngIf="application.program">
           Preferred Programme:{{ application.program.name }}
         </div>
-        <div class="body-small">
+        <div class="body-xs">
           Status:
-          <span [ngClass]="getStatusClassName()">{{ getDisplayStatus() }}</span>
+          <span
+            [ngClass]="getStatusClassName()"
+            [attr.title]="getDisplayStatusDescription()"
+          >
+            {{ getDisplayStatus() }}
+          </span>
         </div>
       </div>
     </div>
@@ -226,7 +231,7 @@
             application.application_no
           }}</span>
         </div>
-        <div class="body-small" style="color: rgba(0, 0, 128, 1)">
+        <div class="body-xs" style="color: rgba(0, 0, 128, 1)">
           Download Profile <i class="bi bi-file-earmark-arrow-down"></i>
         </div>
       </div>
@@ -244,16 +249,14 @@
                 track $index
               ) {
                 <div class="detail-cell">
-                  <span class="detail-label body-small">{{
-                    pair.leftLabel
-                  }}</span>
+                  <span class="detail-label body-xs">{{ pair.leftLabel }}</span>
                   <span class="detail-value title-small">{{
                     pair.leftValue
                   }}</span>
                 </div>
                 @if (pair.rightLabel) {
                   <div class="detail-cell">
-                    <span class="detail-label body-small">{{
+                    <span class="detail-label body-xs">{{
                       pair.rightLabel
                     }}</span>
                     <span class="detail-value title-small">{{
@@ -270,16 +273,14 @@
             <div class="detail-grid">
               @for (pair of getDetailPairRows(nextOfKinRows); track $index) {
                 <div class="detail-cell">
-                  <span class="detail-label body-small">{{
-                    pair.leftLabel
-                  }}</span>
+                  <span class="detail-label body-xs">{{ pair.leftLabel }}</span>
                   <span class="detail-value title-small">{{
                     pair.leftValue
                   }}</span>
                 </div>
                 @if (pair.rightLabel) {
                   <div class="detail-cell">
-                    <span class="detail-label body-small">{{
+                    <span class="detail-label body-xs">{{
                       pair.rightLabel
                     }}</span>
                     <span class="detail-value title-small">{{
@@ -446,19 +447,23 @@
 <ng-template #academicHistoryContent>
   <section class="academic-history-layout">
     <section class="academic-section">
-      <h3 class="academic-section-title">Examination Score</h3>
+      <h3 class="academic-section-title label-small">Examination Score</h3>
       <div class="academic-score-grid">
         <div class="academic-score-card">
-          <span class="detail-label body-small">JAMB Score:</span>
-          <span class="academic-score-value">{{ getJambScoreDisplay() }}</span>
+          <span class="detail-label body-xs">JAMB Score:</span>
+          <span class="academic-score-value title-large">{{
+            getJambScoreDisplay()
+          }}</span>
         </div>
         <div class="academic-score-card">
-          <span class="detail-label body-small">CBT Score:</span>
-          <span class="academic-score-value">{{ getCbtScoreDisplay() }}</span>
+          <span class="detail-label body-xs">CBT Score:</span>
+          <span class="academic-score-value title-large">{{
+            getCbtScoreDisplay()
+          }}</span>
         </div>
         <div class="academic-score-card academic-score-card-wide">
-          <span class="detail-label body-small">JAMB Registration No.:</span>
-          <span class="academic-text-value">{{
+          <span class="detail-label body-xs">JAMB Registration No.:</span>
+          <span class="academic-text-value body-xs-500">{{
             getUtmeRegistrationNumber()
           }}</span>
         </div>
@@ -467,8 +472,8 @@
 
     @if (oLevelResults.length > 0) {
       <section class="academic-section">
-        <h3 class="academic-section-title">O Level Grades</h3>
-        <div class="academic-meta-row body-small">
+        <h3 class="academic-section-title label-small">O Level Grades</h3>
+        <div class="academic-meta-row body-xs">
           @if (getYear(); as examinationYear) {
             <span>{{ examinationYear }}</span>
             <span class="academic-meta-dot"></span>
@@ -482,7 +487,7 @@
           }}</span>
         </div>
 
-        <div class="academic-point-badge">
+        <div class="academic-point-badge title-medium">
           {{ getOLevelPointDisplay() }} Points
         </div>
 
@@ -491,7 +496,7 @@
             <section class="academic-attempt-column">
               @for (subject of result.subjects; track subject.subject) {
                 <div class="academic-grade-row">
-                  <span class="detail-label body-small"
+                  <span class="detail-label body-xs"
                     >{{ formatSubjectName(subject.subject) }}:</span
                   >
                   <span class="academic-grade-pill">{{
@@ -506,17 +511,17 @@
     }
 
     <section class="academic-section">
-      <h3 class="academic-section-title">Other Details</h3>
+      <h3 class="academic-section-title label-small">Other Details</h3>
       <div class="academic-details-grid">
         <div class="detail-cell">
-          <span class="detail-label body-small">Primary School:</span>
-          <span class="academic-text-value">{{
+          <span class="detail-label body-xs">Primary School:</span>
+          <span class="academic-text-value body-xs-500">{{
             formatValue(primaryAcademicHistory?.institution)
           }}</span>
         </div>
         <div class="detail-cell">
-          <span class="detail-label body-small">Duration:</span>
-          <span class="academic-text-value">{{
+          <span class="detail-label body-xs">Duration:</span>
+          <span class="academic-text-value body-xs-500">{{
             formatDateRange(
               primaryAcademicHistory?.from_date,
               primaryAcademicHistory?.to_date
@@ -524,14 +529,14 @@
           }}</span>
         </div>
         <div class="detail-cell">
-          <span class="detail-label body-small">Secondary School:</span>
-          <span class="academic-text-value">{{
+          <span class="detail-label body-xs">Secondary School:</span>
+          <span class="academic-text-value body-xs-500">{{
             formatValue(secondaryAcademicHistory?.institution)
           }}</span>
         </div>
         <div class="detail-cell">
-          <span class="detail-label body-small">Duration:</span>
-          <span class="academic-text-value">{{
+          <span class="detail-label body-xs">Duration:</span>
+          <span class="academic-text-value body-xs-500">{{
             formatDateRange(
               secondaryAcademicHistory?.from_date,
               secondaryAcademicHistory?.to_date
@@ -539,8 +544,8 @@
           }}</span>
         </div>
         <div class="detail-cell academic-detail-wide">
-          <span class="detail-label body-small">Address:</span>
-          <span class="academic-text-value">{{
+          <span class="detail-label body-xs">Address:</span>
+          <span class="academic-text-value body-xs-500">{{
             formatValue(application.residential_address?.address)
           }}</span>
         </div>
@@ -549,30 +554,26 @@
 
     @if (otherQualifications.length > 0) {
       <section class="academic-section">
-        <h3 class="academic-section-title">Other Qualifications</h3>
+        <h3 class="academic-section-title label-small">Other Qualifications</h3>
         <div class="academic-qualification-list">
           @for (qualification of otherQualifications; track $index) {
             <section class="academic-qualification-card">
               <div class="academic-details-grid">
                 <div class="detail-cell">
-                  <span class="detail-label body-small"
-                    >Qualification Name:</span
-                  >
-                  <span class="academic-text-value">{{
+                  <span class="detail-label body-xs">Qualification Name:</span>
+                  <span class="academic-text-value body-xs-500">{{
                     formatValue(qualification.institution)
                   }}</span>
                 </div>
                 <div class="detail-cell">
-                  <span class="detail-label body-small"
-                    >Qualification Type:</span
-                  >
-                  <span class="academic-text-value">{{
+                  <span class="detail-label body-xs">Qualification Type:</span>
+                  <span class="academic-text-value body-xs-500">{{
                     formatValue(qualification.certificate_type)
                   }}</span>
                 </div>
                 <div class="detail-cell academic-detail-wide">
-                  <span class="detail-label body-small">Duration:</span>
-                  <span class="academic-text-value">{{
+                  <span class="detail-label body-xs">Duration:</span>
+                  <span class="academic-text-value body-xs-500">{{
                     formatDateRange(
                       qualification.from_date,
                       qualification.to_date

@@ -48,6 +48,8 @@ import {
   UpdateFileModalComponent,
   UpdateFileSelection,
 } from '../../widgets/update-file-modal/update-file-modal.component';
+import { APPLICATION_STATUS_LABELS } from '../../constants/application-status.constants';
+import { getApplicationStatusDefinition } from '../../constants/application-status.utils';
 
 interface PagingEvent {
   first: number;
@@ -71,6 +73,8 @@ interface AdmissionTableRow {
   program: string;
   status_text: string;
   status_tone: StatusTone;
+  status_description: string;
+  status_key: string;
   decision_category: AdmissionDecisionFilter;
 }
 
@@ -165,8 +169,11 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   activeCardFilter: AdmissionDecisionFilter = 'all';
   readonly filterCards: AdmissionFilterCard[] = [
     { label: 'All Candidates', filter: 'all' },
-    { label: 'Shortlisted', filter: 'pending-review' },
-    { label: 'Pending Publish', filter: 'pending-publish' },
+    { label: APPLICATION_STATUS_LABELS.shortlisted, filter: 'pending-review' },
+    {
+      label: APPLICATION_STATUS_LABELS.admitted_internally,
+      filter: 'pending-publish',
+    },
     { label: 'Admitted Candidates', filter: 'admitted' },
   ];
   metrics: AdmissionAdminDashboardResponse = {
@@ -210,11 +217,13 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     this.loadCardMetrics();
     this.approval_status = [
       { name: 'All', code: 0 },
-      { name: 'Pending', code: 1 },
-      { name: 'Shortlisted', code: 2 },
-      { name: 'Compliance', code: 3 },
-      { name: 'Rejected', code: 4 },
-      { name: 'Resolved', code: 5 },
+      { name: APPLICATION_STATUS_LABELS.pending, code: 1 },
+      { name: APPLICATION_STATUS_LABELS.shortlisted, code: 2 },
+      { name: APPLICATION_STATUS_LABELS.compliance_required, code: 3 },
+      { name: APPLICATION_STATUS_LABELS.rejected, code: 4 },
+      { name: APPLICATION_STATUS_LABELS.admitted, code: 5 },
+      { name: APPLICATION_STATUS_LABELS.approved, code: 6 },
+      { name: APPLICATION_STATUS_LABELS.admitted_internally, code: 7 },
     ];
 
     this.cols = [];
@@ -356,6 +365,8 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
         program: programmeName,
         status_text: status.text,
         status_tone: status.tone,
+        status_description: status.description,
+        status_key: status.key,
         decision_category: status.category,
       };
       newSummary.push(_summ);
@@ -368,38 +379,23 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   private resolveStatus(status: string): {
     text: string;
     tone: StatusTone;
+    description: string;
+    key: string;
     category: AdmissionDecisionFilter;
   } {
-    const value = (status ?? '').toLowerCase();
-    if (
-      value.includes('admitted internally') ||
-      value.includes('admit internally') ||
-      value.includes('pending publish') ||
-      value.includes('publish')
-    ) {
-      return {
-        text: 'Pending Publish',
-        tone: 'resubmitted',
-        category: 'pending-publish',
-      };
-    }
-    if (value.includes('shortlist')) {
-      return {
-        text: 'Shortlisted',
-        tone: 'shortlisted',
-        category: 'pending-review',
-      };
-    }
-    if (value.includes('admit') || value.includes('approved')) {
-      return { text: 'Admitted', tone: 'shortlisted', category: 'admitted' };
-    }
-    if (value.includes('reject')) {
-      return { text: 'Rejected', tone: 'rejected', category: 'pending-review' };
-    }
+    const statusDefinition = getApplicationStatusDefinition(status);
     return {
-      text: 'Pending Review',
-      tone: 'pending',
-      category: 'pending-review',
+      text: statusDefinition.label,
+      tone: statusDefinition.tone,
+      description: statusDefinition.description,
+      key: statusDefinition.key,
+      category:
+        statusDefinition.key === 'admitted_internally'
+          ? 'pending-publish'
+          : statusDefinition.key === 'admitted' ||
+              statusDefinition.key === 'approved'
+            ? 'admitted'
+            : 'pending-review',
     };
   }
 

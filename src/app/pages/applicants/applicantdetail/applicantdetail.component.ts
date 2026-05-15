@@ -31,6 +31,8 @@ import {
 import { Observable } from 'rxjs';
 import { ActionNoteModalComponent } from '../../../widgets/action-note-modal/action-note-modal.component';
 import { ButtonComponent } from '../../../widgets/button/button.component';
+import { getApplicationStatusDefinition } from '../../../constants/application-status.utils';
+import { ApplicationStatusDefinition } from '../../../constants/application-status.types';
 
 type ApplicantDocumentFile =
   | Certificate
@@ -205,15 +207,18 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
 
   getAcademicHistory(name: string): AcademicHistory | undefined {
     const academicHistory = this.application.academic_history ?? [];
-    if (name == 'primary') {
+    if (name === 'primary') {
       return academicHistory.filter(
-        (f) => f.certificate_type == 'Primary School Leaving Certificate',
+        (historyItem) =>
+          historyItem.certificate_type === 'Primary School Leaving Certificate',
       )[0];
-    } else if (name == 'secondary') {
-      return academicHistory.filter((f) => f.certificate_type == 'SSSCE')[0];
-    } else {
-      return undefined;
     }
+    if (name === 'secondary') {
+      return academicHistory.filter(
+        (historyItem) => historyItem.certificate_type === 'SSSCE',
+      )[0];
+    }
+    return undefined;
   }
   getYear(): number | null {
     const input = this.application.o_level_result![0].name;
@@ -315,6 +320,23 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
     return file ?? null;
   }
 
+  private formatAddressDisplay(): string {
+    const residentialAddress = this.application.residential_address;
+    if (!residentialAddress) {
+      return '-----';
+    }
+
+    const addressParts = [
+      residentialAddress.address,
+      residentialAddress.lga?.name,
+      residentialAddress.state?.name,
+    ]
+      .map((addressPart) => addressPart?.trim() ?? '')
+      .filter((addressPart) => addressPart.length > 0);
+
+    return addressParts.length > 0 ? addressParts.join(', ') : '-----';
+  }
+
   viewDocument(row: Record<string, unknown>): void {
     const file = this.getDocumentFile(row);
     const fileUrl = this.getDocumentUrl(file);
@@ -360,7 +382,7 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
   }
 
   getJambScoreDisplay(): string {
-    return this.formatValue(this.application.utme_score);
+    return this.formatValue(this.application.utme_result?.score);
   }
 
   getCbtScoreDisplay(): string {
@@ -368,10 +390,7 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
       string,
       unknown
     >;
-    return this.formatValue(
-      applicationRecord['post_utme_point'] ??
-        this.application.utme_result?.score,
-    );
+    return this.formatValue(applicationRecord['post_utme_point'] || '0');
   }
 
   getUtmeRegistrationNumber(): string {
@@ -440,7 +459,7 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
       }),
       'Candidate shortlisted successfully.',
       () => {
-        this.application.approval_status = 'Shortlisted';
+        this.application.approval_status = 'shortlisted';
       },
       () => {
         this.isShortlisting = true;
@@ -502,7 +521,7 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
         this._applicationservice.issueComplianceDirective(payload),
         'Compliance directive issued successfully.',
         () => {
-          this.application.approval_status = 'Compliance';
+          this.application.approval_status = 'compliance_required';
           this.application.compliance_directive = payload.extra_note;
           this.closeReasonModal();
         },
@@ -525,7 +544,7 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
       this._applicationservice.rejectApplicants(payload),
       'Candidate rejected successfully.',
       () => {
-        this.application.approval_status = 'Rejected';
+        this.application.approval_status = 'rejected';
         this.closeReasonModal();
       },
       () => {
@@ -601,7 +620,7 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
       { label: 'Specified disability', value: this.application.disability },
       {
         label: 'Address',
-        value: this.application.residential_address?.address,
+        value: this.formatAddressDisplay(),
       },
     ];
 
@@ -670,6 +689,11 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
         actions: 'View, Download',
       },
       {
+        label: 'Certificate of Origin',
+        file: this.application.certificate_of_origin ?? null,
+        actions: 'View, Download',
+      },
+      {
         label: 'Passport Photograph',
         file: this.application.passport_photo ?? null,
         actions: 'View, Download',
@@ -686,41 +710,8 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
     return (this.application?.approval_status ?? '').toLowerCase();
   }
 
-  private getResolvedStatus(): {
-    text: string;
-    tone:
-      | 'pending'
-      | 'shortlisted'
-      | 'directive'
-      | 'resubmitted'
-      | 'rejected'
-      | 'admitted';
-  } {
-    const status = this.getNormalizedApprovalStatus();
-    if (status.includes('admit') || status.includes('approved')) {
-      return { text: 'Admitted', tone: 'admitted' };
-    }
-    if (
-      status.includes('publish') ||
-      status.includes('pending publish') ||
-      status.includes('shortlist')
-    ) {
-      return { text: 'Pending Publish', tone: 'resubmitted' };
-    }
-    if (status.includes('resubmit')) {
-      return { text: 'Resubmitted', tone: 'resubmitted' };
-    }
-    if (
-      status.includes('compliance') ||
-      status.includes('complaince') ||
-      status.includes('directive')
-    ) {
-      return { text: 'Directive Issued', tone: 'directive' };
-    }
-    if (status.includes('reject')) {
-      return { text: 'Rejected', tone: 'rejected' };
-    }
-    return { text: 'Pending Review', tone: 'pending' };
+  private getResolvedStatus(): ApplicationStatusDefinition {
+    return getApplicationStatusDefinition(this.application?.approval_status);
   }
 
   getApplicantFullName(): string {
@@ -737,11 +728,11 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
   }
 
   isShortlistedForExam(): boolean {
-    return this.getNormalizedApprovalStatus().includes('shortlist');
+    return this.getResolvedStatus().key === 'shortlisted';
   }
 
   isComplianceStatus(): boolean {
-    return this.getNormalizedApprovalStatus().includes('compliance');
+    return this.getResolvedStatus().key === 'compliance_required';
   }
 
   isComplianceIssued(): boolean {
@@ -754,8 +745,7 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
   }
 
   isComplianceRequired(): boolean {
-    const status = this.getNormalizedApprovalStatus();
-    return status === 'complaince required' || status === 'compliance required';
+    return this.getResolvedStatus().key === 'compliance_required';
   }
 
   isComplianceBaseState(): boolean {
@@ -763,36 +753,48 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
   }
 
   isRejected(): boolean {
-    return this.getNormalizedApprovalStatus().includes('reject');
+    const statusKey = this.getResolvedStatus().key;
+    return statusKey === 'rejected' || statusKey === 'auto_rejected';
   }
 
   getDisplayStatus(): string {
-    return this.getResolvedStatus().text;
+    return this.getResolvedStatus().label;
+  }
+
+  getDisplayStatusDescription(): string {
+    return this.getResolvedStatus().description;
   }
 
   getHeroStatusClass(): string {
-    const tone = this.getResolvedStatus().tone;
-    if (tone === 'admitted') {
+    const statusKey = this.getResolvedStatus().key;
+    if (statusKey === 'admitted') {
+      return 'hero-status-admitted';
+    }
+    if (statusKey === 'approved') {
+      return 'hero-status-approved';
+    }
+    if (statusKey === 'shortlisted') {
       return 'hero-status-shortlisted';
     }
-    if (tone === 'shortlisted') {
-      return 'hero-status-shortlisted';
-    }
-    if (tone === 'directive') {
+    if (statusKey === 'compliance_required') {
       return 'hero-status-directive';
     }
-    if (tone === 'resubmitted') {
+    if (statusKey === 'resubmitted') {
       return 'hero-status-resubmitted';
     }
-    if (tone === 'rejected') {
+    if (statusKey === 'rejected' || statusKey === 'auto_rejected') {
       return 'hero-status-rejected';
     }
     return 'hero-status-pending';
   }
 
   getStatusClassName(): string {
-    if (this.getResolvedStatus().tone === 'admitted') {
-      return 'status-shortlisted';
+    const statusKey = this.getResolvedStatus().key;
+    if (statusKey === 'admitted') {
+      return 'status-admitted';
+    }
+    if (statusKey === 'approved') {
+      return 'status-approved';
     }
     if (this.isComplianceBaseState()) {
       return 'status-compliance';
