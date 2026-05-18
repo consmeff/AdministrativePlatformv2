@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import {
+  PaymentDashboardDto,
   PaymentDetailDto,
   PaymentsListResponseDto,
 } from '../pages/payment-record/payment-record.types';
@@ -35,6 +36,11 @@ export class PaymentService {
       params = params.set('search', query.search);
     }
     return this.http.get<PaymentsListResponseDto>(url, { params });
+  }
+
+  getPaymentDashboard(): Observable<PaymentDashboardDto> {
+    const url = `${this.apiRoot}/api/v1/payments/payments/dashboard`;
+    return this.http.get<PaymentDashboardDto>(url);
   }
 
   getPaymentByRefId(refId: string): Observable<PaymentDetailDto> {

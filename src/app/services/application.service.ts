@@ -48,6 +48,7 @@ export interface RejectApplicantPayload extends ApplicantActionPayload {
 export interface GetApplicantsQuery {
   approval_status?: string;
   form?: string;
+  programme?: string;
   ordering?: string;
   payment_status?: string;
   application_no?: string;
@@ -178,6 +179,9 @@ export class ApplicationService {
     }
     if (query?.form) {
       params = params.set('form', query.form);
+    }
+    if (query?.programme) {
+      params = params.set('programme', query.programme);
     }
     if (query?.payment_status) {
       params = params.set('payment_status', query.payment_status);

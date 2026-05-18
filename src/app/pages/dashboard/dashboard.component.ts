@@ -94,7 +94,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     'JAMB',
     'O Level',
     'Submission Date',
-    'Programme',
     'Status',
     'Actions',
   ];

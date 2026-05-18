@@ -155,7 +155,7 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
 
   selectedStatus: FilterOption = this.statusOptions[0];
   selectedOrdering: FilterOption = this.orderingOptions[0];
-  currentFormLevel: string | undefined = undefined;
+  currentProgrammeKey: string | undefined = undefined;
   activeCardFilter: ApplicantCardFilter = 'all';
   readonly filterCards: ApplicantFilterCard[] = [
     { label: 'All Applicants', filter: 'all' },
@@ -216,7 +216,7 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
     this.route.queryParamMap
       .pipe(takeUntil(this.destroy$))
       .subscribe((params: ParamMap) => {
-        this.syncFormFromQuery(params.get('level'));
+        this.syncProgrammeFromQuery(params.get('programme'));
         this.first = 0;
         this.fetchRecords();
       });
@@ -244,7 +244,7 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
         this.selectedStatus.value === 'all'
           ? undefined
           : this.selectedStatus.value,
-      // form: this.currentFormLevel,
+      programme: this.currentProgrammeKey,
       ordering: this.selectedOrdering.value,
     };
 
@@ -393,13 +393,13 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
     return 'all';
   }
 
-  private syncFormFromQuery(level: string | null): void {
-    const normalizedLevel = (level ?? '').toLowerCase();
-    if (normalizedLevel === 'ond' || normalizedLevel === 'hnd') {
-      this.currentFormLevel = normalizedLevel;
+  private syncProgrammeFromQuery(programme: string | null): void {
+    const normalizedProgramme = (programme ?? '').trim().toLowerCase();
+    if (normalizedProgramme.length > 0) {
+      this.currentProgrammeKey = normalizedProgramme;
       return;
     }
-    this.currentFormLevel = undefined;
+    this.currentProgrammeKey = undefined;
   }
 
   private resolveStatus(status: string): {
@@ -605,7 +605,6 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
         this.selectedApplicantIds.length > 0 ? this.selectedApplicantIds : [],
       keyword: (this.searchKeyword ?? this.searchText?.trim()) || undefined,
       approval_status: selection.approval_status,
-      // form: this.currentFormLevel,
       ordering: this.selectedOrdering.value,
     };
 
