@@ -45,12 +45,12 @@ export class SidebarComponent {
         {
           label: 'OND',
           route: '/pages/applicants',
-          queryParams: { level: 'ond' },
+          queryParams: { programme: 'ond' },
         },
         {
           label: 'HND',
           route: '/pages/applicants',
-          queryParams: { level: 'hnd' },
+          queryParams: { programme: 'hnd' },
         },
       ],
     },
@@ -62,12 +62,12 @@ export class SidebarComponent {
         {
           label: 'OND',
           route: '/pages/admissions',
-          queryParams: { level: 'ond' },
+          queryParams: { programme: 'ond' },
         },
         {
           label: 'HND',
           route: '/pages/admissions',
-          queryParams: { level: 'hnd' },
+          queryParams: { programme: 'hnd' },
         },
       ],
     },
@@ -152,18 +152,18 @@ export class SidebarComponent {
       .map((segment) => segment.path)
       .join('/');
     const normalizedCurrentPath = currentPath ? `/${currentPath}` : '';
-    const expectedLevel = item.queryParams?.['level'];
-    const currentLevel = currentTree.queryParams['level'];
+    const expectedprogramme = item.queryParams?.['programme'];
+    const currentprogramme = currentTree.queryParams['programme'];
 
     if (!normalizedCurrentPath.startsWith(item.route)) {
       return false;
     }
-    if (!expectedLevel) {
+    if (!expectedprogramme) {
       return true;
     }
     return (
-      String(currentLevel ?? '').toLowerCase() ===
-      String(expectedLevel).toLowerCase()
+      String(currentprogramme ?? '').toLowerCase() ===
+      String(expectedprogramme).toLowerCase()
     );
   }
 

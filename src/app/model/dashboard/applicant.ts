@@ -29,6 +29,7 @@ export interface Application {
   gender?: string;
   utme_result?: UtmeResult;
   utme_score?: number | null;
+  post_utme_point?: number | null;
   residential_address?: ResidentialAddress;
   correspondence_address?: CorrespondenceAddress;
   nationality?: string;

@@ -26,13 +26,16 @@ import { PaymentReceiptModalComponent } from './receipt-modal/payment-receipt-mo
 import { MetricCardComponent } from '../../widgets/metric-card/metric-card.component';
 import {
   FilterOption,
+  PaymentDashboardDto,
   PaymentDetailDto,
   PaymentsListItemDto,
   PaymentsListResponseDto,
   PaymentStatus,
+  PaymentSummaryCard,
   PaymentType,
   TransactionRow,
 } from './payment-record.types';
+import { PAYMENT_BREAKDOWN_CARD_ORDER } from './payment-record.constants';
 
 @Component({
   selector: 'app-payment-record',
@@ -81,31 +84,26 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
   allTransactions: TransactionRow[] = [];
   selectedTransaction: TransactionRow | null = null;
 
-  readonly summaryCards = [
+  summaryCards: PaymentSummaryCard[] = [
     {
       title: 'Total Revenue',
-      value: 'N684.3M',
-      subtext: '1054 Transactions',
+      value: this.formatAmount(0),
+      subtext: '0 Transactions',
     },
     {
       title: 'Application Fees',
-      value: 'N4.9M',
-      subtext: '247 payments',
+      value: this.formatAmount(0),
+      subtext: '',
     },
     {
       title: 'Acceptance Fees',
-      value: 'N2.7M',
-      subtext: '90 payments',
+      value: this.formatAmount(0),
+      subtext: '',
     },
     {
-      title: 'School Fees',
-      value: 'N535.4M',
-      subtext: '893 students',
-    },
-    {
-      title: 'Other Fees',
-      value: 'N10.3M',
-      subtext: '893 students',
+      title: 'Tuition Fee',
+      value: this.formatAmount(0),
+      subtext: '',
     },
   ];
 
@@ -119,6 +117,7 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
         )
         .subscribe(),
     );
+    this.subscriptions.add(this.loadPaymentDashboard().subscribe());
     this.subscriptions.add(this.fetchPayments().subscribe());
   }
 
@@ -239,6 +238,18 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
       );
   }
 
+  private loadPaymentDashboard() {
+    return this.paymentService.getPaymentDashboard().pipe(
+      tap((paymentDashboard) => {
+        this.summaryCards = this.mapSummaryCards(paymentDashboard);
+      }),
+      catchError(() => {
+        this.summaryCards = this.buildDefaultSummaryCards();
+        return of(null);
+      }),
+    );
+  }
+
   private mapPaymentListItem(
     item: PaymentsListItemDto,
     index: number,
@@ -302,6 +313,53 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
         this.normalizeDisplayText(detail.level_of_study, '') || base.payerLevel,
       paymentType: this.normalizePaymentType(detail.payment_type),
     };
+  }
+
+  private mapSummaryCards(
+    paymentDashboard: PaymentDashboardDto,
+  ): PaymentSummaryCard[] {
+    const paymentBreakdown = paymentDashboard.payment_breakdown ?? {};
+    const orderedBreakdownTitles = PAYMENT_BREAKDOWN_CARD_ORDER.filter(
+      (paymentTitle) => paymentBreakdown[paymentTitle] !== undefined,
+    );
+    const additionalBreakdownTitles = Object.keys(paymentBreakdown).filter(
+      (paymentTitle) =>
+        !PAYMENT_BREAKDOWN_CARD_ORDER.some(
+          (orderedPaymentTitle) => orderedPaymentTitle === paymentTitle,
+        ),
+    );
+    const paymentCardTitles = [
+      ...orderedBreakdownTitles,
+      ...additionalBreakdownTitles,
+    ];
+
+    return [
+      {
+        title: 'Total Revenue',
+        value: this.formatAmount(this.toNumber(paymentDashboard.total_revenue)),
+        subtext: `${paymentDashboard.total_transactions ?? 0} Transactions`,
+      },
+      ...paymentCardTitles.map((paymentTitle) => ({
+        title: paymentTitle,
+        value: this.formatAmount(this.toNumber(paymentBreakdown[paymentTitle])),
+        subtext: '',
+      })),
+    ];
+  }
+
+  private buildDefaultSummaryCards(): PaymentSummaryCard[] {
+    return [
+      {
+        title: 'Total Revenue',
+        value: this.formatAmount(0),
+        subtext: '0 Transactions',
+      },
+      ...PAYMENT_BREAKDOWN_CARD_ORDER.slice(0, 3).map((paymentTitle) => ({
+        title: paymentTitle,
+        value: this.formatAmount(0),
+        subtext: '',
+      })),
+    ];
   }
 
   private normalizeStatus(status: string): PaymentStatus {

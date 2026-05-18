@@ -15,7 +15,7 @@ import {
   ApplicationSetupItem,
   GetApplicantsQuery,
 } from '../../services/application.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 import {
   Application,
   ApplicationListResponse,
@@ -125,7 +125,7 @@ interface ChangeProgrammeSelection {
 })
 export class AdmissionsComponent implements OnInit, OnDestroy {
   _applicationService = inject(ApplicationService);
-  router = inject(Router);
+  route = inject(ActivatedRoute);
   busyService = inject(BusyIndicatorService);
   notification = inject(NotificationService);
   cd = inject(ChangeDetectorRef);
@@ -145,6 +145,7 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   rows = 100;
 
   searchText = '';
+  currentProgrammeKey: string | undefined = undefined;
   selectedRows: AdmissionTableRow[] = [];
   selectedApplicationNo: string | null = null;
   isApplicantDrawerVisible = false;
@@ -215,6 +216,15 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     this.checkCbtUploadStatus();
     this.loadProgrammeCatalog();
     this.loadCardMetrics();
+    this.subscriptions.add(
+      this.route.queryParamMap.subscribe((params: ParamMap) => {
+        this.syncProgrammeFromQuery(params.get('programme'));
+        this.first = 0;
+        if (this.hasCheckedCbtUploadStatus) {
+          this.loadAdmissionsRecords();
+        }
+      }),
+    );
     this.approval_status = [
       { name: 'All', code: 0 },
       { name: APPLICATION_STATUS_LABELS.pending, code: 1 },
@@ -308,6 +318,7 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   ): Observable<ApplicationListResponse> {
     const query: GetApplicantsQuery = {
       search: this.searchKeyword,
+      programme: this.currentProgrammeKey,
       approval_status: this.getApprovalStatusForCardFilter(
         this.activeCardFilter,
       ),
@@ -361,7 +372,7 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
         full_name: `${v.first_name} ${v.last_name}`,
         jamb_score: v.utme_score ?? v.utme_result?.score ?? 'N/A',
         o_level: `${v.o_level_point ?? 'N/A'} Points`,
-        cbt_score: v.utme_result?.score ?? 'N/A',
+        cbt_score: v.post_utme_point ?? 'N/A',
         program: programmeName,
         status_text: status.text,
         status_tone: status.tone,
@@ -433,9 +444,15 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
       return 'admitted_internally';
     }
     if (filter === 'admitted') {
-      return 'admitted';
+      return 'approved';
     }
     return undefined;
+  }
+
+  private syncProgrammeFromQuery(programme: string | null): void {
+    const normalizedProgramme = (programme ?? '').trim().toLowerCase();
+    this.currentProgrammeKey =
+      normalizedProgramme.length > 0 ? normalizedProgramme : undefined;
   }
 
   getCardCount(filter: AdmissionDecisionFilter): number {
@@ -883,8 +900,11 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   }
 
   private revertDecision(row: AdmissionTableRow): void {
-    this.notification.warn(
-      `Revert decision is not yet wired for ${row.full_name}.`,
+    this.performApplicantAction(
+      this._applicationService.shortlistApplicants({
+        applicant_ids: [row.id],
+      }),
+      `Decision reverted for ${row.full_name}.`,
     );
   }
 
