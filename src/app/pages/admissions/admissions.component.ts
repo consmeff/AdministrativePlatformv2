@@ -15,7 +15,7 @@ import {
   ApplicationSetupItem,
   GetApplicantsQuery,
 } from '../../services/application.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 import {
   Application,
   ApplicationListResponse,
@@ -48,6 +48,8 @@ import {
   UpdateFileModalComponent,
   UpdateFileSelection,
 } from '../../widgets/update-file-modal/update-file-modal.component';
+import { APPLICATION_STATUS_LABELS } from '../../constants/application-status.constants';
+import { getApplicationStatusDefinition } from '../../constants/application-status.utils';
 
 interface PagingEvent {
   first: number;
@@ -71,6 +73,8 @@ interface AdmissionTableRow {
   program: string;
   status_text: string;
   status_tone: StatusTone;
+  status_description: string;
+  status_key: string;
   decision_category: AdmissionDecisionFilter;
 }
 
@@ -121,7 +125,7 @@ interface ChangeProgrammeSelection {
 })
 export class AdmissionsComponent implements OnInit, OnDestroy {
   _applicationService = inject(ApplicationService);
-  router = inject(Router);
+  route = inject(ActivatedRoute);
   busyService = inject(BusyIndicatorService);
   notification = inject(NotificationService);
   cd = inject(ChangeDetectorRef);
@@ -141,6 +145,7 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   rows = 100;
 
   searchText = '';
+  currentProgrammeKey: string | undefined = undefined;
   selectedRows: AdmissionTableRow[] = [];
   selectedApplicationNo: string | null = null;
   isApplicantDrawerVisible = false;
@@ -165,8 +170,11 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   activeCardFilter: AdmissionDecisionFilter = 'all';
   readonly filterCards: AdmissionFilterCard[] = [
     { label: 'All Candidates', filter: 'all' },
-    { label: 'Shortlisted', filter: 'pending-review' },
-    { label: 'Pending Publish', filter: 'pending-publish' },
+    { label: APPLICATION_STATUS_LABELS.shortlisted, filter: 'pending-review' },
+    {
+      label: APPLICATION_STATUS_LABELS.admitted_internally,
+      filter: 'pending-publish',
+    },
     { label: 'Admitted Candidates', filter: 'admitted' },
   ];
   metrics: AdmissionAdminDashboardResponse = {
@@ -208,13 +216,24 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     this.checkCbtUploadStatus();
     this.loadProgrammeCatalog();
     this.loadCardMetrics();
+    this.subscriptions.add(
+      this.route.queryParamMap.subscribe((params: ParamMap) => {
+        this.syncProgrammeFromQuery(params.get('programme'));
+        this.first = 0;
+        if (this.hasCheckedCbtUploadStatus) {
+          this.loadAdmissionsRecords();
+        }
+      }),
+    );
     this.approval_status = [
       { name: 'All', code: 0 },
-      { name: 'Pending', code: 1 },
-      { name: 'Shortlisted', code: 2 },
-      { name: 'Compliance', code: 3 },
-      { name: 'Rejected', code: 4 },
-      { name: 'Resolved', code: 5 },
+      { name: APPLICATION_STATUS_LABELS.pending, code: 1 },
+      { name: APPLICATION_STATUS_LABELS.shortlisted, code: 2 },
+      { name: APPLICATION_STATUS_LABELS.compliance_required, code: 3 },
+      { name: APPLICATION_STATUS_LABELS.rejected, code: 4 },
+      { name: APPLICATION_STATUS_LABELS.admitted, code: 5 },
+      { name: APPLICATION_STATUS_LABELS.approved, code: 6 },
+      { name: APPLICATION_STATUS_LABELS.admitted_internally, code: 7 },
     ];
 
     this.cols = [];
@@ -299,6 +318,7 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   ): Observable<ApplicationListResponse> {
     const query: GetApplicantsQuery = {
       search: this.searchKeyword,
+      programme: this.currentProgrammeKey,
       approval_status: this.getApprovalStatusForCardFilter(
         this.activeCardFilter,
       ),
@@ -352,10 +372,12 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
         full_name: `${v.first_name} ${v.last_name}`,
         jamb_score: v.utme_score ?? v.utme_result?.score ?? 'N/A',
         o_level: `${v.o_level_point ?? 'N/A'} Points`,
-        cbt_score: v.utme_result?.score ?? 'N/A',
+        cbt_score: v.post_utme_point ?? 'N/A',
         program: programmeName,
         status_text: status.text,
         status_tone: status.tone,
+        status_description: status.description,
+        status_key: status.key,
         decision_category: status.category,
       };
       newSummary.push(_summ);
@@ -368,38 +390,23 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   private resolveStatus(status: string): {
     text: string;
     tone: StatusTone;
+    description: string;
+    key: string;
     category: AdmissionDecisionFilter;
   } {
-    const value = (status ?? '').toLowerCase();
-    if (
-      value.includes('admitted internally') ||
-      value.includes('admit internally') ||
-      value.includes('pending publish') ||
-      value.includes('publish')
-    ) {
-      return {
-        text: 'Pending Publish',
-        tone: 'resubmitted',
-        category: 'pending-publish',
-      };
-    }
-    if (value.includes('shortlist')) {
-      return {
-        text: 'Shortlisted',
-        tone: 'shortlisted',
-        category: 'pending-review',
-      };
-    }
-    if (value.includes('admit') || value.includes('approved')) {
-      return { text: 'Admitted', tone: 'shortlisted', category: 'admitted' };
-    }
-    if (value.includes('reject')) {
-      return { text: 'Rejected', tone: 'rejected', category: 'pending-review' };
-    }
+    const statusDefinition = getApplicationStatusDefinition(status);
     return {
-      text: 'Pending Review',
-      tone: 'pending',
-      category: 'pending-review',
+      text: statusDefinition.label,
+      tone: statusDefinition.tone,
+      description: statusDefinition.description,
+      key: statusDefinition.key,
+      category:
+        statusDefinition.key === 'admitted_internally'
+          ? 'pending-publish'
+          : statusDefinition.key === 'admitted' ||
+              statusDefinition.key === 'approved'
+            ? 'admitted'
+            : 'pending-review',
     };
   }
 
@@ -437,9 +444,15 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
       return 'admitted_internally';
     }
     if (filter === 'admitted') {
-      return 'admitted';
+      return 'approved';
     }
     return undefined;
+  }
+
+  private syncProgrammeFromQuery(programme: string | null): void {
+    const normalizedProgramme = (programme ?? '').trim().toLowerCase();
+    this.currentProgrammeKey =
+      normalizedProgramme.length > 0 ? normalizedProgramme : undefined;
   }
 
   getCardCount(filter: AdmissionDecisionFilter): number {
@@ -489,6 +502,7 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
         next: () => {
           this.notification.success('Applicants updated successfully.');
           this.isUpdateFileModalVisible = false;
+          this.loadCardMetrics();
           this.loadAdmissionsRecords();
         },
         error: () => {
@@ -502,6 +516,7 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
 
   onCbtUploadFlowCompleted(): void {
     this.isCbtResultsUploaded = true;
+    this.loadCardMetrics();
     this.loadAdmissionsRecords();
   }
 
@@ -627,6 +642,7 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
               : `${this.changeProgrammeApplicantIds.length} candidates moved to ${normalizedSelection.programmeName}.`,
           );
           this.isChangeProgrammeModalVisible = false;
+          this.loadCardMetrics();
           this.fetchRecords().subscribe((data: ApplicationListResponse) => {
             this.total_record_count = data.total;
             this.nextPageUrl = data.next_page_url ?? null;
@@ -805,14 +821,17 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
     }
 
     this.performApplicantAction(
-      this._applicationService.markAsAdmittedInternally({
-        data: publishableRows.map((row) => ({ applicant_id: row.id })),
+      this._applicationService.approveApplicants({
+        data: publishableRows.map((row) => ({
+          applicant_id: row.id,
+        })),
       }),
       this.buildBulkSuccessMessage(
         'Admission published',
         publishableRows.length,
         'candidate',
       ),
+      true,
     );
   }
 
@@ -881,8 +900,11 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   }
 
   private revertDecision(row: AdmissionTableRow): void {
-    this.notification.warn(
-      `Revert decision is not yet wired for ${row.full_name}.`,
+    this.performApplicantAction(
+      this._applicationService.shortlistApplicants({
+        applicant_ids: [row.id],
+      }),
+      `Decision reverted for ${row.full_name}.`,
     );
   }
 
@@ -895,12 +917,16 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   private performApplicantAction(
     request: Observable<unknown>,
     successMessage: string,
+    refreshMetrics = true,
   ) {
     this.busyService.show();
     request.subscribe({
       next: () => {
         this.notification.success(successMessage);
         this.selectedRows = [];
+        if (refreshMetrics) {
+          this.loadCardMetrics();
+        }
         this.fetchRecords().subscribe((data: ApplicationListResponse) => {
           this.total_record_count = data.total;
           this.nextPageUrl = data.next_page_url ?? null;

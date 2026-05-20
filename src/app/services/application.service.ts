@@ -1,6 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpEvent,
+  HttpHeaders,
+  HttpParams,
+  HttpResponse,
+} from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
   Application,
@@ -27,6 +33,14 @@ export interface MarkAsAdmittedPayload {
   data: MarkAsAdmittedDataItem[];
 }
 
+export interface ApproveApplicantsDataItem {
+  applicant_id: number;
+}
+
+export interface ApproveApplicantsPayload {
+  data: ApproveApplicantsDataItem[];
+}
+
 export interface RejectApplicantPayload extends ApplicantActionPayload {
   extra_note: string;
 }
@@ -34,6 +48,7 @@ export interface RejectApplicantPayload extends ApplicantActionPayload {
 export interface GetApplicantsQuery {
   approval_status?: string;
   form?: string;
+  programme?: string;
   ordering?: string;
   payment_status?: string;
   application_no?: string;
@@ -60,7 +75,7 @@ export interface BulkUpdateApplicantsPayload {
 export interface SetCutoffRequestPayload {
   min_jamb_score: number;
   min_post_utme_score: number;
-  application: number | string;
+  application_id?: number;
   all_application: boolean;
 }
 
@@ -165,6 +180,9 @@ export class ApplicationService {
     if (query?.form) {
       params = params.set('form', query.form);
     }
+    if (query?.programme) {
+      params = params.set('programme', query.programme);
+    }
     if (query?.payment_status) {
       params = params.set('payment_status', query.payment_status);
     }
@@ -211,6 +229,14 @@ export class ApplicationService {
     return this.http.get<unknown>(url);
   }
 
+  downloadCbtResultsTemplate(): Observable<HttpResponse<Blob>> {
+    const url = `${this.apiRoot}/api/v1/applicants/cbt-results-template`;
+    return this.http.get(url, {
+      observe: 'response',
+      responseType: 'blob',
+    });
+  }
+
   getAvailableApplications(): Observable<ApplicationSetupListResponse> {
     const url = `${this.apiRoot}/api/v1/setup/applications`;
     return this.http.get<ApplicationSetupListResponse>(url);
@@ -235,6 +261,11 @@ export class ApplicationService {
     return this.http.post(url, payload);
   }
 
+  approveApplicants(payload: ApproveApplicantsPayload): Observable<unknown> {
+    const url = `${this.apiRoot}/api/v1/applicants/approve-applicants`;
+    return this.http.post(url, payload);
+  }
+
   rejectApplicants(payload: RejectApplicantPayload): Observable<unknown> {
     const url = `${this.apiRoot}/api/v1/applicants/reject-applicants`;
     return this.http.post(url, payload);
@@ -248,20 +279,38 @@ export class ApplicationService {
   bulkUpdateApplicants(
     payload: BulkUpdateApplicantsPayload,
   ): Observable<unknown> {
+    const formData = this.buildBulkUpdateFormData(payload);
     const url = `${this.apiRoot}/api/v1/applicants/bulk-update`;
-    const formData = new FormData();
-    formData.append('file', payload.file);
-    formData.append('fields', payload.fields);
     return this.http.post(url, formData);
+  }
+
+  bulkUpdateApplicantsWithProgress(
+    payload: BulkUpdateApplicantsPayload,
+  ): Observable<HttpEvent<unknown>> {
+    const formData = this.buildBulkUpdateFormData(payload);
+    const url = `${this.apiRoot}/api/v1/applicants/bulk-update`;
+    return this.http.post(url, formData, {
+      observe: 'events',
+      reportProgress: true,
+    });
   }
 
   setApplicationCutoff(payload: SetCutoffRequestPayload): Observable<unknown> {
     const url = `${this.apiRoot}/api/v1/applications/cutoff`;
-    return this.http.put(url, payload);
+    return this.http.patch(url, payload);
   }
 
   getApplicationCutoff(): Observable<SetCutoffResponsePayload> {
     const url = `${this.apiRoot}/api/v1/applications/cutoff`;
     return this.http.get<SetCutoffResponsePayload>(url);
+  }
+
+  private buildBulkUpdateFormData(
+    payload: BulkUpdateApplicantsPayload,
+  ): FormData {
+    const formData = new FormData();
+    formData.append('file', payload.file);
+    formData.append('fields', payload.fields);
+    return formData;
   }
 }

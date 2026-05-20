@@ -21,6 +21,7 @@ import {
   Application,
   ApplicationListResponse,
   Certificate,
+  OLevelResult,
 } from '../../../model/dashboard/applicant';
 import { TabViewModule } from 'primeng/tabview';
 import {
@@ -30,6 +31,8 @@ import {
 import { Observable } from 'rxjs';
 import { ActionNoteModalComponent } from '../../../widgets/action-note-modal/action-note-modal.component';
 import { ButtonComponent } from '../../../widgets/button/button.component';
+import { getApplicationStatusDefinition } from '../../../constants/application-status.utils';
+import { ApplicationStatusDefinition } from '../../../constants/application-status.types';
 
 type ApplicantDocumentFile =
   | Certificate
@@ -67,6 +70,7 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
   @Output() closed = new EventEmitter<void>();
   @Output() changeProgrammeRequested = new EventEmitter<string>();
   @Output() grantAdmissionRequested = new EventEmitter<void>();
+  @Output() actionCompleted = new EventEmitter<void>();
 
   app_no: string | null = '';
   isIssuingCompliance = false;
@@ -90,8 +94,11 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
   ];
   personalDetailRows: Record<string, unknown>[] = [];
   nextOfKinRows: Record<string, unknown>[] = [];
-  academicHistoryRows: Record<string, unknown>[] = [];
   documentRows: Record<string, unknown>[] = [];
+  oLevelResults: OLevelResult[] = [];
+  otherQualifications: AcademicHistory[] = [];
+  primaryAcademicHistory: AcademicHistory | null = null;
+  secondaryAcademicHistory: AcademicHistory | null = null;
 
   onChangeProgramme(): void {
     if (this.embeddedMode === 'admissions') {
@@ -200,42 +207,19 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
 
   getAcademicHistory(name: string): AcademicHistory | undefined {
     const academicHistory = this.application.academic_history ?? [];
-    if (name == 'primary') {
+    if (name === 'primary') {
       return academicHistory.filter(
-        (f) => f.certificate_type == 'Primary School Leaving Certificate',
+        (historyItem) =>
+          historyItem.certificate_type === 'Primary School Leaving Certificate',
       )[0];
-    } else if (name == 'secondary') {
-      return academicHistory.filter((f) => f.certificate_type == 'SSSCE')[0];
-    } else {
-      return undefined;
     }
+    if (name === 'secondary') {
+      return academicHistory.filter(
+        (historyItem) => historyItem.certificate_type === 'SSSCE',
+      )[0];
+    }
+    return undefined;
   }
-  getAttemptCount(): number {
-    return (this.application.academic_history ?? []).filter(
-      (f) => f.certificate_type == 'SSSCE',
-    ).length;
-  }
-
-  getSubjects(): string {
-    const subjects = this.application.o_level_result![0].subjects;
-    const subjectFormats: Record<string, string> = {
-      english: 'English Language',
-      math: 'Mathematics',
-      physics: 'Physics',
-      chemistry: 'Chemistry',
-      biology: 'Biology',
-    };
-
-    return subjects
-      .map((item) => {
-        const formattedSubject =
-          subjectFormats[item.subject.toLowerCase()] ||
-          item.subject.charAt(0).toUpperCase() + item.subject.slice(1);
-        return `${formattedSubject} - ${item.grade.toUpperCase()}`;
-      })
-      .join(', ');
-  }
-
   getYear(): number | null {
     const input = this.application.o_level_result![0].name;
     const yearMatches = input.match(/\b(20\d{2}|19\d{2})\b/g);
@@ -336,6 +320,23 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
     return file ?? null;
   }
 
+  private formatAddressDisplay(): string {
+    const residentialAddress = this.application.residential_address;
+    if (!residentialAddress) {
+      return '-----';
+    }
+
+    const addressParts = [
+      residentialAddress.address,
+      residentialAddress.lga?.name,
+      residentialAddress.state?.name,
+    ]
+      .map((addressPart) => addressPart?.trim() ?? '')
+      .filter((addressPart) => addressPart.length > 0);
+
+    return addressParts.length > 0 ? addressParts.join(', ') : '-----';
+  }
+
   viewDocument(row: Record<string, unknown>): void {
     const file = this.getDocumentFile(row);
     const fileUrl = this.getDocumentUrl(file);
@@ -376,11 +377,67 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
     return file?.file_url?.trim() ?? '';
   }
 
+  formatValue(value: unknown, fallback = '-----'): string {
+    return this.getDisplayText(value, fallback);
+  }
+
+  getJambScoreDisplay(): string {
+    return this.formatValue(this.application.utme_result?.score);
+  }
+
+  getCbtScoreDisplay(): string {
+    const applicationRecord = this.application as unknown as Record<
+      string,
+      unknown
+    >;
+    return this.formatValue(applicationRecord['post_utme_point'] || '0');
+  }
+
+  getUtmeRegistrationNumber(): string {
+    const applicationRecord = this.application as unknown as Record<
+      string,
+      unknown
+    >;
+    return this.formatValue(applicationRecord['utme_reg_no']);
+  }
+
+  getOLevelPointDisplay(): string {
+    return this.formatValue(this.application.o_level_point, '0');
+  }
+
+  getAttemptCountLabel(): string {
+    const attemptCount = this.oLevelResults.length;
+    return `${attemptCount} ${attemptCount === 1 ? 'Attempt' : 'Attempts'}`;
+  }
+
+  formatSubjectName(subjectName: string): string {
+    const normalizedName = subjectName.trim().toLowerCase();
+    const formattedNames: Record<string, string> = {
+      english: 'English Language',
+      math: 'Mathematics',
+      physics: 'Physics',
+      chemistry: 'Chemistry',
+      biology: 'Biology',
+    };
+
+    return (
+      formattedNames[normalizedName] ??
+      normalizedName.replace(/\b\w/g, (character) => character.toUpperCase())
+    );
+  }
+
+  formatDateRange(fromDate?: string, toDate?: string): string {
+    const normalizedFromDate = this.formatValue(fromDate);
+    const normalizedToDate = this.formatValue(toDate);
+    return `${normalizedFromDate} to ${normalizedToDate}`;
+  }
+
   issueComplianceDirective() {
     if (
       !this.application?.id ||
       this.isIssuingCompliance ||
-      this.isComplianceIssued()
+      this.isComplianceIssued() ||
+      this.isShortlistedForExam()
     ) {
       return;
     }
@@ -402,7 +459,7 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
       }),
       'Candidate shortlisted successfully.',
       () => {
-        this.application.approval_status = 'Shortlisted';
+        this.application.approval_status = 'shortlisted';
       },
       () => {
         this.isShortlisting = true;
@@ -464,7 +521,7 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
         this._applicationservice.issueComplianceDirective(payload),
         'Compliance directive issued successfully.',
         () => {
-          this.application.approval_status = 'Compliance';
+          this.application.approval_status = 'compliance_required';
           this.application.compliance_directive = payload.extra_note;
           this.closeReasonModal();
         },
@@ -487,7 +544,7 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
       this._applicationservice.rejectApplicants(payload),
       'Candidate rejected successfully.',
       () => {
-        this.application.approval_status = 'Rejected';
+        this.application.approval_status = 'rejected';
         this.closeReasonModal();
       },
       () => {
@@ -510,6 +567,7 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
     request.subscribe({
       next: () => {
         onSuccess?.();
+        this.actionCompleted.emit();
         this.notification.success(successMessage);
       },
 
@@ -526,7 +584,21 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
     const hasOLevelResults =
       Array.isArray(this.application.o_level_result) &&
       this.application.o_level_result.length > 0;
-    const examinationYear = hasOLevelResults ? this.getYear() : null;
+
+    this.primaryAcademicHistory = primaryHistory ?? null;
+    this.secondaryAcademicHistory = secondaryHistory ?? null;
+    this.oLevelResults = this.application.o_level_result ?? [];
+    this.otherQualifications = (this.application.academic_history ?? []).filter(
+      (item) => {
+        const certificateType = (item.certificate_type ?? '')
+          .trim()
+          .toLowerCase();
+        return (
+          certificateType !== 'primary school leaving certificate' &&
+          certificateType !== 'sssce'
+        );
+      },
+    );
 
     this.personalDetailRows = [
       { label: 'First Name', value: this.application.first_name },
@@ -548,7 +620,7 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
       { label: 'Specified disability', value: this.application.disability },
       {
         label: 'Address',
-        value: this.application.residential_address?.address,
+        value: this.formatAddressDisplay(),
       },
     ];
 
@@ -603,36 +675,6 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
       },
     ];
 
-    this.academicHistoryRows = [
-      { label: 'Primary School', value: primaryHistory?.institution },
-      {
-        label: 'Duration',
-        value: `${primaryHistory?.from_date ?? '-----'} to ${primaryHistory?.to_date ?? '-----'}`,
-      },
-      { label: 'Secondary School', value: secondaryHistory?.institution },
-      {
-        label: 'Duration',
-        value: `${secondaryHistory?.from_date ?? '-----'} to ${secondaryHistory?.to_date ?? '-----'}`,
-      },
-      {
-        label: 'Qualification',
-        value: secondaryHistory?.certificate_type ?? '-----',
-      },
-      { label: 'Number of Attempts', value: this.getAttemptCount() },
-      {
-        label: 'Examination Name',
-        value: hasOLevelResults ? this.getExamName() : '-----',
-      },
-      {
-        label: 'Examination Year',
-        value: examinationYear ?? '-----',
-      },
-      {
-        label: 'Grades',
-        value: hasOLevelResults ? this.getSubjects() : '-----',
-      },
-    ];
-
     this.documentRows = [
       {
         label: 'Cirtificate of Birth',
@@ -644,6 +686,11 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
         file: hasOLevelResults
           ? this.application.o_level_result?.[0]?.file
           : null,
+        actions: 'View, Download',
+      },
+      {
+        label: 'Certificate of Origin',
+        file: this.application.certificate_of_origin ?? null,
         actions: 'View, Download',
       },
       {
@@ -663,41 +710,8 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
     return (this.application?.approval_status ?? '').toLowerCase();
   }
 
-  private getResolvedStatus(): {
-    text: string;
-    tone:
-      | 'pending'
-      | 'shortlisted'
-      | 'directive'
-      | 'resubmitted'
-      | 'rejected'
-      | 'admitted';
-  } {
-    const status = this.getNormalizedApprovalStatus();
-    if (status.includes('admit') || status.includes('approved')) {
-      return { text: 'Admitted', tone: 'admitted' };
-    }
-    if (
-      status.includes('publish') ||
-      status.includes('pending publish') ||
-      status.includes('shortlist')
-    ) {
-      return { text: 'Pending Publish', tone: 'resubmitted' };
-    }
-    if (status.includes('resubmit')) {
-      return { text: 'Resubmitted', tone: 'resubmitted' };
-    }
-    if (
-      status.includes('compliance') ||
-      status.includes('complaince') ||
-      status.includes('directive')
-    ) {
-      return { text: 'Directive Issued', tone: 'directive' };
-    }
-    if (status.includes('reject')) {
-      return { text: 'Rejected', tone: 'rejected' };
-    }
-    return { text: 'Pending Review', tone: 'pending' };
+  private getResolvedStatus(): ApplicationStatusDefinition {
+    return getApplicationStatusDefinition(this.application?.approval_status);
   }
 
   getApplicantFullName(): string {
@@ -714,11 +728,11 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
   }
 
   isShortlistedForExam(): boolean {
-    return this.getNormalizedApprovalStatus().includes('shortlist');
+    return this.getResolvedStatus().key === 'shortlisted';
   }
 
   isComplianceStatus(): boolean {
-    return this.getNormalizedApprovalStatus().includes('compliance');
+    return this.getResolvedStatus().key === 'compliance_required';
   }
 
   isComplianceIssued(): boolean {
@@ -731,8 +745,7 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
   }
 
   isComplianceRequired(): boolean {
-    const status = this.getNormalizedApprovalStatus();
-    return status === 'complaince required' || status === 'compliance required';
+    return this.getResolvedStatus().key === 'compliance_required';
   }
 
   isComplianceBaseState(): boolean {
@@ -740,36 +753,48 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
   }
 
   isRejected(): boolean {
-    return this.getNormalizedApprovalStatus().includes('reject');
+    const statusKey = this.getResolvedStatus().key;
+    return statusKey === 'rejected' || statusKey === 'auto_rejected';
   }
 
   getDisplayStatus(): string {
-    return this.getResolvedStatus().text;
+    return this.getResolvedStatus().label;
+  }
+
+  getDisplayStatusDescription(): string {
+    return this.getResolvedStatus().description;
   }
 
   getHeroStatusClass(): string {
-    const tone = this.getResolvedStatus().tone;
-    if (tone === 'admitted') {
+    const statusKey = this.getResolvedStatus().key;
+    if (statusKey === 'admitted') {
+      return 'hero-status-admitted';
+    }
+    if (statusKey === 'approved') {
+      return 'hero-status-approved';
+    }
+    if (statusKey === 'shortlisted') {
       return 'hero-status-shortlisted';
     }
-    if (tone === 'shortlisted') {
-      return 'hero-status-shortlisted';
-    }
-    if (tone === 'directive') {
+    if (statusKey === 'compliance_required') {
       return 'hero-status-directive';
     }
-    if (tone === 'resubmitted') {
+    if (statusKey === 'resubmitted') {
       return 'hero-status-resubmitted';
     }
-    if (tone === 'rejected') {
+    if (statusKey === 'rejected' || statusKey === 'auto_rejected') {
       return 'hero-status-rejected';
     }
     return 'hero-status-pending';
   }
 
   getStatusClassName(): string {
-    if (this.getResolvedStatus().tone === 'admitted') {
-      return 'status-shortlisted';
+    const statusKey = this.getResolvedStatus().key;
+    if (statusKey === 'admitted') {
+      return 'status-admitted';
+    }
+    if (statusKey === 'approved') {
+      return 'status-approved';
     }
     if (this.isComplianceBaseState()) {
       return 'status-compliance';

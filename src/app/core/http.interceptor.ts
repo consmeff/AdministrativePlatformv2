@@ -7,11 +7,13 @@ import { BusyIndicatorService } from '../services/busy-indicator.service';
 export const contentTypeInterceptor: HttpInterceptorFn = (req, next) => {
   // Define the exempted route
   const exemptedRoute = '/api/v1/uploads';
+  const isFormDataRequest = req.body instanceof FormData;
 
   // Check if the method is POST, PUT, or PATCH and Content-Type is not already set
   const shouldSetContentType =
     ['POST', 'PUT', 'PATCH'].includes(req.method) &&
     !req.headers.has('Content-Type') &&
+    !isFormDataRequest &&
     !req.url.includes(exemptedRoute); // Exempt specific route
 
   // Update headers conditionally

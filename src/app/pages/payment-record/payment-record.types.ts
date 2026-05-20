@@ -7,6 +7,14 @@ export interface FilterOption {
   value: string;
 }
 
+export type PaymentBreakdown = Record<string, number | string>;
+
+export interface PaymentSummaryCard {
+  title: string;
+  value: string;
+  subtext: string;
+}
+
 export interface TransactionRow {
   id: string;
   dateText: string;
@@ -67,4 +75,12 @@ export interface PaymentDetailDto {
   email?: string | null;
   phone_number?: string | null;
   level_of_study?: string | null;
+}
+
+export interface PaymentDashboardDto {
+  total_revenue: number | string;
+  total_transactions: number;
+  payment_breakdown: PaymentBreakdown;
+  status_breakdown?: Record<string, number | string>;
+  recent_transactions?: string[];
 }

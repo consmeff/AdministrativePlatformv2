@@ -3,7 +3,7 @@
     #fileInput
     type="file"
     class="hidden-file-input"
-    accept=".csv,.xls,.xlsx"
+    [accept]="acceptedFileTypes"
     (change)="onFileSelected($event)"
   />
 
@@ -17,23 +17,15 @@
   </p>
 
   @if (stage === "upload") {
-    <button
-      type="button"
-      class="upload-dropzone"
-      (click)="triggerFileInput(fileInput)"
-    >
+    <div class="upload-dropzone" (click)="triggerFileInput(fileInput)">
       <span class="upload-icon"><i class="bi bi-folder2-open"></i></span>
       <span class="upload-text">Click to Upload or drag and drop file</span>
-    </button>
+    </div>
 
-    <button
-      type="button"
-      class="flow-action-btn"
-      (click)="onDownloadTemplate()"
-    >
+    <app-button variant="outline" (buttonClick)="onDownloadTemplate()">
       Download Template
-    </button>
-  } @else if (stage === "file-selected" || stage === "syncing") {
+    </app-button>
+  } @else if (stage === "file-selected") {
     <article class="selected-file-card">
       <div class="file-leading-icon">
         <i class="bi bi-file-earmark-text"></i>
@@ -49,27 +41,16 @@
       >
         <i class="bi bi-trash"></i>
       </button>
-
-      @if (stage === "syncing") {
-        <div class="flow-progress-wrap">
-          <div class="flow-progress">
-            <div
-              class="flow-progress-value"
-              [style.width.%]="uploadProgress"
-            ></div>
-          </div>
-          <span class="flow-progress-label">{{ uploadProgress }}%</span>
-        </div>
-      }
     </article>
 
-    <button
-      type="button"
-      class="flow-action-btn"
-      (click)="stage === 'file-selected' ? startSyncing() : processUpdate()"
-    >
-      {{ stage === "file-selected" ? "Start Update" : "Update Files" }}
-    </button>
+    <div class="rows-preview">
+      <span class="rows-preview-value">{{ totalRows }}</span>
+      <span class="rows-preview-text">rows pending upload</span>
+    </div>
+
+    <app-button variant="primary" (buttonClick)="startUpload()">
+      {{ startButtonLabel }}
+    </app-button>
   } @else if (stage === "processing") {
     <section class="update-progress-card">
       <div class="rows-counter">
@@ -83,8 +64,8 @@
     </section>
   } @else {
     <div class="success-icon"><i class="bi bi-clipboard2-check"></i></div>
-    <button type="button" class="flow-action-btn" (click)="continue()">
-      {{ mode === "cbt" ? "Continue to Admissions" : "Back to Admissions" }}
-    </button>
+    <app-button variant="primary" (buttonClick)="continue()">
+      {{ completionButtonLabel }}
+    </app-button>
   }
 </section>

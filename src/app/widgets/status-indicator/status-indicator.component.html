@@ -1,4 +1,9 @@
-<span class="status-indicator" [class.pill]="pill" [attr.data-tone]="tone">
+<span
+  class="status-indicator"
+  [class.pill]="pill"
+  [attr.data-tone]="tone"
+  [attr.title]="tooltip || null"
+>
   @if (dot) {
     <span class="dot" aria-hidden="true"></span>
   }

@@ -37,6 +37,7 @@
   align-items: center;
   justify-content: center;
   gap: 18px;
+  cursor: pointer;
 }
 
 .upload-icon {
@@ -48,18 +49,6 @@
   font-size: 36px;
   font-weight: 700;
   color: #0b1b54;
-}
-
-.flow-action-btn {
-  border: 0;
-  border-radius: 14px;
-  background: var(--app-primary);
-  color: #fff;
-  min-width: 220px;
-  height: 64px;
-  font-size: 26px;
-  font-weight: 600;
-  padding: 0 24px;
 }
 
 .selected-file-card {
@@ -106,6 +95,25 @@
   background: transparent;
   color: #8aa0c5;
   font-size: 20px;
+}
+
+.rows-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.rows-preview-value {
+  font-size: 48px;
+  font-weight: 700;
+  color: #0b1b54;
+  line-height: 1;
+}
+
+.rows-preview-text {
+  font-size: 22px;
+  color: #7b8fb3;
 }
 
 .flow-progress-wrap {
@@ -202,6 +210,14 @@
 
   .flow-progress-label {
     font-size: 22px;
+  }
+
+  .rows-preview-value {
+    font-size: 38px;
+  }
+
+  .rows-preview-text {
+    font-size: 18px;
   }
 
   .rows-value {

@@ -7,6 +7,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import { APPLICATION_STATUS_LABELS } from '../../constants/application-status.constants';
 
 @Component({
   selector: 'app-doughnut',
@@ -18,9 +19,9 @@ export class DoughnutComponent implements OnInit, OnChanges {
   @Input() chartData: {
     shortlisted: number;
     pending: number;
-    resubmitted: number;
+    compliance_required: number;
     rejected: number;
-  } = { shortlisted: 0, pending: 0, resubmitted: 0, rejected: 0 };
+  } = { shortlisted: 0, pending: 0, compliance_required: 0, rejected: 0 };
 
   chart?: Chart<'doughnut'>;
   legendItems: { label: string; value: number; color: string }[] = [];
@@ -44,8 +45,8 @@ export class DoughnutComponent implements OnInit, OnChanges {
         color: this.colors[1],
       },
       {
-        label: 'Resubmitted',
-        value: this.chartData.resubmitted,
+        label: APPLICATION_STATUS_LABELS.compliance_required,
+        value: this.chartData.compliance_required,
         color: this.colors[2],
       },
       {
@@ -68,13 +69,18 @@ export class DoughnutComponent implements OnInit, OnChanges {
     this.chart = new Chart(ctx, {
       type: 'doughnut',
       data: {
-        labels: ['Shortlisted', 'Pending', 'Resubmitted', 'Rejected'],
+        labels: [
+          'Shortlisted',
+          'Pending',
+          APPLICATION_STATUS_LABELS.compliance_required,
+          'Rejected',
+        ],
         datasets: [
           {
             data: [
               this.chartData.shortlisted,
               this.chartData.pending,
-              this.chartData.resubmitted,
+              this.chartData.compliance_required,
               this.chartData.rejected,
             ],
             backgroundColor: this.colors,
@@ -114,7 +120,7 @@ export class DoughnutComponent implements OnInit, OnChanges {
       this.chart.data.datasets[0].data = [
         this.chartData.shortlisted,
         this.chartData.pending,
-        this.chartData.resubmitted,
+        this.chartData.compliance_required,
         this.chartData.rejected,
       ];
       this.chart.update();

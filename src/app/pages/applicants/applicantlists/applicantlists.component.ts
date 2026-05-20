@@ -45,6 +45,15 @@ import {
   UpdateFileModalComponent,
   UpdateFileSelection,
 } from '../../../widgets/update-file-modal/update-file-modal.component';
+import {
+  APPLICATION_STATUS_LABELS,
+  APPLICATION_STATUS_OPTIONS,
+} from '../../../constants/application-status.constants';
+import {
+  getApplicationStatusDefinition,
+  shouldDisableComplianceAction,
+  shouldDisableShortlistAction,
+} from '../../../constants/application-status.utils';
 
 interface FilterOption {
   label: string;
@@ -61,6 +70,10 @@ interface ApplicationListRow {
   programme: string;
   status_text: string;
   status_tone: StatusTone;
+  status_description: string;
+  status_key: string;
+  disable_compliance: boolean;
+  disable_shortlist: boolean;
 }
 
 interface ApplicantFilterCard {
@@ -118,14 +131,7 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
 
   readonly statusOptions: FilterOption[] = [
     { label: 'All Status', value: 'all' },
-    { label: 'Pending', value: 'Pending' },
-    { label: 'Shortlisted', value: 'Shortlisted' },
-    { label: 'Compliance Required', value: 'Complaince Required' },
-    { label: 'Resubmitted', value: 'Resubmited' },
-    { label: 'Rejected', value: 'Rejected' },
-    { label: 'Admitted', value: 'Admitted' },
-    { label: 'Approved', value: 'Approved' },
-    { label: 'Submitted', value: 'Submitted' },
+    ...APPLICATION_STATUS_OPTIONS,
   ];
   readonly orderingOptions: FilterOption[] = [
     { label: 'Newest First', value: '-created_at' },
@@ -149,14 +155,17 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
 
   selectedStatus: FilterOption = this.statusOptions[0];
   selectedOrdering: FilterOption = this.orderingOptions[0];
-  currentFormLevel: string | undefined = undefined;
+  currentProgrammeKey: string | undefined = undefined;
   activeCardFilter: ApplicantCardFilter = 'all';
   readonly filterCards: ApplicantFilterCard[] = [
     { label: 'All Applicants', filter: 'all' },
-    { label: 'Pending Review', filter: 'pending' },
-    { label: 'Shortlisted', filter: 'shortlisted' },
-    { label: 'Directive Issued', filter: 'directive' },
-    { label: 'Resubmitted', filter: 'resubmitted' },
+    { label: APPLICATION_STATUS_LABELS.pending, filter: 'pending' },
+    { label: APPLICATION_STATUS_LABELS.shortlisted, filter: 'shortlisted' },
+    {
+      label: APPLICATION_STATUS_LABELS.compliance_required,
+      filter: 'directive',
+    },
+    { label: APPLICATION_STATUS_LABELS.resubmitted, filter: 'resubmitted' },
   ];
 
   metrics: ApplicationAdminDashboardResponse = {
@@ -202,16 +211,12 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   ];
 
   ngOnInit(): void {
-    this.applicationService
-      .getApplicationAdminDashboard()
-      .subscribe((metrics) => {
-        this.metrics = metrics;
-      });
+    this.loadCardMetrics();
 
     this.route.queryParamMap
       .pipe(takeUntil(this.destroy$))
       .subscribe((params: ParamMap) => {
-        this.syncFormFromQuery(params.get('level'));
+        this.syncProgrammeFromQuery(params.get('programme'));
         this.first = 0;
         this.fetchRecords();
       });
@@ -239,7 +244,7 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
         this.selectedStatus.value === 'all'
           ? undefined
           : this.selectedStatus.value,
-      // form: this.currentFormLevel,
+      programme: this.currentProgrammeKey,
       ordering: this.selectedOrdering.value,
     };
 
@@ -306,6 +311,10 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
         programme: this.getProgrammeName(item),
         status_text: status.text,
         status_tone: status.tone,
+        status_description: status.description,
+        status_key: status.key,
+        disable_compliance: shouldDisableComplianceAction(status.key),
+        disable_shortlist: shouldDisableShortlistAction(status.key),
       };
     });
   }
@@ -353,20 +362,16 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   }
 
   private getCardFilterFromStatus(value: string): ApplicantCardFilter {
-    const normalized = value.toLowerCase();
-    if (normalized.includes('shortlist')) {
+    if (value === 'shortlisted') {
       return 'shortlisted';
     }
-    if (
-      normalized.includes('complaince') ||
-      normalized.includes('compliance')
-    ) {
+    if (value === 'compliance_required') {
       return 'directive';
     }
-    if (normalized.includes('resub')) {
+    if (value === 'resubmitted') {
       return 'resubmitted';
     }
-    if (normalized.includes('pending')) {
+    if (value === 'pending') {
       return 'pending';
     }
     return 'all';
@@ -374,48 +379,42 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
 
   private getApprovalStatusForCardFilter(filter: ApplicantCardFilter): string {
     if (filter === 'pending') {
-      return 'Pending';
+      return 'pending';
     }
     if (filter === 'shortlisted') {
-      return 'Shortlisted';
+      return 'shortlisted';
     }
     if (filter === 'directive') {
-      return 'Complaince Required';
+      return 'compliance_required';
     }
     if (filter === 'resubmitted') {
-      return 'Resubmited';
+      return 'resubmitted';
     }
     return 'all';
   }
 
-  private syncFormFromQuery(level: string | null): void {
-    const normalizedLevel = (level ?? '').toLowerCase();
-    if (normalizedLevel === 'ond' || normalizedLevel === 'hnd') {
-      this.currentFormLevel = normalizedLevel;
+  private syncProgrammeFromQuery(programme: string | null): void {
+    const normalizedProgramme = (programme ?? '').trim().toLowerCase();
+    if (normalizedProgramme.length > 0) {
+      this.currentProgrammeKey = normalizedProgramme;
       return;
     }
-    this.currentFormLevel = undefined;
+    this.currentProgrammeKey = undefined;
   }
 
-  private resolveStatus(status: string): { text: string; tone: StatusTone } {
-    const value = (status ?? '').toLowerCase();
-    if (value.includes('resubmit')) {
-      return { text: 'Resubmitted', tone: 'resubmitted' };
-    }
-    if (value.includes('shortlist')) {
-      return { text: 'Shortlisted', tone: 'shortlisted' };
-    }
-    if (
-      value.includes('compliance') ||
-      value.includes('complaince') ||
-      value.includes('directive')
-    ) {
-      return { text: 'Directive Issued', tone: 'directive' };
-    }
-    if (value.includes('reject')) {
-      return { text: 'Rejected', tone: 'rejected' };
-    }
-    return { text: 'Pending Review', tone: 'pending' };
+  private resolveStatus(status: string): {
+    text: string;
+    tone: StatusTone;
+    description: string;
+    key: string;
+  } {
+    const statusDefinition = getApplicationStatusDefinition(status);
+    return {
+      text: statusDefinition.label,
+      tone: statusDefinition.tone,
+      description: statusDefinition.description,
+      key: statusDefinition.key,
+    };
   }
 
   private getProgrammeName(item: Application): string {
@@ -580,6 +579,7 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
         next: () => {
           this.notification.success('Applicants updated successfully.');
           this.isUpdateFileModalVisible = false;
+          this.loadCardMetrics();
           this.fetchRecords();
         },
         error: () => {
@@ -605,7 +605,6 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
         this.selectedApplicantIds.length > 0 ? this.selectedApplicantIds : [],
       keyword: (this.searchKeyword ?? this.searchText?.trim()) || undefined,
       approval_status: selection.approval_status,
-      // form: this.currentFormLevel,
       ordering: this.selectedOrdering.value,
     };
 
@@ -681,11 +680,25 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
         onSuccess?.();
         this.notification.success(successMessage);
         this.selectedApplicantIds = [];
+        this.loadCardMetrics();
         this.fetchRecords();
       },
       complete: () => {
         this.isReasonActionLoading = false;
         this.busyService.hide();
+      },
+    });
+  }
+
+  onApplicantActionCompleted(): void {
+    this.loadCardMetrics();
+    this.fetchRecords();
+  }
+
+  private loadCardMetrics(): void {
+    this.applicationService.getApplicationAdminDashboard().subscribe({
+      next: (metrics) => {
+        this.metrics = metrics;
       },
     });
   }

@@ -66,17 +66,17 @@
             <td>{{ row.jamb_score }}</td>
             <td>{{ row.o_level }}</td>
             <td>{{ row.submission_date }}</td>
-            <td>{{ row.programme }}</td>
             <td>
               <app-status-indicator
                 [text]="row.status_text"
                 [tone]="row.status_tone"
+                [tooltip]="row.status_description"
               />
             </td>
             <td>
               <app-table-row-actions
-                [disableCompliance]="row.status_text === 'Shortlisted'"
-                [disableShortlist]="row.status_text === 'Shortlisted'"
+                [disableCompliance]="row.disable_compliance"
+                [disableShortlist]="row.disable_shortlist"
                 (view)="viewProfile(row)"
                 (shortlist)="shortlistSingle(row)"
                 (compliance)="openComplianceForSingle(row)"
@@ -106,6 +106,7 @@
       [applicationNo]="activeApplicationNo"
       [embedded]="true"
       (closed)="closeApplicantDrawer()"
+      (actionCompleted)="onApplicantActionCompleted()"
     />
   }
 </p-drawer>

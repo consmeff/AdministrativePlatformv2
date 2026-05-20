@@ -31,6 +31,12 @@ import {
   SetCutoffModalComponent,
   SetCutoffPayload,
 } from '../admissions/set-cutoff-modal/set-cutoff-modal.component';
+import { APPLICATION_STATUS_LABELS } from '../../constants/application-status.constants';
+import {
+  getApplicationStatusDefinition,
+  shouldDisableComplianceAction,
+  shouldDisableShortlistAction,
+} from '../../constants/application-status.utils';
 
 interface DashboardRow {
   id: number;
@@ -42,6 +48,10 @@ interface DashboardRow {
   programme: string;
   status_text: string;
   status_tone: StatusTone;
+  status_description: string;
+  status_key: string;
+  disable_compliance: boolean;
+  disable_shortlist: boolean;
 }
 
 interface DashboardMetricCard {
@@ -84,7 +94,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     'JAMB',
     'O Level',
     'Submission Date',
-    'Programme',
     'Status',
     'Actions',
   ];
@@ -111,12 +120,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
   chartData: {
     pending: number;
     shortlisted: number;
-    resubmitted: number;
+    compliance_required: number;
     rejected: number;
   } = {
     pending: 0,
     shortlisted: 0,
-    resubmitted: 0,
+    compliance_required: 0,
     rejected: 0,
   };
 
@@ -168,7 +177,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         icon: 'assets/dashboard/Layer_1.png',
       },
       {
-        title: 'Pending Reviews',
+        title: APPLICATION_STATUS_LABELS.pending,
         value: this.metrics.approval_status_breakdown.total_pending,
         icon: 'assets/dashboard/Layer_2.png',
       },
@@ -184,7 +193,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.chartData = {
       pending: this.metrics.approval_status_breakdown.total_pending,
       shortlisted: this.metrics.approval_status_breakdown.total_shortlisted,
-      resubmitted:
+      compliance_required:
         this.metrics.approval_status_breakdown.total_compliance_required,
       rejected: this.metrics.approval_status_breakdown.total_rejected,
     };
@@ -208,29 +217,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
             : (item.department?.name ?? item.program?.name ?? 'N/A'),
         status_text: status.text,
         status_tone: status.tone,
+        status_description: status.description,
+        status_key: status.key,
+        disable_compliance: shouldDisableComplianceAction(status.key),
+        disable_shortlist: shouldDisableShortlistAction(status.key),
       };
     });
   }
 
-  private resolveStatus(status: string): { text: string; tone: StatusTone } {
-    const value = (status ?? '').toLowerCase();
-    if (value.includes('resubmit')) {
-      return { text: 'Resubmitted', tone: 'resubmitted' };
-    }
-    if (value.includes('shortlist')) {
-      return { text: 'Shortlisted', tone: 'shortlisted' };
-    }
-    if (
-      value.includes('compliance') ||
-      value.includes('complaince') ||
-      value.includes('directive')
-    ) {
-      return { text: 'Directive Issued', tone: 'directive' };
-    }
-    if (value.includes('reject')) {
-      return { text: 'Rejected', tone: 'rejected' };
-    }
-    return { text: 'Pending Review', tone: 'pending' };
+  private resolveStatus(status: string): {
+    text: string;
+    tone: StatusTone;
+    description: string;
+    key: string;
+  } {
+    const statusDefinition = getApplicationStatusDefinition(status);
+    return {
+      text: statusDefinition.label,
+      tone: statusDefinition.tone,
+      description: statusDefinition.description,
+      key: statusDefinition.key,
+    };
   }
 
   private formatDate(input: string): string {
@@ -248,6 +255,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   viewProfile(row: DashboardRow) {
     this.activeApplicationNo = row.application_no;
     this.isApplicantDrawerVisible = true;
+  }
+
+  onApplicantActionCompleted(): void {
+    this.loadDashboardData();
   }
 
   closeApplicantDrawer(): void {
@@ -303,7 +314,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .setApplicationCutoff({
         min_jamb_score: payload.minimumJambScore,
         min_post_utme_score: payload.minimumCbtScore,
-        application: payload.applicationId ?? '',
+        application_id: payload.applicationId,
         all_application: payload.applicationId === undefined,
       })
       .subscribe({
