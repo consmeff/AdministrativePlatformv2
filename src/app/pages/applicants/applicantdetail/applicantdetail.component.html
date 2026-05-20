@@ -142,54 +142,56 @@
       </div>
     </div>
 
-    <footer class="drawer-actions">
-      @if (embeddedMode === "admissions") {
-        <app-button
-          [fullWidth]="true"
-          variant="outline"
-          [disabled]="!application.id"
-          (buttonClick)="onChangeProgramme()"
-        >
-          Change Programme
-        </app-button>
-        <app-button
-          variant="primary"
-          [fullWidth]="true"
-          [disabled]="!application.id"
-          (buttonClick)="onGrantAdmission()"
-        >
-          Grant Admission
-        </app-button>
-      } @else {
-        <app-button
-          [fullWidth]="true"
-          variant="info"
-          [outline]="true"
-          iconClass="bi bi-exclamation-triangle"
-          [disabled]="
-            isIssuingCompliance || !application.id || isShortlistedForExam()
-          "
-          (buttonClick)="issueComplianceDirective()"
-        >
-          {{
-            isIssuingCompliance
-              ? "Issuing Compliance Directive..."
-              : "Issue Compliance Directive"
-          }}
-        </app-button>
-        <app-button
-          [fullWidth]="true"
-          variant="muted"
-          iconClass="bi bi-check"
-          [disabled]="
-            isShortlisting || !application.id || isComplianceBaseState()
-          "
-          (buttonClick)="shortlistApplicant()"
-        >
-          {{ isShortlisting ? "Shortlisting..." : "Shortlist" }}
-        </app-button>
-      }
-    </footer>
+    @if (shouldShowAdmissionsActions() || embeddedMode !== "admissions") {
+      <footer class="drawer-actions">
+        @if (shouldShowAdmissionsActions()) {
+          <app-button
+            [fullWidth]="true"
+            variant="outline"
+            [disabled]="!application.id"
+            (buttonClick)="onChangeProgramme()"
+          >
+            Change Programme
+          </app-button>
+          <app-button
+            variant="primary"
+            [fullWidth]="true"
+            [disabled]="!application.id"
+            (buttonClick)="onGrantAdmission()"
+          >
+            Grant Admission
+          </app-button>
+        } @else {
+          <app-button
+            [fullWidth]="true"
+            variant="info"
+            [outline]="true"
+            iconClass="bi bi-exclamation-triangle"
+            [disabled]="
+              isIssuingCompliance || !application.id || isShortlistedForExam()
+            "
+            (buttonClick)="issueComplianceDirective()"
+          >
+            {{
+              isIssuingCompliance
+                ? "Issuing Compliance Directive..."
+                : "Issue Compliance Directive"
+            }}
+          </app-button>
+          <app-button
+            [fullWidth]="true"
+            variant="muted"
+            iconClass="bi bi-check"
+            [disabled]="
+              isShortlisting || !application.id || isComplianceBaseState()
+            "
+            (buttonClick)="shortlistApplicant()"
+          >
+            {{ isShortlisting ? "Shortlisting..." : "Shortlist" }}
+          </app-button>
+        }
+      </footer>
+    }
   </section>
 } @else {
   <div class="row g-4 mb-4 first-cards">

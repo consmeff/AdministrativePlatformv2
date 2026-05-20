@@ -120,6 +120,13 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
     this.notification.warn('Grant admission action is not yet wired.');
   }
 
+  shouldShowAdmissionsActions(): boolean {
+    return (
+      this.embeddedMode === 'admissions' &&
+      this.getResolvedStatus().key !== 'approved'
+    );
+  }
+
   getDetailPairRows(rows: Record<string, unknown>[]): {
     leftLabel: string;
     leftValue: string;
