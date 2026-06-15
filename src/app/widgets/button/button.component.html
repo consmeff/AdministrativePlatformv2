@@ -5,6 +5,8 @@
   [class.btn--disabled]="disabled"
   [class]="variantClass + ' ' + modeClass"
   [disabled]="disabled"
+  [routerLink]="routerLink"
+  [queryParams]="queryParams"
   (click)="handleClick($event)"
 >
   @if (iconClass && iconPosition === "left") {

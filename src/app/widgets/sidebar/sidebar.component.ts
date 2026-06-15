@@ -30,7 +30,7 @@ export class SidebarComponent {
   _widgetService = inject(WidgetService);
   router = inject(Router);
   openGroupRoute: string | null = null;
-  readonly menuItems: SidebarMenuItem[] = [
+  readonly adminMenuItems: SidebarMenuItem[] = [
     {
       label: 'Dashboard',
       iconClass: 'bi bi-house',
@@ -75,6 +75,24 @@ export class SidebarComponent {
       label: 'Payment Records',
       iconClass: 'bi bi-wallet2',
       route: '/pages/payment-records',
+    },
+  ];
+  readonly lecturerMenuItems: SidebarMenuItem[] = [
+    {
+      label: 'Dashboard',
+      iconClass: 'bi bi-house',
+      route: '/pages/lecturer/dashboard',
+      exact: true,
+    },
+    {
+      label: 'My Courses',
+      iconClass: 'bi bi-journal-text',
+      route: '/pages/lecturer/my-courses',
+    },
+    {
+      label: 'Profile',
+      iconClass: 'bi bi-person',
+      route: '/pages/lecturer/profile',
     },
   ];
 
@@ -135,6 +153,16 @@ export class SidebarComponent {
     return this.isMobileViewport && this.sidebarVisible;
   }
 
+  get activeMenuItems(): SidebarMenuItem[] {
+    return this.isLecturerContext()
+      ? this.lecturerMenuItems
+      : this.adminMenuItems;
+  }
+
+  get sidebarRoleLabel(): string {
+    return this.isLecturerContext() ? 'Lecturer' : 'Academic Officer';
+  }
+
   isGroupOpen(item: SidebarMenuItem): boolean {
     if (!item.children?.length) {
       return false;
@@ -168,7 +196,7 @@ export class SidebarComponent {
   }
 
   private getDefaultOpenGroup(): string | null {
-    const matched = this.menuItems.find(
+    const matched = this.activeMenuItems.find(
       (item) => item.children?.length && this.isRouteActive(item.route),
     );
     return matched?.route ?? null;
@@ -194,5 +222,14 @@ export class SidebarComponent {
     setTimeout(() => {
       this.router.navigateByUrl('/auth/login');
     }, 1000);
+  }
+
+  private isLecturerContext(): boolean {
+    const storedUserType = sessionStorage.getItem('USER_TYPE');
+
+    return (
+      this.router.url.startsWith('/pages/lecturer') ||
+      storedUserType?.toLowerCase().includes('lecturer') === true
+    );
   }
 }

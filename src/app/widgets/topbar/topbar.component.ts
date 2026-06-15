@@ -5,6 +5,7 @@ import { DashboardInfo } from '../../model/dashboard/information.dto';
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
+import { LecturerStateService } from '../../pages/lecturer/lecturer-state.service';
 
 @Component({
   selector: 'app-topbar',
@@ -15,6 +16,7 @@ import { filter, Subscription } from 'rxjs';
 export class TopbarComponent implements OnDestroy {
   _widgetService = inject(WidgetService);
   dashInfoService = inject(DashboardinformationService);
+  lecturerStateService = inject(LecturerStateService);
   router = inject(Router);
   dashinfo: DashboardInfo = {} as DashboardInfo;
   currentModuleName = 'Dashboard';
@@ -50,7 +52,46 @@ export class TopbarComponent implements OnDestroy {
     this._widgetService.setSidebarState({ isvisible: true });
   }
 
+  get currentUserName(): string {
+    if (this.isLecturerContext()) {
+      return this.lecturerStateService.lecturerProfile().fullName;
+    }
+
+    return this.dashinfo.username || 'Academic Officer';
+  }
+
+  get currentUserRole(): string {
+    if (this.isLecturerContext()) {
+      return 'Lecturer';
+    }
+
+    return this.dashinfo.role || 'Academic Officer';
+  }
+
   private resolveModuleName(url: string): string {
+    if (
+      url.includes('/pages/lecturer/my-courses/') &&
+      url.includes('/upload')
+    ) {
+      return 'Upload Result';
+    }
+
+    if (url.includes('/pages/lecturer/my-courses/')) {
+      return 'Course Details';
+    }
+
+    if (url.includes('/pages/lecturer/my-courses')) {
+      return 'My Courses';
+    }
+
+    if (url.includes('/pages/lecturer/profile')) {
+      return 'Profile';
+    }
+
+    if (url.includes('/pages/lecturer/dashboard')) {
+      return 'Dashboard';
+    }
+
     if (url.includes('/pages/admissions')) {
       return 'Admissions';
     }
@@ -72,5 +113,14 @@ export class TopbarComponent implements OnDestroy {
     }
 
     return 'Dashboard';
+  }
+
+  private isLecturerContext(): boolean {
+    const storedUserType = sessionStorage.getItem('USER_TYPE');
+
+    return (
+      this.router.url.startsWith('/pages/lecturer') ||
+      storedUserType?.toLowerCase().includes('lecturer') === true
+    );
   }
 }

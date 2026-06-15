@@ -28,8 +28,12 @@
     </button>
   </div>
 
+  @if (!isDesktopCollapsed) {
+    <div class="sidebar-role-label">{{ sidebarRoleLabel }}</div>
+  }
+
   <nav class="menu-list">
-    @for (item of menuItems; track item.route) {
+    @for (item of activeMenuItems; track item.route) {
       @if (item.children?.length) {
         <div class="menu-group" [class.open]="isGroupOpen(item)">
           <button

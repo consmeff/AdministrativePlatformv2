@@ -156,8 +156,9 @@ export class AuthService {
   }
 
   private doLoginUser(username: string, tokens: LoginResponse) {
-    if (username != '') {
+    if (username !== '') {
       this._dash.username = username;
+      this._dash.role = tokens.user_type;
       this.dashInfoService.setdashInfo(this._dash);
     }
     this.loggedUser = username;

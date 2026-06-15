@@ -72,6 +72,16 @@
   gap: 0;
 }
 
+.sidebar-role-label {
+  margin-bottom: 16px;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8ba0bf;
+}
+
 .menu-list > a,
 .menu-list > .menu-group > .menu-link {
   display: flex;

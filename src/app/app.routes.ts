@@ -19,6 +19,47 @@ export const routes: Routes = [
       ),
     children: [
       {
+        path: 'lecturer',
+        children: [
+          { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+          {
+            path: 'dashboard',
+            loadComponent: () =>
+              import('./pages/lecturer/lecturer-dashboard/lecturer-dashboard.component').then(
+                (m) => m.LecturerDashboardComponent,
+              ),
+          },
+          {
+            path: 'my-courses',
+            loadComponent: () =>
+              import('./pages/lecturer/lecturer-my-courses/lecturer-my-courses.component').then(
+                (m) => m.LecturerMyCoursesComponent,
+              ),
+          },
+          {
+            path: 'my-courses/:courseId',
+            loadComponent: () =>
+              import('./pages/lecturer/lecturer-course-details/lecturer-course-details.component').then(
+                (m) => m.LecturerCourseDetailsComponent,
+              ),
+          },
+          {
+            path: 'my-courses/:courseId/upload',
+            loadComponent: () =>
+              import('./pages/lecturer/lecturer-course-upload/lecturer-course-upload.component').then(
+                (m) => m.LecturerCourseUploadComponent,
+              ),
+          },
+          {
+            path: 'profile',
+            loadComponent: () =>
+              import('./pages/lecturer/lecturer-profile/lecturer-profile.component').then(
+                (m) => m.LecturerProfileComponent,
+              ),
+          },
+        ],
+      },
+      {
         path: 'dashboard',
         loadComponent: () =>
           import('./pages/dashboard/dashboard.component').then(

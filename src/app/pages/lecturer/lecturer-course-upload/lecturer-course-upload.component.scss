@@ -1,0 +1,235 @@
+.lecturer-upload-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+}
+
+.breadcrumb-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--app-text-secondary);
+}
+
+.breadcrumb-row a {
+  color: var(--app-text-secondary);
+  text-decoration: none;
+}
+
+.upload-flow-shell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: min(100%, 720px);
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+
+.flow-title,
+.processing-title,
+.success-title {
+  margin: 0;
+  color: var(--app-text-primary);
+}
+
+.flow-title {
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.flow-subtitle,
+.success-copy {
+  margin: 0;
+  max-width: 560px;
+  font-size: 15px;
+  color: var(--app-text-secondary);
+  text-align: center;
+}
+
+.hidden-file-input {
+  display: none;
+}
+
+.upload-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: min(100%, 520px);
+  min-height: 200px;
+  border: 2px dashed #d3ddea;
+  border-radius: 20px;
+  background: #fbfdff;
+  cursor: pointer;
+}
+
+.dropzone-icon {
+  font-size: 54px;
+  color: #f4c542;
+}
+
+.dropzone-text {
+  color: var(--app-text-primary);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.selected-file-card,
+.processing-card {
+  width: min(100%, 560px);
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 18px;
+}
+
+.selected-file-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+}
+
+.file-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.file-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #eff4ff;
+  color: var(--app-primary);
+  font-size: 20px;
+}
+
+.file-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--app-text-primary);
+}
+
+.file-size {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--app-text-secondary);
+}
+
+.remove-file-btn {
+  border: 0;
+  background: transparent;
+  color: #8ba0bf;
+  font-size: 18px;
+}
+
+.processing-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 24px;
+}
+
+.processing-title {
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.rows-counter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 112px;
+  height: 112px;
+  margin: 0 auto;
+  border-radius: 16px;
+  background: var(--app-primary);
+  color: #ffffff;
+}
+
+.rows-value {
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.rows-total {
+  font-size: 12px;
+}
+
+.progress-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.progress-track {
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  background: #e8eef7;
+  overflow: hidden;
+}
+
+.progress-value {
+  height: 100%;
+  background: var(--app-primary);
+  border-radius: 999px;
+}
+
+.progress-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--app-text-secondary);
+}
+
+.upload-success-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 0;
+}
+
+.success-icon {
+  display: grid;
+  place-items: center;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: #ecfff3;
+  color: #18a55f;
+  font-size: 60px;
+}
+
+.success-title {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .lecturer-upload-page {
+    padding: 16px;
+  }
+
+  .upload-flow-shell {
+    padding: 32px 0;
+  }
+
+  .selected-file-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
