@@ -74,6 +74,15 @@ body {
   overflow: auto;
 }
 
+.course-registration-review-drawer {
+  width: min(600px, 96vw) !important;
+}
+
+.course-registration-review-drawer .p-drawer-content {
+  padding: 0;
+  overflow: auto;
+}
+
 .p-drawer-mask {
   z-index: 2000000 !important;
 }

@@ -135,16 +135,8 @@
   opacity: 0.5;
 }
 
-:host ::ng-deep .course-registration-review-drawer {
-  width: min(560px, 96vw) !important;
-}
-
 :host ::ng-deep .course-registration-review-drawer .p-drawer-header {
   display: none;
-}
-
-:host ::ng-deep .course-registration-review-drawer .p-drawer-content {
-  padding: 0;
 }
 
 @media (max-width: 900px) {
