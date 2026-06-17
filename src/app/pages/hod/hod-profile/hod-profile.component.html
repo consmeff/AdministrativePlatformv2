@@ -1,0 +1,32 @@
+<section class="hod-profile-page">
+  <section class="profile-card profile-hero">
+    <div class="avatar-badge">
+      {{ profile().fullName.charAt(0) }}
+    </div>
+
+    <div class="hero-copy">
+      <p class="hero-eyebrow">{{ profile().roleLabel }}</p>
+      <h1 class="hero-title">{{ profile().fullName }}</h1>
+      <p class="hero-subtitle">{{ profile().departmentLabel }}</p>
+    </div>
+  </section>
+
+  <section class="profile-card profile-details">
+    <article class="detail-row">
+      <span class="detail-label">Faculty</span>
+      <span class="detail-value">{{ profile().facultyLabel }}</span>
+    </article>
+    <article class="detail-row">
+      <span class="detail-label">Department</span>
+      <span class="detail-value">{{ profile().departmentLabel }}</span>
+    </article>
+    <article class="detail-row">
+      <span class="detail-label">Email address</span>
+      <span class="detail-value">{{ profile().emailAddress }}</span>
+    </article>
+    <article class="detail-row">
+      <span class="detail-label">Office location</span>
+      <span class="detail-value">{{ profile().officeLocation }}</span>
+    </article>
+  </section>
+</section>

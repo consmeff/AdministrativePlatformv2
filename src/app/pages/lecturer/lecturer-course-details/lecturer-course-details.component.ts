@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
+import { PortalContextService } from '../../../services/portal-context.service';
 import { ButtonComponent } from '../../../widgets/button/button.component';
 import { LecturerStateService } from '../lecturer-state.service';
 
@@ -14,6 +15,7 @@ import { LecturerStateService } from '../lecturer-state.service';
 export class LecturerCourseDetailsComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly lecturerStateService = inject(LecturerStateService);
+  private readonly portalContextService = inject(PortalContextService);
 
   readonly courseId = computed(() =>
     this.route.snapshot.paramMap.get('courseId'),
@@ -63,5 +65,9 @@ export class LecturerCourseDetailsComponent {
     anchor.click();
     document.body.removeChild(anchor);
     globalThis.URL.revokeObjectURL(objectUrl);
+  }
+
+  get roleBasePath(): string {
+    return this.portalContextService.getRoleBasePath();
   }
 }

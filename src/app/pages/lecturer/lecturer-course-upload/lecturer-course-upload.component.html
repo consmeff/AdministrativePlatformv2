@@ -1,7 +1,7 @@
 @if (course(); as activeCourse) {
   <section class="lecturer-upload-page">
     <nav class="breadcrumb-row" aria-label="Breadcrumb">
-      <a [routerLink]="['/pages/lecturer/my-courses', activeCourse.id]">
+      <a [routerLink]="[roleBasePath, 'my-courses', activeCourse.id]">
         Course Details
       </a>
       <span><i class="bi bi-chevron-right"></i></span>

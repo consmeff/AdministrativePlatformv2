@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { PortalContextService } from '../../../services/portal-context.service';
 import { ButtonComponent } from '../../../widgets/button/button.component';
 import {
   LECTURER_UPLOAD_ACCEPTED_FILE_TYPES,
@@ -25,6 +26,7 @@ export class LecturerCourseUploadComponent implements OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly lecturerStateService = inject(LecturerStateService);
+  private readonly portalContextService = inject(PortalContextService);
   private uploadIntervalId: ReturnType<typeof globalThis.setInterval> | null =
     null;
 
@@ -120,11 +122,11 @@ export class LecturerCourseUploadComponent implements OnDestroy {
     const course = this.course();
 
     if (!course) {
-      this.router.navigateByUrl('/pages/lecturer/my-courses');
+      this.router.navigateByUrl(`${this.roleBasePath}/my-courses`);
       return;
     }
 
-    this.router.navigate(['/pages/lecturer/my-courses', course.id]);
+    this.router.navigate([this.roleBasePath, 'my-courses', course.id]);
   }
 
   ngOnDestroy(): void {
@@ -178,5 +180,9 @@ export class LecturerCourseUploadComponent implements OnDestroy {
 
     const sizeInKb = Math.max(1, Math.round(sizeInBytes / 1024));
     return `${sizeInKb} KB`;
+  }
+
+  get roleBasePath(): string {
+    return this.portalContextService.getRoleBasePath();
   }
 }

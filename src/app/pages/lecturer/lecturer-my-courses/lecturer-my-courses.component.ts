@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { PortalContextService } from '../../../services/portal-context.service';
 import { LecturerStateService } from '../lecturer-state.service';
 
 @Component({
@@ -12,6 +13,11 @@ import { LecturerStateService } from '../lecturer-state.service';
 })
 export class LecturerMyCoursesComponent {
   private readonly lecturerStateService = inject(LecturerStateService);
+  private readonly portalContextService = inject(PortalContextService);
 
   readonly courses = this.lecturerStateService.courses;
+
+  get roleBasePath(): string {
+    return this.portalContextService.getRoleBasePath();
+  }
 }

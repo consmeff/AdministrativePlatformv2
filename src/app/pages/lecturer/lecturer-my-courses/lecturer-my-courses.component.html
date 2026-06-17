@@ -18,7 +18,7 @@
     @for (course of courses(); track course.id) {
       <a
         class="course-card"
-        [routerLink]="['/pages/lecturer/my-courses', course.id]"
+        [routerLink]="[roleBasePath, 'my-courses', course.id]"
       >
         <span class="course-code">{{ course.code }}</span>
         <h2 class="course-title">{{ course.title }}</h2>

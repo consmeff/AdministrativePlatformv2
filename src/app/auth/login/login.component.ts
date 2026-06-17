@@ -71,6 +71,10 @@ export class LoginComponent implements OnInit {
   private resolvePostLoginRoute(): string {
     const userType = sessionStorage.getItem('USER_TYPE')?.toLowerCase();
 
+    if (userType?.includes('hod')) {
+      return '/pages/hod/dashboard';
+    }
+
     if (userType?.includes('lecturer')) {
       return '/pages/lecturer/dashboard';
     }

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { PortalContextService } from '../../../services/portal-context.service';
 import { ButtonComponent } from '../../../widgets/button/button.component';
 import { LecturerStateService } from '../lecturer-state.service';
 
@@ -13,6 +14,7 @@ import { LecturerStateService } from '../lecturer-state.service';
 })
 export class LecturerDashboardComponent {
   private readonly lecturerStateService = inject(LecturerStateService);
+  private readonly portalContextService = inject(PortalContextService);
 
   readonly lecturerProfile = this.lecturerStateService.lecturerProfile;
   readonly courses = this.lecturerStateService.courses;
@@ -41,4 +43,8 @@ export class LecturerDashboardComponent {
       },
     ];
   });
+
+  get roleBasePath(): string {
+    return this.portalContextService.getRoleBasePath();
+  }
 }

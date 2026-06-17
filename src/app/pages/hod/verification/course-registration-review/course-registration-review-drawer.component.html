@@ -1,0 +1,68 @@
+@if (record; as activeRecord) {
+  <section class="drawer-shell">
+    <header class="drawer-hero">
+      <div class="hero-left">
+        <div class="hero-avatar">{{ studentInitials }}</div>
+        <div class="hero-text">
+          <h2 class="hero-name">{{ activeRecord.studentName }}</h2>
+          <div class="hero-id">{{ activeRecord.registrationNumber }}</div>
+          <span class="hero-level-pill">{{ activeRecord.levelLabel }}</span>
+        </div>
+      </div>
+
+      <button type="button" class="drawer-close-btn" (click)="closed.emit()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </header>
+
+    <div class="drawer-body">
+      <div class="summary-grid">
+        <article class="summary-card">
+          <span class="summary-value">{{ activeRecord.courseCount }}</span>
+          <span class="summary-label">Courses</span>
+        </article>
+        <article class="summary-card">
+          <span class="summary-value">{{ activeRecord.totalUnits }}</span>
+          <span class="summary-label">Total Units</span>
+        </article>
+        <article class="summary-card">
+          <span class="summary-value">{{ activeRecord.coreCourseCount }}</span>
+          <span class="summary-label">Core Courses</span>
+        </article>
+      </div>
+
+      <div class="registered-course-list">
+        @for (
+          course of activeRecord.registeredCourses;
+          track course.code + course.title
+        ) {
+          <div class="registered-course-row">
+            <span class="course-code">{{ course.code }}</span>
+            <span class="course-title">{{ course.title }}</span>
+            <span class="course-units">{{ course.units }} Units</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <footer class="drawer-actions">
+      <app-button
+        variant="info"
+        [outline]="true"
+        [fullWidth]="true"
+        [disabled]="!canReject"
+        (buttonClick)="reject()"
+      >
+        Reject
+      </app-button>
+      <app-button
+        variant="primary"
+        [fullWidth]="true"
+        [disabled]="!canApprove"
+        (buttonClick)="approve()"
+      >
+        Approve
+      </app-button>
+    </footer>
+  </section>
+}

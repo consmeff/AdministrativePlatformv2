@@ -19,6 +19,114 @@ export const routes: Routes = [
       ),
     children: [
       {
+        path: 'hod',
+        children: [
+          { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+          {
+            path: 'dashboard',
+            loadComponent: () =>
+              import('./pages/hod/hod-dashboard/hod-dashboard.component').then(
+                (m) => m.HodDashboardComponent,
+              ),
+          },
+          {
+            path: 'my-courses',
+            loadComponent: () =>
+              import('./pages/lecturer/lecturer-my-courses/lecturer-my-courses.component').then(
+                (m) => m.LecturerMyCoursesComponent,
+              ),
+          },
+          {
+            path: 'my-courses/:courseId',
+            loadComponent: () =>
+              import('./pages/lecturer/lecturer-course-details/lecturer-course-details.component').then(
+                (m) => m.LecturerCourseDetailsComponent,
+              ),
+          },
+          {
+            path: 'my-courses/:courseId/upload',
+            loadComponent: () =>
+              import('./pages/lecturer/lecturer-course-upload/lecturer-course-upload.component').then(
+                (m) => m.LecturerCourseUploadComponent,
+              ),
+          },
+          {
+            path: 'profile',
+            loadComponent: () =>
+              import('./pages/hod/hod-profile/hod-profile.component').then(
+                (m) => m.HodProfileComponent,
+              ),
+          },
+          {
+            path: 'overview',
+            loadComponent: () =>
+              import('./pages/hod/hod-overview/hod-overview.component').then(
+                (m) => m.HodOverviewComponent,
+              ),
+          },
+          {
+            path: 'verification/course-reg',
+            loadComponent: () =>
+              import('./pages/hod/verification/course-registration-review/hod-course-registration-review.component').then(
+                (m) => m.HodCourseRegistrationReviewComponent,
+              ),
+          },
+          {
+            path: 'verification/documents',
+            loadComponent: () =>
+              import('./pages/hod/verification/document-verification/hod-document-verification.component').then(
+                (m) => m.HodDocumentVerificationComponent,
+              ),
+          },
+          {
+            path: 'result-review',
+            loadComponent: () =>
+              import('./pages/hod/hod-module-placeholder/hod-module-placeholder.component').then(
+                (m) => m.HodModulePlaceholderComponent,
+              ),
+            data: {
+              title: 'Result review',
+              description:
+                'Review submitted results across the department from this module.',
+            },
+          },
+          {
+            path: 'students-record',
+            loadComponent: () =>
+              import('./pages/hod/hod-module-placeholder/hod-module-placeholder.component').then(
+                (m) => m.HodModulePlaceholderComponent,
+              ),
+            data: {
+              title: 'Students record',
+              description:
+                'Manage department student records from this module.',
+            },
+          },
+          {
+            path: 'lecturers',
+            loadComponent: () =>
+              import('./pages/hod/hod-module-placeholder/hod-module-placeholder.component').then(
+                (m) => m.HodModulePlaceholderComponent,
+              ),
+            data: {
+              title: 'Lecturers',
+              description: 'Manage department lecturers from this module.',
+            },
+          },
+          {
+            path: 'courses',
+            loadComponent: () =>
+              import('./pages/hod/hod-module-placeholder/hod-module-placeholder.component').then(
+                (m) => m.HodModulePlaceholderComponent,
+              ),
+            data: {
+              title: 'Courses',
+              description: 'Manage department courses from this module.',
+            },
+          },
+        ],
+      },
+      {
         path: 'lecturer',
         children: [
           { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
