@@ -12,6 +12,11 @@ export interface HodProgrammeFilterOption {
   value: string;
 }
 
+export interface HodLevelFilterOption {
+  label: string;
+  value: string;
+}
+
 export type HodRegistrationStatus =
   | 'pending_review'
   | 'resubmitted'
@@ -136,3 +141,33 @@ export type HodStudentRecordDrawerTab =
   | 'personal_details'
   | 'academic_performance'
   | 'documents';
+
+export interface HodLecturer {
+  id: string;
+  fullName: string;
+  staffId: string;
+  emailAddress: string;
+  phoneNumber: string;
+  assignedCourseIds: string[];
+}
+
+export interface HodLecturerCourse {
+  id: string;
+  code: string;
+  title: string;
+  units: number;
+  levelValue: string;
+  levelLabel: string;
+  assignedLecturerIds: string[];
+}
+
+export interface HodLecturerAssignmentHistoryRecord {
+  id: string;
+  courseId: string;
+  courseCode: string;
+  courseTitle: string;
+  lecturerId: string;
+  lecturerName: string;
+  action: 'assigned' | 'removed';
+  changedAt: string;
+}

@@ -1,0 +1,106 @@
+.hod-lecturers-page {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 24px;
+}
+
+.action-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.search-wrap {
+  flex: 1;
+  max-width: 320px;
+}
+
+.lecturer-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.lecturer-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 186px;
+  border: 1px solid #dfe6f0;
+  border-radius: 18px;
+  background: #ffffff;
+  padding: 14px 14px 16px;
+}
+
+.lecturer-name {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.lecturer-id {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.card-divider {
+  border-top: 1px solid #e7edf6;
+}
+
+.courses-trigger-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font-size: 13px;
+  color: #94a3b8;
+  text-align: left;
+}
+
+.view-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.contact-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.contact-icon,
+.contact-copy {
+  color: #66758f;
+  font-size: 14px;
+}
+
+@media (max-width: 1200px) {
+  .lecturer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .hod-lecturers-page {
+    padding: 16px;
+  }
+
+  .action-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-wrap,
+  .lecturer-grid {
+    max-width: none;
+    grid-template-columns: 1fr;
+  }
+}

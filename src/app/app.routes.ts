@@ -95,13 +95,16 @@ export const routes: Routes = [
           {
             path: 'lecturers',
             loadComponent: () =>
-              import('./pages/hod/hod-module-placeholder/hod-module-placeholder.component').then(
-                (m) => m.HodModulePlaceholderComponent,
+              import('./pages/hod/lecturers/hod-lecturers.component').then(
+                (m) => m.HodLecturersComponent,
               ),
-            data: {
-              title: 'Lecturers',
-              description: 'Manage department lecturers from this module.',
-            },
+          },
+          {
+            path: 'lecturers/assign-courses',
+            loadComponent: () =>
+              import('./pages/hod/lecturers/assign-courses/hod-assign-courses.component').then(
+                (m) => m.HodAssignCoursesComponent,
+              ),
           },
           {
             path: 'courses',

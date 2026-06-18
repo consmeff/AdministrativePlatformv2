@@ -1,6 +1,10 @@
 import {
   HodCourseRegistrationRecord,
   HodDocumentVerificationRecord,
+  HodLecturer,
+  HodLecturerAssignmentHistoryRecord,
+  HodLecturerCourse,
+  HodLevelFilterOption,
   HodProgrammeFilterOption,
   HodProfile,
   HodRegisteredCourse,
@@ -59,6 +63,133 @@ const HOD_STUDENT_DOCUMENT_NAMES = [
   'State of Origin Certificate',
   'Transcript Statement',
 ] as const;
+
+const HOD_LECTURER_NAMES = [
+  'Dr. Amira Gbadegesin',
+  'Prof. Ifeoma Bassey',
+  'Mr. Kayode Adeniyi',
+  'Mrs. Rachel Edeh',
+  'Dr. Daniel Udeh',
+  'Dr. Halima Sani',
+  'Mr. Tunde Afolabi',
+  'Mrs. Nkem Chukwu',
+  'Dr. Maryam Bello',
+] as const;
+
+const HOD_LECTURER_COURSE_DEFINITIONS = [
+  {
+    code: 'NUR 211',
+    title: 'Human Anatomy III',
+    units: 3,
+    levelValue: 'ond_1',
+    levelLabel: 'OND 1',
+  },
+  {
+    code: 'NUR 212',
+    title: 'General Physiology',
+    units: 3,
+    levelValue: 'ond_1',
+    levelLabel: 'OND 1',
+  },
+  {
+    code: 'NUR 213',
+    title: 'Foundations of Nursing Practice',
+    units: 2,
+    levelValue: 'ond_1',
+    levelLabel: 'OND 1',
+  },
+  {
+    code: 'NUR 214',
+    title: 'Nutrition in Nursing',
+    units: 3,
+    levelValue: 'ond_1',
+    levelLabel: 'OND 1',
+  },
+  {
+    code: 'NUR 215',
+    title: 'Introduction to Pharmacology',
+    units: 3,
+    levelValue: 'ond_1',
+    levelLabel: 'OND 1',
+  },
+  {
+    code: 'NUR 321',
+    title: 'Maternal and Child Nursing',
+    units: 3,
+    levelValue: 'hnd_1',
+    levelLabel: 'HND 1',
+  },
+  {
+    code: 'NUR 322',
+    title: 'Community Health Practice',
+    units: 2,
+    levelValue: 'hnd_1',
+    levelLabel: 'HND 1',
+  },
+  {
+    code: 'NUR 323',
+    title: 'Medical Surgical Nursing',
+    units: 3,
+    levelValue: 'hnd_1',
+    levelLabel: 'HND 1',
+  },
+] as const;
+
+function buildLecturerAssignmentHistoryRecord(
+  index: number,
+  action: HodLecturerAssignmentHistoryRecord['action'],
+): HodLecturerAssignmentHistoryRecord {
+  const lecturerName = HOD_LECTURER_NAMES[index % HOD_LECTURER_NAMES.length];
+  const courseDefinition =
+    HOD_LECTURER_COURSE_DEFINITIONS[
+      index % HOD_LECTURER_COURSE_DEFINITIONS.length
+    ];
+
+  return {
+    id: `hod-lecturer-history-${index + 1}`,
+    courseId: `hod-lecturer-course-${(index % HOD_LECTURER_COURSE_DEFINITIONS.length) + 1}`,
+    courseCode: courseDefinition.code,
+    courseTitle: courseDefinition.title,
+    lecturerId: `hod-lecturer-${(index % HOD_LECTURER_NAMES.length) + 1}`,
+    lecturerName,
+    action,
+    changedAt: `${24 - (index % 5)} Jan 2026 1${index % 10}:15 AM`,
+  };
+}
+
+function buildLecturerCourse(
+  index: number,
+  assignedLecturerIds: string[],
+): HodLecturerCourse {
+  const courseDefinition = HOD_LECTURER_COURSE_DEFINITIONS[index];
+
+  return {
+    id: `hod-lecturer-course-${index + 1}`,
+    code: courseDefinition.code,
+    title: courseDefinition.title,
+    units: courseDefinition.units,
+    levelValue: courseDefinition.levelValue,
+    levelLabel: courseDefinition.levelLabel,
+    assignedLecturerIds,
+  };
+}
+
+function buildLecturer(
+  index: number,
+  assignedCourseIds: string[],
+): HodLecturer {
+  const lecturerName = HOD_LECTURER_NAMES[index];
+  const normalizedName = lecturerName.toLowerCase().replace(/[^a-z]+/g, '.');
+
+  return {
+    id: `hod-lecturer-${index + 1}`,
+    fullName: lecturerName,
+    staffId: `CONSMMEFS/STF/2019/${String(index + 14).padStart(4, '0')}`,
+    emailAddress: `${normalizedName}@consmmefs.edu.ng`,
+    phoneNumber: `0809 ${String(2813200 + index * 53).slice(0, 3)} ${String(2813200 + index * 53).slice(3)}`,
+    assignedCourseIds,
+  };
+}
 
 function buildResultStudentRows(resultIndex: number): HodResultStudentRow[] {
   return Array.from({ length: 8 }, (_, studentIndex) => {
@@ -288,6 +419,11 @@ export const HOD_PROGRAMME_FILTER_OPTIONS: HodProgrammeFilterOption[] = [
   { label: 'HND', value: 'HND' },
 ];
 
+export const HOD_LEVEL_FILTER_OPTIONS: HodLevelFilterOption[] = [
+  { label: 'OND 1', value: 'ond_1' },
+  { label: 'HND 1', value: 'hnd_1' },
+];
+
 export const HOD_FLAG_REASON_OPTIONS = [
   'Wrong File Uploaded',
   'Blurry Document',
@@ -332,3 +468,38 @@ export const HOD_STUDENT_RECORDS: HodStudentRecord[] = Array.from(
   { length: 18 },
   (_, index) => buildStudentRecord(index),
 );
+
+export const HOD_LECTURER_COURSES: HodLecturerCourse[] = [
+  buildLecturerCourse(0, []),
+  buildLecturerCourse(1, ['hod-lecturer-1']),
+  buildLecturerCourse(2, ['hod-lecturer-1', 'hod-lecturer-4']),
+  buildLecturerCourse(3, []),
+  buildLecturerCourse(4, ['hod-lecturer-2', 'hod-lecturer-6']),
+  buildLecturerCourse(5, ['hod-lecturer-3']),
+  buildLecturerCourse(6, ['hod-lecturer-5']),
+  buildLecturerCourse(7, ['hod-lecturer-7', 'hod-lecturer-9']),
+];
+
+export const HOD_LECTURERS: HodLecturer[] = [
+  buildLecturer(0, [
+    'hod-lecturer-course-2',
+    'hod-lecturer-course-3',
+    'hod-lecturer-course-6',
+  ]),
+  buildLecturer(1, ['hod-lecturer-course-5']),
+  buildLecturer(2, ['hod-lecturer-course-6']),
+  buildLecturer(3, ['hod-lecturer-course-3']),
+  buildLecturer(4, ['hod-lecturer-course-7']),
+  buildLecturer(5, ['hod-lecturer-course-5']),
+  buildLecturer(6, ['hod-lecturer-course-8']),
+  buildLecturer(7, []),
+  buildLecturer(8, ['hod-lecturer-course-8']),
+];
+
+export const HOD_LECTURER_ASSIGNMENT_HISTORY: HodLecturerAssignmentHistoryRecord[] =
+  [
+    buildLecturerAssignmentHistoryRecord(0, 'assigned'),
+    buildLecturerAssignmentHistoryRecord(1, 'removed'),
+    buildLecturerAssignmentHistoryRecord(2, 'assigned'),
+    buildLecturerAssignmentHistoryRecord(3, 'assigned'),
+  ];
