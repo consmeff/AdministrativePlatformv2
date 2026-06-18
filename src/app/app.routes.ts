@@ -109,13 +109,16 @@ export const routes: Routes = [
           {
             path: 'courses',
             loadComponent: () =>
-              import('./pages/hod/hod-module-placeholder/hod-module-placeholder.component').then(
-                (m) => m.HodModulePlaceholderComponent,
+              import('./pages/hod/courses/hod-courses.component').then(
+                (m) => m.HodCoursesComponent,
               ),
-            data: {
-              title: 'Courses',
-              description: 'Manage department courses from this module.',
-            },
+          },
+          {
+            path: 'courses/setup',
+            loadComponent: () =>
+              import('./pages/hod/courses/setup/hod-course-setup.component').then(
+                (m) => m.HodCourseSetupComponent,
+              ),
           },
         ],
       },

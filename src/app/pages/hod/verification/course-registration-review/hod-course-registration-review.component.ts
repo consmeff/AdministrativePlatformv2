@@ -70,7 +70,7 @@ export class HodCourseRegistrationReviewComponent {
       .filter((record) =>
         selectedProgramme === 'all'
           ? true
-          : record.programmeType === selectedProgramme,
+          : record.levelLabel === selectedProgramme,
       )
       .filter((record) => {
         if (!normalizedSearchTerm) {

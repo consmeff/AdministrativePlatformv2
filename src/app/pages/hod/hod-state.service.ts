@@ -1,5 +1,9 @@
 import { Injectable, computed, signal } from '@angular/core';
 import {
+  HOD_COURSE_CATALOGUE_COURSES,
+  HOD_COURSE_LEVEL_CONFIGURATIONS,
+  HOD_COURSE_OVERVIEW_LEVELS,
+  HOD_COURSE_PUBLICATION_HISTORY,
   HOD_COURSE_REGISTRATION_RECORDS,
   HOD_DOCUMENT_VERIFICATION_RECORDS,
   HOD_LECTURERS,
@@ -10,6 +14,11 @@ import {
   HOD_STUDENT_RECORDS,
 } from './hod.constants';
 import {
+  HodCourseCatalogueCourse,
+  HodCourseLevelConfiguration,
+  HodCourseLevelSelection,
+  HodCourseOverviewLevel,
+  HodCoursePublicationHistoryRecord,
   HodCourseRegistrationRecord,
   HodDocumentVerificationRecord,
   HodDocumentFlag,
@@ -29,6 +38,10 @@ interface HodState {
   lecturers: HodLecturer[];
   lecturerCourses: HodLecturerCourse[];
   lecturerAssignmentHistory: HodLecturerAssignmentHistoryRecord[];
+  courseOverviewLevels: HodCourseOverviewLevel[];
+  courseCatalogueCourses: HodCourseCatalogueCourse[];
+  courseLevelConfigurations: HodCourseLevelConfiguration[];
+  coursePublicationHistory: HodCoursePublicationHistoryRecord[];
 }
 
 @Injectable({
@@ -43,6 +56,10 @@ export class HodStateService {
     lecturers: HOD_LECTURERS,
     lecturerCourses: HOD_LECTURER_COURSES,
     lecturerAssignmentHistory: HOD_LECTURER_ASSIGNMENT_HISTORY,
+    courseOverviewLevels: HOD_COURSE_OVERVIEW_LEVELS,
+    courseCatalogueCourses: HOD_COURSE_CATALOGUE_COURSES,
+    courseLevelConfigurations: HOD_COURSE_LEVEL_CONFIGURATIONS,
+    coursePublicationHistory: HOD_COURSE_PUBLICATION_HISTORY,
   });
 
   readonly profile = signal<HodProfile>(HOD_PROFILE);
@@ -58,6 +75,18 @@ export class HodStateService {
   readonly lecturerCourses = computed(() => this.state().lecturerCourses);
   readonly lecturerAssignmentHistory = computed(
     () => this.state().lecturerAssignmentHistory,
+  );
+  readonly courseOverviewLevels = computed(
+    () => this.state().courseOverviewLevels,
+  );
+  readonly courseCatalogueCourses = computed(
+    () => this.state().courseCatalogueCourses,
+  );
+  readonly courseLevelConfigurations = computed(
+    () => this.state().courseLevelConfigurations,
+  );
+  readonly coursePublicationHistory = computed(
+    () => this.state().coursePublicationHistory,
   );
   readonly pendingCourseRegistrationCount = computed(
     () =>
@@ -245,6 +274,85 @@ export class HodStateService {
           changedAt,
         })),
         ...currentState.lecturerAssignmentHistory,
+      ],
+    }));
+  }
+
+  getCourseOverviewLevel(levelValue: string): HodCourseOverviewLevel | null {
+    return (
+      this.courseOverviewLevels().find(
+        (level) => level.levelValue === levelValue,
+      ) ?? null
+    );
+  }
+
+  getCourseLevelConfiguration(
+    levelValue: string,
+  ): HodCourseLevelConfiguration | null {
+    return (
+      this.courseLevelConfigurations().find(
+        (configuration) => configuration.levelValue === levelValue,
+      ) ?? null
+    );
+  }
+
+  publishCourseLevelSelection(
+    levelValue: string,
+    selections: HodCourseLevelSelection[],
+  ): void {
+    const levelConfiguration = this.getCourseLevelConfiguration(levelValue);
+    const courseOverviewLevel = this.getCourseOverviewLevel(levelValue);
+
+    if (!levelConfiguration || !courseOverviewLevel) {
+      return;
+    }
+
+    const totalUnits = selections.reduce((sum, selection) => {
+      const course = this.courseCatalogueCourses().find(
+        (catalogueCourse) => catalogueCourse.id === selection.courseId,
+      );
+
+      return sum + (course?.units ?? 0);
+    }, 0);
+    const formattedTimestamp = this.formatTimestamp();
+
+    this.state.update((currentState) => ({
+      ...currentState,
+      courseLevelConfigurations: currentState.courseLevelConfigurations.map(
+        (configuration) =>
+          configuration.levelValue === levelValue
+            ? {
+                ...configuration,
+                selections: [...selections],
+                publishedAt: formattedTimestamp,
+              }
+            : configuration,
+      ),
+      courseOverviewLevels: currentState.courseOverviewLevels.map((level) =>
+        level.levelValue === levelValue
+          ? {
+              ...level,
+              configured: true,
+              semesters: level.semesters.map((semester) => ({
+                ...semester,
+                courseCount: selections.length,
+                totalUnits,
+              })),
+            }
+          : level,
+      ),
+      coursePublicationHistory: [
+        {
+          id: `hod-course-publication-history-${Date.now()}`,
+          sessionLabel: '2024/2025',
+          levelValue,
+          levelLabel: courseOverviewLevel.levelLabel,
+          courseCount: selections.length,
+          totalUnits,
+          lecturerCount: 0,
+          publishedAt: formattedTimestamp,
+        },
+        ...currentState.coursePublicationHistory,
       ],
     }));
   }

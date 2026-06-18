@@ -171,3 +171,51 @@ export interface HodLecturerAssignmentHistoryRecord {
   action: 'assigned' | 'removed';
   changedAt: string;
 }
+
+export type HodCourseRequirementType = 'compulsory' | 'elective';
+
+export interface HodCourseSemesterSummary {
+  semesterLabel: string;
+  courseCount: number;
+  totalUnits: number;
+}
+
+export interface HodCourseOverviewLevel {
+  id: string;
+  levelValue: string;
+  levelLabel: string;
+  configured: boolean;
+  semesters: HodCourseSemesterSummary[];
+}
+
+export interface HodCourseCatalogueCourse {
+  id: string;
+  code: string;
+  title: string;
+  units: number;
+  levelValue: string;
+  categoryLabel: string;
+}
+
+export interface HodCourseLevelSelection {
+  courseId: string;
+  requirementType: HodCourseRequirementType;
+}
+
+export interface HodCourseLevelConfiguration {
+  levelValue: string;
+  levelLabel: string;
+  selections: HodCourseLevelSelection[];
+  publishedAt: string | null;
+}
+
+export interface HodCoursePublicationHistoryRecord {
+  id: string;
+  sessionLabel: string;
+  levelValue: string;
+  levelLabel: string;
+  courseCount: number;
+  totalUnits: number;
+  lecturerCount: number;
+  publishedAt: string;
+}

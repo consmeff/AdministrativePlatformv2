@@ -1,0 +1,111 @@
+.hod-courses-page {
+  padding: 24px;
+}
+
+.levels-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.level-card,
+.setup-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 196px;
+  border-radius: 24px;
+  background: #ffffff;
+  text-decoration: none;
+}
+
+.level-card {
+  padding: 18px;
+  border: 1px solid #dfe6f0;
+}
+
+.level-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.semester-list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0;
+  margin-top: 18px;
+}
+
+.semester-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 0;
+  border-top: 1px solid #e7edf6;
+}
+
+.semester-label {
+  font-size: 16px;
+  color: #1e293b;
+}
+
+.semester-meta {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #7487a9;
+}
+
+.setup-card {
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  border: 1px dashed #d9e2ee;
+  color: #1e293b;
+}
+
+.setup-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  font-size: 28px;
+  color: #7487a9;
+}
+
+.setup-copy {
+  font-size: 16px;
+  color: #1e293b;
+}
+
+@media (max-width: 960px) {
+  .levels-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .hod-courses-page {
+    padding: 16px;
+  }
+
+  .semester-row,
+  .semester-meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

@@ -1,5 +1,10 @@
 import {
+  HodCourseCatalogueCourse,
+  HodCourseLevelConfiguration,
+  HodCourseOverviewLevel,
+  HodCoursePublicationHistoryRecord,
   HodCourseRegistrationRecord,
+  HodCourseRequirementType,
   HodDocumentVerificationRecord,
   HodLecturer,
   HodLecturerAssignmentHistoryRecord,
@@ -135,6 +140,255 @@ const HOD_LECTURER_COURSE_DEFINITIONS = [
   },
 ] as const;
 
+const HOD_COURSE_OVERVIEW_LEVEL_DEFINITIONS = [
+  { levelValue: 'ond_1', levelLabel: 'OND 1', configured: true },
+  { levelValue: 'ond_2', levelLabel: 'OND 2', configured: true },
+  { levelValue: 'hnd_1', levelLabel: 'HND 1', configured: true },
+  { levelValue: 'hnd_2', levelLabel: 'HND 2', configured: false },
+] as const;
+
+const HOD_COURSE_CATALOGUE_DEFINITIONS = [
+  {
+    code: 'NUR 211',
+    title: 'Human Anatomy III',
+    units: 3,
+    levelValue: 'ond_1',
+    categoryLabel: 'General Studies',
+  },
+  {
+    code: 'NUR 212',
+    title: 'General Physiology',
+    units: 3,
+    levelValue: 'ond_1',
+    categoryLabel: 'General Studies',
+  },
+  {
+    code: 'NUR 213',
+    title: 'Introduction to Biochemistry',
+    units: 3,
+    levelValue: 'ond_1',
+    categoryLabel: 'General Studies',
+  },
+  {
+    code: 'NUR 214',
+    title: 'Basic Midwifery I',
+    units: 3,
+    levelValue: 'ond_1',
+    categoryLabel: 'Basic Midwifery',
+  },
+  {
+    code: 'NUR 215',
+    title: 'Basic Midwifery II',
+    units: 3,
+    levelValue: 'ond_1',
+    categoryLabel: 'Basic Midwifery',
+  },
+  {
+    code: 'NUR 216',
+    title: 'Nutrition in Nursing',
+    units: 3,
+    levelValue: 'ond_1',
+    categoryLabel: 'Basic Midwifery',
+  },
+  {
+    code: 'NUR 221',
+    title: 'Adult Nursing Practice',
+    units: 3,
+    levelValue: 'ond_2',
+    categoryLabel: 'Clinical Nursing',
+  },
+  {
+    code: 'NUR 222',
+    title: 'Pathophysiology',
+    units: 2,
+    levelValue: 'ond_2',
+    categoryLabel: 'Clinical Nursing',
+  },
+  {
+    code: 'NUR 223',
+    title: 'Child Health Nursing',
+    units: 3,
+    levelValue: 'ond_2',
+    categoryLabel: 'Specialty Nursing',
+  },
+  {
+    code: 'NUR 224',
+    title: 'Mental Health Nursing',
+    units: 2,
+    levelValue: 'ond_2',
+    categoryLabel: 'Specialty Nursing',
+  },
+  {
+    code: 'NUR 321',
+    title: 'Maternal and Child Nursing',
+    units: 3,
+    levelValue: 'hnd_1',
+    categoryLabel: 'Advanced Practice',
+  },
+  {
+    code: 'NUR 322',
+    title: 'Community Health Practice',
+    units: 2,
+    levelValue: 'hnd_1',
+    categoryLabel: 'Advanced Practice',
+  },
+  {
+    code: 'NUR 323',
+    title: 'Medical Surgical Nursing',
+    units: 3,
+    levelValue: 'hnd_1',
+    categoryLabel: 'Advanced Practice',
+  },
+  {
+    code: 'NUR 324',
+    title: 'Research Methods in Nursing',
+    units: 2,
+    levelValue: 'hnd_1',
+    categoryLabel: 'Professional Studies',
+  },
+  {
+    code: 'NUR 411',
+    title: 'Advanced Clinical Nursing',
+    units: 3,
+    levelValue: 'hnd_2',
+    categoryLabel: 'Clinical Rotation',
+  },
+  {
+    code: 'NUR 412',
+    title: 'Leadership in Nursing Services',
+    units: 2,
+    levelValue: 'hnd_2',
+    categoryLabel: 'Clinical Rotation',
+  },
+  {
+    code: 'NUR 413',
+    title: 'Emergency and Trauma Nursing',
+    units: 3,
+    levelValue: 'hnd_2',
+    categoryLabel: 'Specialist Practice',
+  },
+  {
+    code: 'NUR 414',
+    title: 'Entrepreneurship in Health Care',
+    units: 2,
+    levelValue: 'hnd_2',
+    categoryLabel: 'Specialist Practice',
+  },
+] as const;
+
+const HOD_ACADEMIC_LEVEL_LABELS = ['OND 1', 'OND 2', 'HND 1', 'HND 2'] as const;
+
+function getAcademicLevelLabel(index: number): string {
+  return HOD_ACADEMIC_LEVEL_LABELS[index % HOD_ACADEMIC_LEVEL_LABELS.length];
+}
+
+function getProgrammeTypeFromLevel(levelLabel: string): string {
+  return levelLabel.startsWith('OND') ? 'OND' : 'HND';
+}
+
+const HOD_PUBLISHED_COURSE_SELECTIONS: Record<string, string[]> = {
+  ond_1: [
+    'hod-catalogue-course-1',
+    'hod-catalogue-course-2',
+    'hod-catalogue-course-3',
+    'hod-catalogue-course-4',
+    'hod-catalogue-course-5',
+    'hod-catalogue-course-6',
+  ],
+  ond_2: [
+    'hod-catalogue-course-7',
+    'hod-catalogue-course-8',
+    'hod-catalogue-course-9',
+    'hod-catalogue-course-10',
+  ],
+  hnd_1: [
+    'hod-catalogue-course-11',
+    'hod-catalogue-course-12',
+    'hod-catalogue-course-13',
+    'hod-catalogue-course-14',
+  ],
+};
+
+function buildCourseOverviewLevel(index: number): HodCourseOverviewLevel {
+  const levelDefinition = HOD_COURSE_OVERVIEW_LEVEL_DEFINITIONS[index];
+
+  return {
+    id: `hod-course-overview-level-${index + 1}`,
+    levelValue: levelDefinition.levelValue,
+    levelLabel: levelDefinition.levelLabel,
+    configured: levelDefinition.configured,
+    semesters: [
+      {
+        semesterLabel: 'First Semester',
+        courseCount: levelDefinition.configured ? 10 : 0,
+        totalUnits: levelDefinition.configured ? 24 : 0,
+      },
+      {
+        semesterLabel: 'Second Semester',
+        courseCount: levelDefinition.configured ? 10 : 0,
+        totalUnits: levelDefinition.configured ? 24 : 0,
+      },
+    ],
+  };
+}
+
+function buildCourseCatalogueCourse(index: number): HodCourseCatalogueCourse {
+  const courseDefinition = HOD_COURSE_CATALOGUE_DEFINITIONS[index];
+
+  return {
+    id: `hod-catalogue-course-${index + 1}`,
+    code: courseDefinition.code,
+    title: courseDefinition.title,
+    units: courseDefinition.units,
+    levelValue: courseDefinition.levelValue,
+    categoryLabel: courseDefinition.categoryLabel,
+  };
+}
+
+function buildCourseLevelConfiguration(
+  levelValue: string,
+): HodCourseLevelConfiguration {
+  const levelOption = HOD_COURSE_LEVEL_FILTER_OPTIONS.find(
+    (option) => option.value === levelValue,
+  );
+  const selectedCourseIds = HOD_PUBLISHED_COURSE_SELECTIONS[levelValue] ?? [];
+
+  return {
+    levelValue,
+    levelLabel: levelOption?.label ?? levelValue.toUpperCase(),
+    selections: selectedCourseIds.map((courseId, index) => ({
+      courseId,
+      requirementType:
+        index < Math.ceil(selectedCourseIds.length * 0.75)
+          ? 'compulsory'
+          : ('elective' as HodCourseRequirementType),
+    })),
+    publishedAt: selectedCourseIds.length > 0 ? '24 Jan 2026 22:58 AM' : null,
+  };
+}
+
+function buildCoursePublicationHistoryRecord(
+  index: number,
+  levelValue: string,
+  courseCount: number,
+  totalUnits: number,
+): HodCoursePublicationHistoryRecord {
+  const levelOption = HOD_COURSE_LEVEL_FILTER_OPTIONS.find(
+    (option) => option.value === levelValue,
+  );
+
+  return {
+    id: `hod-course-publication-history-${index + 1}`,
+    sessionLabel: '2023/2024',
+    levelValue,
+    levelLabel: levelOption?.label ?? levelValue.toUpperCase(),
+    courseCount,
+    totalUnits,
+    lecturerCount: 10,
+    publishedAt: `${24 - index} Jan 2026 11:1${index} AM`,
+  };
+}
+
 function buildLecturerAssignmentHistoryRecord(
   index: number,
   action: HodLecturerAssignmentHistoryRecord['action'],
@@ -248,14 +502,15 @@ function buildResultReviewRecord(
   const passedStudents = studentRows.filter(
     (studentRow) => studentRow.totalScore >= 40,
   ).length;
+  const levelLabel = getAcademicLevelLabel(index);
 
   return {
     id: `hod-result-review-${index + 1}`,
     courseTitle: course.courseTitle,
     courseCode: course.courseCode,
     submittedBy: course.submittedBy,
-    programmeType: index % 2 === 0 ? 'OND' : 'HND',
-    levelLabel: index % 2 === 0 ? 'OND 2' : 'HND 1',
+    programmeType: getProgrammeTypeFromLevel(levelLabel),
+    levelLabel,
     submittedAt: '24 Jan 2026 22:58 AM',
     totalStudents: studentRows.length,
     passedStudents,
@@ -307,8 +562,8 @@ function buildStudentAcademicPerformance(
 
 function buildStudentRecord(index: number): HodStudentRecord {
   const studentName = HOD_STUDENT_NAMES[index % HOD_STUDENT_NAMES.length];
-  const programmeType = index % 2 === 0 ? 'OND' : 'HND';
-  const levelLabel = index % 2 === 0 ? 'OND 2' : 'HND 1';
+  const levelLabel = getAcademicLevelLabel(index);
+  const programmeType = getProgrammeTypeFromLevel(levelLabel);
   const cgpa = Number((3.22 + (index % 6) * 0.11).toFixed(2));
 
   return {
@@ -356,13 +611,14 @@ function buildCourseRegistrationRecord(
   const studentNumber = String(index + 6).padStart(4, '0');
   const courseCount = status === 'rejected' ? 4 : 9;
   const totalUnits = status === 'rejected' ? 16 : 21;
+  const levelLabel = getAcademicLevelLabel(index);
 
   return {
     id: `hod-course-registration-${index + 1}`,
     studentName: 'Gbadegesin Ishola Dada',
     registrationNumber: `CONSMMEFS/ENT-2025/${studentNumber}`,
-    programmeType: index % 2 === 0 ? 'OND' : 'HND',
-    levelLabel: index % 2 === 0 ? 'OND 1' : 'HND 1',
+    programmeType: getProgrammeTypeFromLevel(levelLabel),
+    levelLabel,
     courseCount,
     totalUnits,
     coreCourseCount: 4,
@@ -377,13 +633,14 @@ function buildDocumentVerificationRecord(
   status: HodDocumentVerificationRecord['status'],
 ): HodDocumentVerificationRecord {
   const studentNumber = String(index + 6).padStart(4, '0');
+  const levelLabel = getAcademicLevelLabel(index);
 
   return {
     id: `hod-document-verification-${index + 1}`,
     studentName: 'ISHOLA, Gbadesin Hassan',
     registrationNumber: `CONSMMEFS/ENT-2025/${studentNumber}`,
-    programmeType: index % 2 === 0 ? 'OND' : 'HND',
-    levelLabel: index % 2 === 0 ? 'OND' : 'HND',
+    programmeType: getProgrammeTypeFromLevel(levelLabel),
+    levelLabel,
     submittedAt: '24 Jan 2026 22:58 AM',
     status,
     documents: HOD_DOCUMENT_NAMES.map((documentName, documentIndex) => ({
@@ -415,13 +672,22 @@ export const HOD_PROFILE: HodProfile = {
 
 export const HOD_PROGRAMME_FILTER_OPTIONS: HodProgrammeFilterOption[] = [
   { label: 'All Programme', value: 'all' },
-  { label: 'OND', value: 'OND' },
-  { label: 'HND', value: 'HND' },
+  { label: 'OND 1', value: 'OND 1' },
+  { label: 'OND 2', value: 'OND 2' },
+  { label: 'HND 1', value: 'HND 1' },
+  { label: 'HND 2', value: 'HND 2' },
 ];
 
 export const HOD_LEVEL_FILTER_OPTIONS: HodLevelFilterOption[] = [
   { label: 'OND 1', value: 'ond_1' },
   { label: 'HND 1', value: 'hnd_1' },
+];
+
+export const HOD_COURSE_LEVEL_FILTER_OPTIONS: HodLevelFilterOption[] = [
+  { label: 'OND 1', value: 'ond_1' },
+  { label: 'OND 2', value: 'ond_2' },
+  { label: 'HND 1', value: 'hnd_1' },
+  { label: 'HND 2', value: 'hnd_2' },
 ];
 
 export const HOD_FLAG_REASON_OPTIONS = [
@@ -502,4 +768,28 @@ export const HOD_LECTURER_ASSIGNMENT_HISTORY: HodLecturerAssignmentHistoryRecord
     buildLecturerAssignmentHistoryRecord(1, 'removed'),
     buildLecturerAssignmentHistoryRecord(2, 'assigned'),
     buildLecturerAssignmentHistoryRecord(3, 'assigned'),
+  ];
+
+export const HOD_COURSE_OVERVIEW_LEVELS: HodCourseOverviewLevel[] = Array.from(
+  { length: HOD_COURSE_OVERVIEW_LEVEL_DEFINITIONS.length },
+  (_, index) => buildCourseOverviewLevel(index),
+);
+
+export const HOD_COURSE_CATALOGUE_COURSES: HodCourseCatalogueCourse[] =
+  Array.from({ length: HOD_COURSE_CATALOGUE_DEFINITIONS.length }, (_, index) =>
+    buildCourseCatalogueCourse(index),
+  );
+
+export const HOD_COURSE_LEVEL_CONFIGURATIONS: HodCourseLevelConfiguration[] = [
+  buildCourseLevelConfiguration('ond_1'),
+  buildCourseLevelConfiguration('ond_2'),
+  buildCourseLevelConfiguration('hnd_1'),
+  buildCourseLevelConfiguration('hnd_2'),
+];
+
+export const HOD_COURSE_PUBLICATION_HISTORY: HodCoursePublicationHistoryRecord[] =
+  [
+    buildCoursePublicationHistoryRecord(0, 'ond_1', 10, 24),
+    buildCoursePublicationHistoryRecord(1, 'ond_2', 10, 24),
+    buildCoursePublicationHistoryRecord(2, 'hnd_1', 10, 24),
   ];
