@@ -81,26 +81,16 @@ export const routes: Routes = [
           {
             path: 'result-review',
             loadComponent: () =>
-              import('./pages/hod/hod-module-placeholder/hod-module-placeholder.component').then(
-                (m) => m.HodModulePlaceholderComponent,
+              import('./pages/hod/result-review/hod-result-review.component').then(
+                (m) => m.HodResultReviewComponent,
               ),
-            data: {
-              title: 'Result review',
-              description:
-                'Review submitted results across the department from this module.',
-            },
           },
           {
             path: 'students-record',
             loadComponent: () =>
-              import('./pages/hod/hod-module-placeholder/hod-module-placeholder.component').then(
-                (m) => m.HodModulePlaceholderComponent,
+              import('./pages/hod/students-record/hod-students-record.component').then(
+                (m) => m.HodStudentsRecordComponent,
               ),
-            data: {
-              title: 'Students record',
-              description:
-                'Manage department student records from this module.',
-            },
           },
           {
             path: 'lecturers',

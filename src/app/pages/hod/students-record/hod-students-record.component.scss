@@ -1,0 +1,186 @@
+.hod-students-record-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+}
+
+.summary-strip {
+  display: flex;
+}
+
+.student-count-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  min-height: 118px;
+  padding: 22px 24px;
+  border: 1px solid #dfe6f0;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.student-count-value {
+  display: block;
+  font-size: 32px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.student-count-label {
+  display: block;
+  margin-top: 8px;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.programme-summary-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.programme-summary-pill,
+.level-pill,
+.programme-pill,
+.cgpa-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.programme-summary-pill,
+.level-pill,
+.programme-pill {
+  background: #f5f7fb;
+  color: #63789b;
+}
+
+.cgpa-pill {
+  min-width: 62px;
+}
+
+.cgpa-pill.is-high {
+  background: #effcf5;
+  color: #039855;
+}
+
+.cgpa-pill.is-medium {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.cgpa-pill.is-low {
+  background: #fff3f2;
+  color: #d92d20;
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.filter-search {
+  flex: 1;
+}
+
+.table-card {
+  border: 1px solid #dfe6f0;
+  border-radius: 18px;
+  background: #ffffff;
+  padding: 14px 18px 6px;
+}
+
+.table-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 8px;
+}
+
+.table-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.table-subtitle {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.records-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.records-table th,
+.records-table td {
+  padding: 16px 12px;
+  border-bottom: 1px solid #e7edf6;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.records-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.student-name-cell {
+  font-weight: 600;
+  color: #334155;
+}
+
+.matric-number-cell,
+.email-cell {
+  color: #94a3b8;
+}
+
+.actions-col {
+  width: 84px;
+}
+
+.row-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #dbe4f0;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #94a3b8;
+}
+
+.empty-table-state {
+  padding: 36px 12px;
+  text-align: center;
+  color: #64748b;
+}
+
+@media (max-width: 900px) {
+  .hod-students-record-page {
+    padding: 16px;
+  }
+
+  .student-count-card,
+  .filter-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

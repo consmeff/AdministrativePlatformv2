@@ -3,17 +3,23 @@ import {
   HOD_COURSE_REGISTRATION_RECORDS,
   HOD_DOCUMENT_VERIFICATION_RECORDS,
   HOD_PROFILE,
+  HOD_RESULT_REVIEW_RECORDS,
+  HOD_STUDENT_RECORDS,
 } from './hod.constants';
 import {
   HodCourseRegistrationRecord,
   HodDocumentVerificationRecord,
   HodDocumentFlag,
   HodProfile,
+  HodResultReviewRecord,
+  HodStudentRecord,
 } from './hod.types';
 
 interface HodState {
   courseRegistrations: HodCourseRegistrationRecord[];
   documentVerifications: HodDocumentVerificationRecord[];
+  resultReviews: HodResultReviewRecord[];
+  studentRecords: HodStudentRecord[];
 }
 
 @Injectable({
@@ -23,6 +29,8 @@ export class HodStateService {
   private readonly state = signal<HodState>({
     courseRegistrations: HOD_COURSE_REGISTRATION_RECORDS,
     documentVerifications: HOD_DOCUMENT_VERIFICATION_RECORDS,
+    resultReviews: HOD_RESULT_REVIEW_RECORDS,
+    studentRecords: HOD_STUDENT_RECORDS,
   });
 
   readonly profile = signal<HodProfile>(HOD_PROFILE);
@@ -32,6 +40,8 @@ export class HodStateService {
   readonly documentVerifications = computed(
     () => this.state().documentVerifications,
   );
+  readonly resultReviews = computed(() => this.state().resultReviews);
+  readonly studentRecords = computed(() => this.state().studentRecords);
   readonly pendingCourseRegistrationCount = computed(
     () =>
       this.courseRegistrations().filter(
@@ -56,6 +66,12 @@ export class HodStateService {
       this.documentVerifications().filter(
         (record) => record.status === 'flagged',
       ).length,
+  );
+  readonly pendingResultReviewCount = computed(
+    () => this.resultReviews().filter((record) => !record.approved).length,
+  );
+  readonly approvedResultReviewCount = computed(
+    () => this.resultReviews().filter((record) => record.approved).length,
   );
 
   getCourseRegistrationById(
@@ -115,6 +131,21 @@ export class HodStateService {
           : record,
       ),
     }));
+  }
+
+  approveResultReview(recordId: string): void {
+    this.state.update((currentState) => ({
+      ...currentState,
+      resultReviews: currentState.resultReviews.map((record) =>
+        record.id === recordId ? { ...record, approved: true } : record,
+      ),
+    }));
+  }
+
+  getStudentRecordById(recordId: string): HodStudentRecord | null {
+    return (
+      this.studentRecords().find((record) => record.id === recordId) ?? null
+    );
   }
 
   private formatTimestamp(): string {

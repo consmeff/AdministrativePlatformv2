@@ -65,3 +65,74 @@ export interface HodDocumentVerificationRecord {
   documents: HodVerificationDocument[];
   flag: HodDocumentFlag | null;
 }
+
+export interface HodResultStudentRow {
+  id: string;
+  studentName: string;
+  matricNo: string;
+  continuousAssessmentScore: number;
+  examScore: number;
+  totalScore: number;
+  grade: string;
+}
+
+export interface HodResultReviewRecord {
+  id: string;
+  courseTitle: string;
+  courseCode: string;
+  submittedBy: string;
+  programmeType: string;
+  levelLabel: string;
+  submittedAt: string;
+  totalStudents: number;
+  passedStudents: number;
+  failedStudents: number;
+  approved: boolean;
+  studentRows: HodResultStudentRow[];
+}
+
+export interface HodStudentRecordDocument {
+  id: string;
+  name: string;
+  fileSizeLabel: string;
+  previewUrl: string;
+}
+
+export interface HodStudentSemesterPerformance {
+  id: string;
+  levelLabel: string;
+  semesterLabel: string;
+  gpa: number;
+}
+
+export interface HodStudentRecord {
+  id: string;
+  studentName: string;
+  matricNumber: string;
+  levelLabel: string;
+  programmeType: string;
+  cgpa: number;
+  emailAddress: string;
+  phoneNumber: string;
+  alternatePhoneNumber: string;
+  dateOfBirth: string;
+  gender: string;
+  admissionSession: string;
+  currentLevel: string;
+  maritalStatus: string;
+  nationality: string;
+  stateOfOrigin: string;
+  localGovernmentArea: string;
+  disabilityStatus: string;
+  specifiedDisability: string;
+  address: string;
+  cumulativeGpaLabel: string;
+  cumulativeClassLabel: string;
+  academicPerformance: HodStudentSemesterPerformance[];
+  documents: HodStudentRecordDocument[];
+}
+
+export type HodStudentRecordDrawerTab =
+  | 'personal_details'
+  | 'academic_performance'
+  | 'documents';

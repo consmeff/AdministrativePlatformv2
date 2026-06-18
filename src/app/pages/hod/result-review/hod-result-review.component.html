@@ -1,0 +1,187 @@
+<section class="hod-result-review-page">
+  <header class="summary-cards-row">
+    <button
+      type="button"
+      class="summary-card"
+      [class.is-active]="activeTab() === 'pending'"
+      (click)="setActiveTab('pending')"
+    >
+      <span class="summary-card-value">{{ pendingResultCount() }}</span>
+      <span class="summary-card-label">Pending Result Review</span>
+    </button>
+
+    <button
+      type="button"
+      class="summary-card"
+      [class.is-active]="activeTab() === 'approved'"
+      (click)="setActiveTab('approved')"
+    >
+      <span class="summary-card-value">{{ approvedResultCount() }}</span>
+      <span class="summary-card-label">Approved Results</span>
+    </button>
+
+    <article class="summary-card summary-card--static">
+      <span class="summary-card-value">{{ totalResultCount() }}</span>
+      <span class="summary-card-label">Total Result Submissions</span>
+    </article>
+  </header>
+
+  <section class="filter-row">
+    <div class="filter-search">
+      <app-search-input
+        placeholder="Search by course title, course code or lecturer"
+        [model]="searchTerm()"
+        (modelChange)="onSearchTermChange($event)"
+      />
+    </div>
+
+    <app-filter-select
+      [options]="programmeOptions"
+      [model]="selectedProgramme()"
+      optionLabel="label"
+      placeholder="All Programme"
+      (modelChange)="onProgrammeChange($event)"
+    />
+  </section>
+
+  <section class="result-card-list">
+    @if (paginatedRecords().length === 0) {
+      <article class="empty-state-card">
+        <h2 class="empty-state-title">No result submissions found</h2>
+        <p class="empty-state-copy">
+          Adjust the current search or programme filter to see available
+          records.
+        </p>
+      </article>
+    } @else {
+      @for (record of paginatedRecords(); track record.id) {
+        <article class="result-card">
+          <div class="result-card-head">
+            <div class="course-copy">
+              <div class="course-title-row">
+                <h2 class="course-title">{{ record.courseTitle }}</h2>
+                <span
+                  class="review-status-pill"
+                  [class.is-approved]="record.approved"
+                >
+                  {{ record.approved ? "Approved" : "Pending Review" }}
+                </span>
+              </div>
+
+              <div class="course-chip-row">
+                <span class="course-chip">{{ record.courseCode }}</span>
+                <span class="course-chip">{{ record.programmeType }}</span>
+                <span class="course-chip">{{ record.levelLabel }}</span>
+              </div>
+
+              <div class="course-meta-row">
+                <span class="meta-item">
+                  <i class="bi bi-person-circle"></i>
+                  Submitted by {{ record.submittedBy }}
+                </span>
+                <span class="meta-item">
+                  <i class="bi bi-calendar2-event"></i>
+                  {{ record.submittedAt }}
+                </span>
+              </div>
+            </div>
+
+            <div class="head-actions">
+              @if (!record.approved) {
+                <app-button
+                  variant="primary"
+                  iconClass="bi bi-check-lg"
+                  (buttonClick)="approveRecord(record.id)"
+                >
+                  Approve
+                </app-button>
+              }
+
+              <button
+                type="button"
+                class="expand-btn"
+                [class.is-expanded]="isRecordExpanded(record.id)"
+                [attr.aria-expanded]="isRecordExpanded(record.id)"
+                (click)="toggleExpandedRecord(record.id)"
+              >
+                <span>Student scores</span>
+                <i class="bi bi-chevron-down"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="result-stat-grid">
+            <article class="result-stat-card">
+              <span class="stat-label">Total Students</span>
+              <strong class="stat-value">{{ record.totalStudents }}</strong>
+            </article>
+
+            <article class="result-stat-card result-stat-card--success">
+              <span class="stat-label">Passed</span>
+              <strong class="stat-value">{{ record.passedStudents }}</strong>
+            </article>
+
+            <article class="result-stat-card result-stat-card--danger">
+              <span class="stat-label">Failed</span>
+              <strong class="stat-value">{{ record.failedStudents }}</strong>
+            </article>
+
+            <article class="result-stat-card result-stat-card--info">
+              <span class="stat-label">Pass Rate</span>
+              <strong class="stat-value">{{ getPassRate(record) }}%</strong>
+            </article>
+          </div>
+
+          @if (isRecordExpanded(record.id)) {
+            <div class="result-table-wrap">
+              <table class="result-table">
+                <thead>
+                  <tr>
+                    <th>Student Name</th>
+                    <th>Matric No</th>
+                    <th>CA Score</th>
+                    <th>Exam Score</th>
+                    <th>Total Score</th>
+                    <th>Grade</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (studentRow of record.studentRows; track studentRow.id) {
+                    <tr>
+                      <td class="student-name-cell">
+                        {{ studentRow.studentName }}
+                      </td>
+                      <td class="matric-number-cell">
+                        {{ studentRow.matricNo }}
+                      </td>
+                      <td>{{ studentRow.continuousAssessmentScore }}</td>
+                      <td>{{ studentRow.examScore }}</td>
+                      <td>{{ studentRow.totalScore }}</td>
+                      <td>
+                        <span
+                          class="grade-pill"
+                          [class.is-failed]="studentRow.grade === 'F'"
+                        >
+                          {{ studentRow.grade }}
+                        </span>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </article>
+      }
+    }
+
+    <app-pagination
+      [visible]="filteredRecords().length > 0"
+      [first]="first()"
+      [rows]="rows()"
+      [totalRecords]="filteredRecords().length"
+      [reportTemplate]="'Showing {first}-{last} of {totalRecords} items'"
+      (pageChange)="onPageChange($event)"
+    />
+  </section>
+</section>
