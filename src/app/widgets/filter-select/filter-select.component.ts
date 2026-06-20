@@ -14,6 +14,7 @@ export class FilterSelectComponent<T = unknown> {
   @Input() options: T[] = [];
   @Input() model!: T;
   @Input() optionLabel = 'name';
+  @Input() optionValue = '';
   @Input() placeholder = 'Select';
   @Output() modelChange = new EventEmitter<T>();
 }

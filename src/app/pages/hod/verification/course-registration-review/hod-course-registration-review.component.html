@@ -1,0 +1,143 @@
+<section class="hod-review-page">
+  <header class="summary-cards-row">
+    <button
+      type="button"
+      class="summary-card"
+      [class.is-active]="activeTab() === 'pending'"
+      (click)="setActiveTab('pending')"
+    >
+      <span class="summary-card-value">{{ pendingReviewCount() }}</span>
+      <span class="summary-card-label">Pending Review</span>
+    </button>
+
+    <button
+      type="button"
+      class="summary-card"
+      [class.is-active]="activeTab() === 'rejected'"
+      (click)="setActiveTab('rejected')"
+    >
+      <span class="summary-card-value">{{ rejectedRegistrationCount() }}</span>
+      <span class="summary-card-label">Rejected Registration</span>
+    </button>
+  </header>
+
+  <section class="filter-row">
+    <div class="filter-search">
+      <app-search-input
+        placeholder="Search by name or application no."
+        [model]="searchTerm()"
+        (modelChange)="onSearchTermChange($event)"
+      />
+    </div>
+
+    <app-filter-select
+      [options]="programmeOptions"
+      [model]="selectedProgramme()"
+      optionLabel="label"
+      placeholder="All Programme"
+      (modelChange)="onProgrammeChange($event)"
+    />
+  </section>
+
+  <section class="table-card">
+    <div class="review-table-wrap">
+      <table class="review-table">
+        <thead>
+          <tr>
+            <th class="checkbox-col">
+              <input type="checkbox" aria-label="Select rows" />
+            </th>
+            <th>Student Name</th>
+            <th>Registration Number</th>
+            <th>Level</th>
+            <th>Courses</th>
+            <th>Total Units</th>
+            <th>Status</th>
+            <th class="actions-col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (record of paginatedRecords(); track record.id) {
+            <tr>
+              <td class="checkbox-col">
+                <input type="checkbox" aria-label="Select row" />
+              </td>
+              <td class="student-name">{{ record.studentName }}</td>
+              <td class="registration-number">
+                {{ record.registrationNumber }}
+              </td>
+              <td>
+                <span class="level-pill">{{ record.levelLabel }}</span>
+              </td>
+              <td>{{ record.courseCount }}</td>
+              <td>{{ record.totalUnits }}</td>
+              <td>
+                <app-status-indicator
+                  [text]="getStatusText(record)"
+                  [tone]="getStatusTone(record)"
+                />
+              </td>
+              <td class="actions-col">
+                <div class="row-actions">
+                  <button
+                    type="button"
+                    class="row-action-btn"
+                    aria-label="Open details"
+                    (click)="openDrawer(record.id)"
+                  >
+                    <i class="bi bi-eye"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="row-action-btn"
+                    aria-label="Approve registration"
+                    [disabled]="isApproveDisabled(record)"
+                    (click)="approveRecord(record.id)"
+                  >
+                    <i class="bi bi-check-lg"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="row-action-btn"
+                    aria-label="Reject registration"
+                    [disabled]="isRejectDisabled(record)"
+                    (click)="rejectRecord(record.id)"
+                  >
+                    <i class="bi bi-exclamation-triangle"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <app-pagination
+      [first]="first()"
+      [rows]="rows()"
+      [totalRecords]="filteredRecords().length"
+      [reportTemplate]="'Showing {first}-{last} of {totalRecords} items'"
+      (pageChange)="onPageChange($event)"
+    />
+  </section>
+</section>
+
+<p-drawer
+  [visible]="activeDrawerRecord() !== null"
+  [modal]="true"
+  [appendTo]="'body'"
+  [dismissible]="true"
+  [closable]="false"
+  [blockScroll]="true"
+  position="right"
+  styleClass="course-registration-review-drawer"
+  (onHide)="closeDrawer()"
+>
+  <app-course-registration-review-drawer
+    [record]="activeDrawerRecord()"
+    (closed)="closeDrawer()"
+    (approved)="approveRecord($event)"
+    (rejected)="rejectRecord($event)"
+  />
+</p-drawer>

@@ -1,0 +1,146 @@
+@if (course(); as activeCourse) {
+  <section class="course-details-page">
+    <nav class="breadcrumb-row" aria-label="Breadcrumb">
+      <a [routerLink]="[roleBasePath, 'my-courses']">Course Details</a>
+      <span><i class="bi bi-chevron-right"></i></span>
+      <span>{{ activeCourse.code }}</span>
+    </nav>
+
+    <section class="course-summary-card">
+      <div class="summary-block summary-course">
+        <span class="summary-code">{{ activeCourse.code }}</span>
+        <span class="summary-title">{{ activeCourse.title }}</span>
+      </div>
+      <div class="summary-block">
+        <span class="summary-value">{{ activeCourse.units }} units</span>
+      </div>
+      <div class="summary-block">
+        <span class="summary-value">
+          @if (activeCourse.students.length === 0) {
+            No students
+          } @else {
+            {{ activeCourse.students.length }} Students
+          }
+        </span>
+      </div>
+      <div class="summary-block">
+        <span class="summary-value">{{ activeCourse.levelLabel }}</span>
+      </div>
+      <div class="summary-action">
+        <app-button
+          variant="primary"
+          [routerLink]="[roleBasePath, 'my-courses', activeCourse.id, 'upload']"
+        >
+          Submit Results
+        </app-button>
+      </div>
+    </section>
+
+    <section class="scores-card">
+      <div class="scores-head">
+        <div>
+          <h1 class="section-title">Student Score Sheet</h1>
+          @if (activeCourse.uploadSummary.successMessage) {
+            <p class="upload-note">
+              {{ activeCourse.uploadSummary.successMessage }}
+              @if (activeCourse.uploadSummary.lastUploadedAt) {
+                <span
+                  >Uploaded
+                  {{ activeCourse.uploadSummary.lastUploadedAt }}</span
+                >
+              }
+            </p>
+          }
+        </div>
+
+        <div class="scores-actions">
+          <app-button
+            variant="outline"
+            [disabled]="activeCourse.students.length === 0"
+            (buttonClick)="exportStudentScores()"
+          >
+            Export List
+          </app-button>
+          <app-button
+            variant="muted"
+            [routerLink]="[
+              roleBasePath,
+              'my-courses',
+              activeCourse.id,
+              'upload',
+            ]"
+          >
+            Update with File
+          </app-button>
+        </div>
+      </div>
+
+      @if (activeCourse.students.length === 0) {
+        <section class="empty-students-state">
+          <div class="empty-icon"><i class="bi bi-people"></i></div>
+          <h2 class="empty-title">
+            No students have registered for this course yet
+          </h2>
+          <p class="empty-copy">
+            Student scores will appear here once course registration is
+            complete. You can still download the upload template and return
+            later.
+          </p>
+          <app-button
+            variant="primary"
+            [routerLink]="[
+              roleBasePath,
+              'my-courses',
+              activeCourse.id,
+              'upload',
+            ]"
+          >
+            Open Upload Flow
+          </app-button>
+        </section>
+      } @else {
+        <div class="scores-table-shell">
+          <table class="scores-table">
+            <thead>
+              <tr>
+                <th>Student Name</th>
+                <th>Matric No.</th>
+                <th>C.A.</th>
+                <th>Exam</th>
+                <th>Total</th>
+                <th>Grade</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (student of activeCourse.students; track student.id) {
+                <tr>
+                  <td class="student-name-cell">{{ student.studentName }}</td>
+                  <td>{{ student.matricNo }}</td>
+                  <td>
+                    <span class="score-pill">
+                      {{ student.continuousAssessmentScore }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="score-pill">{{ student.examScore }}</span>
+                  </td>
+                  <td>{{ student.totalScore }}</td>
+                  <td>
+                    <span class="grade-pill">{{ student.grade }}</span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+  </section>
+} @else {
+  <section class="course-details-page">
+    <section class="scores-card">
+      <h1 class="section-title">Course not found</h1>
+      <p class="empty-copy">The selected course could not be loaded.</p>
+    </section>
+  </section>
+}

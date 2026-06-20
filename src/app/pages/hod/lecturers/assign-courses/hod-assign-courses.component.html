@@ -1,0 +1,155 @@
+<section class="hod-assign-courses-page">
+  <nav class="breadcrumb-row" aria-label="Breadcrumb">
+    <a [routerLink]="['/pages/hod/lecturers']" class="breadcrumb-link">
+      Lecturers
+    </a>
+    <span class="breadcrumb-separator"
+      ><i class="bi bi-chevron-right"></i
+    ></span>
+    <span class="breadcrumb-current">Assign Courses</span>
+  </nav>
+
+  <section class="toolbar-card">
+    <div class="toolbar-copy">
+      <h1 class="page-title">Assign Lecturers for the 2024/25 Session</h1>
+
+      <label class="filter-label" for="assign-level-select">Level</label>
+      <div class="filter-wrap">
+        <app-filter-select
+          [options]="levelOptions"
+          [model]="selectedLevel()"
+          optionLabel="label"
+          placeholder="Select level"
+          (modelChange)="onLevelChange($event)"
+        />
+      </div>
+    </div>
+
+    <div class="toolbar-actions">
+      <app-button
+        variant="outline"
+        iconClass="bi bi-arrow-counterclockwise"
+        (buttonClick)="openHistory()"
+      >
+        History
+      </app-button>
+
+      <app-button
+        variant="primary"
+        [disabled]="!hasUnsavedChanges()"
+        (buttonClick)="saveChanges()"
+      >
+        Save Changes
+      </app-button>
+    </div>
+  </section>
+
+  <section class="content-grid">
+    <section class="panel-card course-panel">
+      <h2 class="panel-title">Courses</h2>
+
+      <div class="course-list">
+        @for (course of filteredCourses(); track course.id) {
+          <button
+            type="button"
+            class="course-item"
+            [class.is-active]="selectedCourseId() === course.id"
+            (click)="selectCourse(course.id)"
+          >
+            <div class="course-item-copy">
+              <span class="course-item-code">{{ course.code }}</span>
+              <strong class="course-item-title">{{ course.title }}</strong>
+              <span
+                class="lecturer-count"
+                [class.is-unassigned]="course.assignedLecturerIds.length === 0"
+              >
+                <i class="bi bi-person"></i>
+                {{ getAssignedLecturerCount(course) }}
+              </span>
+            </div>
+
+            <span class="units-pill">{{ course.units }} Units</span>
+          </button>
+        }
+      </div>
+    </section>
+
+    <section class="assignment-stack">
+      @if (selectedCourse(); as activeCourse) {
+        <section class="course-hero">
+          <div>
+            <span class="hero-code">{{ activeCourse.code }}</span>
+            <h2 class="hero-title">{{ activeCourse.title }}</h2>
+          </div>
+
+          <span class="hero-units">
+            <strong>{{ activeCourse.units }}</strong>
+            <span>UNITS</span>
+          </span>
+        </section>
+
+        <section class="panel-card assigned-panel">
+          <h2 class="panel-title">Assigned Lecturer</h2>
+
+          @if (assignedLecturers().length === 0) {
+            <p class="empty-copy">
+              No lecturer is assigned to this course yet.
+            </p>
+          } @else {
+            <div class="assigned-list">
+              @for (lecturer of assignedLecturers(); track lecturer.id) {
+                <div class="assigned-row">
+                  <span class="assigned-name">{{ lecturer.fullName }}</span>
+
+                  <button
+                    type="button"
+                    class="remove-btn"
+                    (click)="removeLecturer(lecturer.id)"
+                  >
+                    Remove
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </section>
+
+        <section class="panel-card add-panel">
+          <h2 class="panel-title">Add Lecturer</h2>
+
+          <app-search-input
+            placeholder="Search by name"
+            [model]="lecturerSearchTerm()"
+            (modelChange)="onLecturerSearchTermChange($event)"
+          />
+
+          <div class="available-list">
+            @if (availableLecturers().length === 0) {
+              <p class="empty-copy">No lecturer matches the current search.</p>
+            } @else {
+              @for (lecturer of availableLecturers(); track lecturer.id) {
+                <div class="available-row">
+                  <span class="available-name">{{ lecturer.fullName }}</span>
+
+                  <button
+                    type="button"
+                    class="assign-btn"
+                    (click)="assignLecturer(lecturer.id)"
+                  >
+                    Assign
+                  </button>
+                </div>
+              }
+            }
+          </div>
+        </section>
+      }
+    </section>
+  </section>
+</section>
+
+<app-lecturer-assignment-history-modal
+  [visible]="historyVisible()"
+  [records]="assignmentHistory()"
+  (closed)="closeHistory()"
+/>

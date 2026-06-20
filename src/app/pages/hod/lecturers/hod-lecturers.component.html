@@ -1,0 +1,61 @@
+<section class="hod-lecturers-page">
+  <section class="action-row">
+    <div class="search-wrap">
+      <app-search-input
+        placeholder="Search by name or staff ID"
+        [model]="searchTerm()"
+        (modelChange)="onSearchTermChange($event)"
+      />
+    </div>
+
+    <app-button
+      variant="primary"
+      [routerLink]="['/pages/hod/lecturers/assign-courses']"
+    >
+      Assign Courses
+    </app-button>
+  </section>
+
+  <section class="lecturer-grid">
+    @for (lecturer of filteredLecturers(); track lecturer.id) {
+      <article class="lecturer-card">
+        <div class="lecturer-copy">
+          <h2 class="lecturer-name">{{ lecturer.fullName }}</h2>
+          <p class="lecturer-id">Staff ID: {{ lecturer.staffId }}</p>
+        </div>
+
+        <div class="card-divider"></div>
+
+        <button
+          type="button"
+          class="courses-trigger-row"
+          (click)="openAssignedCoursesModal(lecturer.id)"
+        >
+          <span>{{ getAssignedCourseCount(lecturer) }} Courses</span>
+          <span class="view-copy">
+            view <i class="bi bi-arrow-right"></i>
+          </span>
+        </button>
+
+        <div class="card-divider"></div>
+
+        <div class="contact-row">
+          <span class="contact-icon"><i class="bi bi-envelope"></i></span>
+          <span class="contact-copy">{{ lecturer.emailAddress }}</span>
+        </div>
+
+        <div class="contact-row">
+          <span class="contact-icon"><i class="bi bi-telephone"></i></span>
+          <span class="contact-copy">{{ lecturer.phoneNumber }}</span>
+        </div>
+      </article>
+    }
+  </section>
+</section>
+
+<app-lecturer-assigned-courses-modal
+  [visible]="activeLecturer() !== null"
+  [lecturerName]="activeLecturer()?.fullName ?? ''"
+  [courses]="activeLecturerCourses()"
+  (closed)="closeAssignedCoursesModal()"
+/>

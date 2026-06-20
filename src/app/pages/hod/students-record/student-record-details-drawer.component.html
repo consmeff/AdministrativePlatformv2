@@ -1,0 +1,187 @@
+@if (record; as activeRecord) {
+  <section class="drawer-shell">
+    <header class="drawer-hero">
+      <div class="hero-left">
+        <div class="hero-avatar">
+          {{ getAvatarText(activeRecord.studentName) }}
+        </div>
+
+        <div class="hero-copy">
+          <h2 class="hero-name">{{ activeRecord.studentName }}</h2>
+          <div class="hero-id">{{ activeRecord.matricNumber }}</div>
+
+          <div class="hero-pill-row">
+            <span class="hero-pill">{{ activeRecord.levelLabel }}</span>
+            <span class="hero-pill">{{ activeRecord.programmeType }}</span>
+          </div>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="drawer-close-btn"
+        aria-label="Close student details"
+        (click)="closed.emit()"
+      >
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </header>
+
+    <section class="drawer-content">
+      <article class="cgpa-summary-card">
+        <div class="cgpa-summary-block">
+          <span class="cgpa-label">Cumulative GPA</span>
+          <strong class="cgpa-value">{{
+            activeRecord.cumulativeGpaLabel
+          }}</strong>
+        </div>
+
+        <div class="cgpa-summary-block">
+          <span class="cgpa-label">Current Class</span>
+          <strong class="cgpa-value">{{
+            activeRecord.cumulativeClassLabel
+          }}</strong>
+        </div>
+      </article>
+
+      <nav class="drawer-tabs" aria-label="Student record sections">
+        @for (tab of drawerTabs; track tab.value) {
+          <button
+            type="button"
+            class="drawer-tab-btn"
+            [class.is-active]="activeTab === tab.value"
+            (click)="activeTabChange.emit(tab.value)"
+          >
+            {{ tab.label }}
+          </button>
+        }
+      </nav>
+
+      @if (activeTab === "personal_details") {
+        <section class="detail-grid">
+          <article class="detail-card">
+            <span class="detail-label">Email address</span>
+            <span class="detail-value">{{ activeRecord.emailAddress }}</span>
+          </article>
+          <article class="detail-card">
+            <span class="detail-label">Phone number</span>
+            <span class="detail-value">{{ activeRecord.phoneNumber }}</span>
+          </article>
+          <article class="detail-card">
+            <span class="detail-label">Alternate phone</span>
+            <span class="detail-value">{{
+              activeRecord.alternatePhoneNumber
+            }}</span>
+          </article>
+          <article class="detail-card">
+            <span class="detail-label">Date of birth</span>
+            <span class="detail-value">{{ activeRecord.dateOfBirth }}</span>
+          </article>
+          <article class="detail-card">
+            <span class="detail-label">Gender</span>
+            <span class="detail-value">{{ activeRecord.gender }}</span>
+          </article>
+          <article class="detail-card">
+            <span class="detail-label">Admission session</span>
+            <span class="detail-value">{{
+              activeRecord.admissionSession
+            }}</span>
+          </article>
+          <article class="detail-card">
+            <span class="detail-label">Current level</span>
+            <span class="detail-value">{{ activeRecord.currentLevel }}</span>
+          </article>
+          <article class="detail-card">
+            <span class="detail-label">Marital status</span>
+            <span class="detail-value">{{ activeRecord.maritalStatus }}</span>
+          </article>
+          <article class="detail-card">
+            <span class="detail-label">Nationality</span>
+            <span class="detail-value">{{ activeRecord.nationality }}</span>
+          </article>
+          <article class="detail-card">
+            <span class="detail-label">State of origin</span>
+            <span class="detail-value">{{ activeRecord.stateOfOrigin }}</span>
+          </article>
+          <article class="detail-card">
+            <span class="detail-label">Local government area</span>
+            <span class="detail-value">{{
+              activeRecord.localGovernmentArea
+            }}</span>
+          </article>
+          <article class="detail-card">
+            <span class="detail-label">Disability status</span>
+            <span class="detail-value">{{
+              activeRecord.disabilityStatus
+            }}</span>
+          </article>
+          <article class="detail-card detail-card--wide">
+            <span class="detail-label">Specified disability</span>
+            <span class="detail-value">{{
+              activeRecord.specifiedDisability
+            }}</span>
+          </article>
+          <article class="detail-card detail-card--wide">
+            <span class="detail-label">Residential address</span>
+            <span class="detail-value">{{ activeRecord.address }}</span>
+          </article>
+        </section>
+      }
+
+      @if (activeTab === "academic_performance") {
+        <section class="table-panel">
+          <table class="performance-table">
+            <thead>
+              <tr>
+                <th>Level</th>
+                <th>Semester</th>
+                <th>GPA</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (
+                performanceRecord of activeRecord.academicPerformance;
+                track performanceRecord.id
+              ) {
+                <tr>
+                  <td>{{ performanceRecord.levelLabel }}</td>
+                  <td>{{ performanceRecord.semesterLabel }}</td>
+                  <td>{{ performanceRecord.gpa.toFixed(2) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </section>
+      }
+
+      @if (activeTab === "documents") {
+        <section class="document-list">
+          @for (document of activeRecord.documents; track document.id) {
+            <article class="document-row">
+              <div class="document-meta">
+                <span class="document-icon">
+                  <i class="bi bi-file-earmark-text"></i>
+                </span>
+
+                <div class="document-copy">
+                  <span class="document-name">{{ document.name }}</span>
+                  <span class="document-size">{{
+                    document.fileSizeLabel
+                  }}</span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                class="document-view-btn"
+                (click)="viewDocument(document.previewUrl)"
+              >
+                View <i class="bi bi-eye"></i>
+              </button>
+            </article>
+          }
+        </section>
+      }
+    </section>
+  </section>
+}

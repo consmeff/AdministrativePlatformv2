@@ -1,0 +1,45 @@
+<section class="hod-courses-page">
+  <section class="levels-grid">
+    @for (level of overviewLevels(); track level.id) {
+      @if (level.configured) {
+        <a
+          class="level-card"
+          [routerLink]="['/pages/hod/courses/setup']"
+          [queryParams]="{ level: level.levelValue }"
+        >
+          <h2 class="level-title">{{ level.levelLabel }}</h2>
+
+          <div class="semester-list">
+            @for (semester of level.semesters; track semester.semesterLabel) {
+              <div class="semester-row">
+                <span class="semester-label">{{ semester.semesterLabel }}</span>
+
+                <div class="semester-meta">
+                  <span class="meta-chip">
+                    <i class="bi bi-book"></i>
+                    {{ semester.courseCount }} Courses
+                  </span>
+                  <span class="meta-chip">
+                    <i class="bi bi-globe2"></i>
+                    {{ semester.totalUnits }} Units
+                  </span>
+                </div>
+              </div>
+            }
+          </div>
+        </a>
+      } @else {
+        <a
+          class="setup-card"
+          [routerLink]="['/pages/hod/courses/setup']"
+          [queryParams]="{ level: level.levelValue }"
+        >
+          <span class="setup-icon"><i class="bi bi-plus-lg"></i></span>
+          <span class="setup-copy"
+            >Set up courses for {{ level.levelLabel }}</span
+          >
+        </a>
+      }
+    }
+  </section>
+</section>

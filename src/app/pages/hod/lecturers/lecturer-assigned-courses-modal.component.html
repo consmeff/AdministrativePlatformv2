@@ -1,0 +1,42 @@
+@if (visible) {
+  <div class="modal-backdrop" (click)="close()">
+    <section class="modal-card" (click)="$event.stopPropagation()">
+      <header class="modal-header">
+        <div>
+          <h2 class="modal-title">Course(s) Assigned</h2>
+          @if (lecturerName) {
+            <p class="modal-subtitle">{{ lecturerName }}</p>
+          }
+        </div>
+
+        <button
+          type="button"
+          class="modal-close-btn"
+          aria-label="Close assigned courses"
+          (click)="close()"
+        >
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </header>
+
+      <div class="modal-divider"></div>
+
+      <section class="course-list">
+        @if (courses.length === 0) {
+          <p class="empty-state-copy">No course has been assigned yet.</p>
+        } @else {
+          @for (course of courses; track course.id) {
+            <article class="course-row">
+              <div class="course-copy">
+                <span class="course-code">{{ course.code }}</span>
+                <strong class="course-title">{{ course.title }}</strong>
+              </div>
+
+              <span class="units-pill">{{ course.units }} Units</span>
+            </article>
+          }
+        }
+      </section>
+    </section>
+  </div>
+}

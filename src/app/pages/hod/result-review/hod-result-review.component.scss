@@ -1,0 +1,308 @@
+.hod-result-review-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+}
+
+.summary-cards-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 112px;
+  padding: 18px 20px;
+  border: 1px solid #dfe6f0;
+  border-radius: 12px;
+  background: #ffffff;
+  text-align: left;
+}
+
+.summary-card.is-active {
+  background: var(--app-primary);
+  border-color: var(--app-primary);
+}
+
+.summary-card--static {
+  cursor: default;
+}
+
+.summary-card-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.summary-card-label {
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+.summary-card.is-active .summary-card-value,
+.summary-card.is-active .summary-card-label {
+  color: #ffffff;
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.filter-search {
+  flex: 1;
+}
+
+.result-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.result-card,
+.empty-state-card {
+  border: 1px solid #dfe6f0;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.result-card {
+  padding: 18px;
+}
+
+.empty-state-card {
+  padding: 28px 24px;
+}
+
+.empty-state-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.empty-state-copy {
+  margin: 10px 0 0;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.result-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.course-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.course-title-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.course-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.review-status-pill,
+.course-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.review-status-pill {
+  background: #fff4dd;
+  color: #b7791f;
+}
+
+.review-status-pill.is-approved {
+  background: #e8fff2;
+  color: #039855;
+}
+
+.course-chip-row,
+.course-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.course-chip {
+  background: #f5f7fb;
+  color: #63789b;
+}
+
+.meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #8a97ad;
+}
+
+.head-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.expand-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  border: 1px solid #dbe4f0;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 0 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.expand-btn i {
+  transition: transform 0.2s ease;
+}
+
+.expand-btn.is-expanded i {
+  transform: rotate(180deg);
+}
+
+.result-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.result-stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
+.result-stat-card--success {
+  background: #effcf5;
+}
+
+.result-stat-card--danger {
+  background: #fff3f2;
+}
+
+.result-stat-card--info {
+  background: #eff6ff;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.result-table-wrap {
+  margin-top: 18px;
+  overflow-x: auto;
+  border-top: 1px solid #edf1f7;
+  padding-top: 18px;
+}
+
+.result-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.result-table th,
+.result-table td {
+  padding: 16px 12px;
+  border-bottom: 1px solid #e7edf6;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.result-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.student-name-cell {
+  font-weight: 600;
+  color: #334155;
+}
+
+.matric-number-cell {
+  color: #94a3b8;
+}
+
+.grade-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  min-height: 28px;
+  border-radius: 8px;
+  background: #effcf5;
+  color: #039855;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.grade-pill.is-failed {
+  background: #fff3f2;
+  color: #d92d20;
+}
+
+@media (max-width: 1200px) {
+  .summary-cards-row,
+  .result-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .hod-result-review-page {
+    padding: 16px;
+  }
+
+  .summary-cards-row,
+  .filter-row,
+  .result-stat-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-row,
+  .result-card-head,
+  .head-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

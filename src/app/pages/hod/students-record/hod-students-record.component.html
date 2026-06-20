@@ -1,0 +1,133 @@
+<section class="hod-students-record-page">
+  <header class="summary-strip">
+    <article class="student-count-card">
+      <div>
+        <span class="student-count-value">{{ totalStudentCount() }}</span>
+        <span class="student-count-label">Department student records</span>
+      </div>
+
+      <div class="programme-summary-row">
+        <span class="programme-summary-pill">
+          OND {{ ondStudentCount() }}
+        </span>
+        <span class="programme-summary-pill">
+          HND {{ hndStudentCount() }}
+        </span>
+      </div>
+    </article>
+  </header>
+
+  <section class="filter-row">
+    <div class="filter-search">
+      <app-search-input
+        placeholder="Search by name, matric number or email"
+        [model]="searchTerm()"
+        (modelChange)="onSearchTermChange($event)"
+      />
+    </div>
+
+    <app-filter-select
+      [options]="programmeOptions"
+      [model]="selectedProgramme()"
+      optionLabel="label"
+      placeholder="All Programme"
+      (modelChange)="onProgrammeChange($event)"
+    />
+  </section>
+
+  <section class="table-card">
+    <div class="table-header-row">
+      <div>
+        <h2 class="table-title">Student list</h2>
+        <p class="table-subtitle">
+          {{ filteredRecords().length }} record{{
+            filteredRecords().length === 1 ? "" : "s"
+          }}
+          available
+        </p>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table class="records-table">
+        <thead>
+          <tr>
+            <th>Student Name</th>
+            <th>Matric Number</th>
+            <th>Level</th>
+            <th>Programme Type</th>
+            <th>CGPA</th>
+            <th>Email Address</th>
+            <th class="actions-col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (paginatedRecords().length === 0) {
+            <tr>
+              <td colspan="7" class="empty-table-state">
+                No student record matches the current filter.
+              </td>
+            </tr>
+          } @else {
+            @for (record of paginatedRecords(); track record.id) {
+              <tr>
+                <td class="student-name-cell">{{ record.studentName }}</td>
+                <td class="matric-number-cell">{{ record.matricNumber }}</td>
+                <td>
+                  <span class="level-pill">{{ record.levelLabel }}</span>
+                </td>
+                <td>
+                  <span class="programme-pill">{{ record.programmeType }}</span>
+                </td>
+                <td>
+                  <span class="cgpa-pill" [class]="getCgpaClass(record)">
+                    {{ record.cumulativeGpaLabel }}
+                  </span>
+                </td>
+                <td class="email-cell">{{ record.emailAddress }}</td>
+                <td class="actions-col">
+                  <button
+                    type="button"
+                    class="row-action-btn"
+                    aria-label="Open student details"
+                    (click)="openDrawer(record.id)"
+                  >
+                    <i class="bi bi-eye"></i>
+                  </button>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <app-pagination
+      [visible]="filteredRecords().length > 0"
+      [first]="first()"
+      [rows]="rows()"
+      [totalRecords]="filteredRecords().length"
+      [reportTemplate]="'Showing {first}-{last} of {totalRecords} items'"
+      (pageChange)="onPageChange($event)"
+    />
+  </section>
+</section>
+
+<p-drawer
+  [visible]="activeStudentRecord() !== null"
+  [modal]="true"
+  [appendTo]="'body'"
+  [dismissible]="true"
+  [closable]="false"
+  [blockScroll]="true"
+  position="right"
+  styleClass="student-record-details-drawer"
+  (onHide)="closeDrawer()"
+>
+  <app-student-record-details-drawer
+    [record]="activeStudentRecord()"
+    [activeTab]="activeDrawerTab()"
+    (closed)="closeDrawer()"
+    (activeTabChange)="setActiveDrawerTab($event)"
+  />
+</p-drawer>

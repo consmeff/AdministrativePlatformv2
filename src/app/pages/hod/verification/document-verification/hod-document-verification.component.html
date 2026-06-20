@@ -1,0 +1,178 @@
+<section class="hod-documents-page">
+  <header class="summary-cards-row">
+    <button
+      type="button"
+      class="summary-card"
+      [class.is-active]="activeTab() === 'pending'"
+      (click)="setActiveTab('pending')"
+    >
+      <span class="summary-card-value">{{ pendingVerificationCount() }}</span>
+      <span class="summary-card-label">Pending Verification</span>
+    </button>
+
+    <button
+      type="button"
+      class="summary-card"
+      [class.is-active]="activeTab() === 'flagged'"
+      (click)="setActiveTab('flagged')"
+    >
+      <span class="summary-card-value">{{ flaggedDocumentCount() }}</span>
+      <span class="summary-card-label">Flagged Documents</span>
+    </button>
+  </header>
+
+  <section class="filter-row">
+    <div class="filter-search">
+      <app-search-input
+        placeholder="Search by name or application no."
+        [model]="searchTerm()"
+        (modelChange)="onSearchTermChange($event)"
+      />
+    </div>
+
+    <app-filter-select
+      [options]="programmeOptions"
+      [model]="selectedProgramme()"
+      optionLabel="label"
+      placeholder="All Programme"
+      (modelChange)="onProgrammeChange($event)"
+    />
+  </section>
+
+  @if (activeTab() === "pending") {
+    <section class="document-card-list">
+      @for (record of paginatedRecords(); track record.id) {
+        <article class="document-card">
+          <div class="document-card-head">
+            <div class="student-meta">
+              <div class="student-avatar">
+                {{ record.studentName.charAt(0) }}
+              </div>
+              <div class="student-copy">
+                <h2 class="student-name">{{ record.studentName }}</h2>
+                <div class="student-id-row">
+                  <span>{{ record.registrationNumber }}</span>
+                  <span class="programme-pill">{{ record.levelLabel }}</span>
+                </div>
+                <div class="submitted-text">
+                  <i class="bi bi-calendar2-event"></i>
+                  <span>{{ record.submittedAt }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="head-actions">
+              <app-button
+                variant="info"
+                [outline]="true"
+                iconClass="bi bi-exclamation-triangle"
+                (buttonClick)="openFlagModal(record.id)"
+              >
+                Flag
+              </app-button>
+              <app-button
+                variant="primary"
+                (buttonClick)="verifyDocuments(record.id)"
+              >
+                Verify
+              </app-button>
+            </div>
+          </div>
+
+          <div class="document-list">
+            @for (document of record.documents; track document.id) {
+              <div class="document-row">
+                <div class="document-meta">
+                  <span class="document-icon"
+                    ><i class="bi bi-file-earmark-text"></i
+                  ></span>
+                  <div class="document-copy">
+                    <span class="document-name">{{ document.name }}</span>
+                    <span class="document-size">{{
+                      document.fileSizeLabel
+                    }}</span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  class="view-document-btn"
+                  (click)="viewDocument(document.previewUrl)"
+                >
+                  View <i class="bi bi-eye"></i>
+                </button>
+              </div>
+            }
+          </div>
+        </article>
+      }
+
+      <app-pagination
+        [first]="first()"
+        [rows]="rows()"
+        [totalRecords]="filteredRecords().length"
+        [reportTemplate]="'Showing {first}-{last} of {totalRecords} items'"
+        (pageChange)="onPageChange($event)"
+      />
+    </section>
+  } @else {
+    <section class="table-card">
+      <div class="review-table-wrap">
+        <table class="review-table">
+          <thead>
+            <tr>
+              <th>Date Flagged</th>
+              <th>Student Name</th>
+              <th>Registration Number</th>
+              <th>Programme Type</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (record of paginatedRecords(); track record.id) {
+              <tr>
+                <td class="date-cell">
+                  <span>{{
+                    record.flag?.flaggedAt ?? record.submittedAt
+                  }}</span>
+                </td>
+                <td class="student-name-cell">{{ record.studentName }}</td>
+                <td class="registration-number">
+                  {{ record.registrationNumber }}
+                </td>
+                <td>
+                  <span class="programme-pill">{{ record.programmeType }}</span>
+                </td>
+                <td>
+                  <app-status-indicator text="Flagged" tone="rejected" />
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <app-pagination
+        [first]="first()"
+        [rows]="rows()"
+        [totalRecords]="filteredRecords().length"
+        [reportTemplate]="'Showing {first}-{last} of {totalRecords} items'"
+        (pageChange)="onPageChange($event)"
+      />
+    </section>
+  }
+</section>
+
+<app-action-note-modal
+  [visible]="activeFlagRecord() !== null"
+  title="Flag Document"
+  prompt="This will notify the student to correct their submission"
+  [showReasonSelect]="true"
+  [reasonOptions]="flagReasonOptions"
+  [documentOptions]="flagDocumentOptions"
+  confirmLabel="Flag Document"
+  notesLabel="Additional Notes:"
+  notesHint="(optional)"
+  (closed)="closeFlagModal()"
+  (submittedPayload)="submitFlagPayload($event)"
+/>

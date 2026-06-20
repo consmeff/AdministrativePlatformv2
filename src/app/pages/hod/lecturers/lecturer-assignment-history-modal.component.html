@@ -1,0 +1,45 @@
+@if (visible) {
+  <div class="modal-backdrop" (click)="close()">
+    <section class="modal-card" (click)="$event.stopPropagation()">
+      <header class="modal-header">
+        <div>
+          <h2 class="modal-title">Assignment history</h2>
+          <p class="modal-subtitle">Recent lecturer to course updates</p>
+        </div>
+
+        <button
+          type="button"
+          class="modal-close-btn"
+          aria-label="Close history"
+          (click)="close()"
+        >
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </header>
+
+      <section class="history-list">
+        @for (record of records; track record.id) {
+          <article class="history-row">
+            <div class="history-main">
+              <div class="history-title-row">
+                <strong class="history-title">{{ record.lecturerName }}</strong>
+                <span
+                  class="history-action-pill"
+                  [class.is-removed]="record.action === 'removed'"
+                >
+                  {{ getActionLabel(record) }}
+                </span>
+              </div>
+
+              <span class="history-course">
+                {{ record.courseCode }} · {{ record.courseTitle }}
+              </span>
+            </div>
+
+            <span class="history-time">{{ record.changedAt }}</span>
+          </article>
+        }
+      </section>
+    </section>
+  </div>
+}

@@ -1,0 +1,28 @@
+<section class="hod-dashboard-page">
+  <header class="dashboard-hero">
+    <div>
+      <p class="hero-eyebrow">{{ profile().roleLabel }}</p>
+      <h1 class="hero-title">{{ profile().departmentLabel }} dashboard</h1>
+      <p class="hero-copy">
+        Review lecturer activity, verify registrations, and manage document
+        checks for the department.
+      </p>
+    </div>
+
+    <app-button
+      variant="primary"
+      [routerLink]="['/pages/hod/verification/course-reg']"
+    >
+      Open verification
+    </app-button>
+  </header>
+
+  <section class="metrics-grid">
+    @for (card of dashboardCards(); track card.label) {
+      <article class="metric-card">
+        <span class="metric-value">{{ card.value }}</span>
+        <span class="metric-label">{{ card.label }}</span>
+      </article>
+    }
+  </section>
+</section>

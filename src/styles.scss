@@ -74,6 +74,36 @@ body {
   overflow: auto;
 }
 
+.course-registration-review-drawer {
+  width: min(600px, 96vw) !important;
+}
+
+.course-registration-review-drawer .p-drawer-header {
+  display: none !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+}
+
+.course-registration-review-drawer .p-drawer-content {
+  padding: 0 !important;
+  overflow: auto;
+}
+
+.student-record-details-drawer {
+  width: min(620px, 96vw) !important;
+}
+
+.student-record-details-drawer .p-drawer-header {
+  display: none !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+}
+
+.student-record-details-drawer .p-drawer-content {
+  padding: 0 !important;
+  overflow: auto;
+}
+
 .p-drawer-mask {
   z-index: 2000000 !important;
 }

@@ -1,0 +1,213 @@
+<section class="hod-course-setup-page">
+  <section class="toolbar-card">
+    <div class="toolbar-copy">
+      <h1 class="page-title">Select courses for the 2024/25 Session</h1>
+
+      <label class="filter-label" for="course-level-select">Level</label>
+      <div class="filter-wrap">
+        <app-filter-select
+          [options]="levelOptions"
+          [model]="selectedLevel()"
+          optionLabel="label"
+          placeholder="Select level"
+          (modelChange)="onLevelChange($event)"
+        />
+      </div>
+    </div>
+
+    <div class="toolbar-actions">
+      <app-button
+        variant="outline"
+        iconClass="bi bi-arrow-counterclockwise"
+        (buttonClick)="openHistory()"
+      >
+        History
+      </app-button>
+
+      @if (stage() === "catalogue") {
+        <app-button
+          variant="primary"
+          [disabled]="selectedCourseIds().length === 0"
+          (buttonClick)="continueToClassification()"
+        >
+          Continue
+        </app-button>
+      }
+
+      @if (stage() === "classification") {
+        <app-button variant="outline" (buttonClick)="backToCatalogue()">
+          Back to Catalogue
+        </app-button>
+        <app-button
+          variant="primary"
+          [disabled]="selectedCourseIds().length === 0"
+          (buttonClick)="publish()"
+        >
+          Publish
+        </app-button>
+      }
+    </div>
+  </section>
+
+  @if (stage() === "empty") {
+    <section class="empty-state-card">
+      <div class="empty-state-icon">
+        <i class="bi bi-clipboard-check"></i>
+      </div>
+      <h2 class="empty-state-title">
+        Set up course registration for this semester
+      </h2>
+      <p class="empty-state-copy">
+        Start by selecting a level and then pick courses from the master
+        catalogue to make available to students during registration.
+      </p>
+      <app-button variant="primary" (buttonClick)="startSelection()">
+        Start Selection
+      </app-button>
+    </section>
+  }
+
+  @if (stage() === "catalogue") {
+    <section class="catalogue-grid">
+      <section class="panel-card">
+        <div class="panel-head">
+          <h2 class="panel-title">Course Catalogue</h2>
+          <span class="panel-count"
+            >({{ filteredCatalogueCourses().length }})</span
+          >
+        </div>
+
+        <app-search-input
+          placeholder="Search courses"
+          [model]="catalogueSearchTerm()"
+          (modelChange)="onCatalogueSearchTermChange($event)"
+        />
+
+        <div class="catalogue-sections">
+          @for (section of catalogueSections(); track section.label) {
+            <section class="catalogue-section">
+              <button
+                type="button"
+                class="section-header"
+                (click)="toggleSection(section.label)"
+              >
+                <span>{{ section.label }}</span>
+                <i
+                  class="bi"
+                  [class.bi-chevron-up]="isSectionExpanded(section.label)"
+                  [class.bi-chevron-down]="!isSectionExpanded(section.label)"
+                ></i>
+              </button>
+
+              @if (isSectionExpanded(section.label)) {
+                <div class="catalogue-course-list">
+                  @for (course of section.courses; track course.id) {
+                    <article class="catalogue-course-row">
+                      <div class="course-copy">
+                        <span class="course-code">{{ course.code }}</span>
+                        <strong class="course-title">{{ course.title }}</strong>
+                        <span class="units-pill">{{ course.units }} Units</span>
+                      </div>
+
+                      <button
+                        type="button"
+                        class="course-toggle-btn"
+                        [class.is-selected]="isCourseSelected(course.id)"
+                        (click)="toggleCourseSelection(course.id)"
+                      >
+                        <i
+                          class="bi"
+                          [class.bi-plus-lg]="!isCourseSelected(course.id)"
+                          [class.bi-check-lg]="isCourseSelected(course.id)"
+                        ></i>
+                      </button>
+                    </article>
+                  }
+                </div>
+              }
+            </section>
+          }
+        </div>
+      </section>
+
+      <section class="panel-card">
+        <div class="panel-head">
+          <h2 class="panel-title">Selected Courses</h2>
+          <span class="panel-count">({{ selectedCourses().length }})</span>
+        </div>
+
+        <div class="selected-course-list">
+          @if (selectedCourses().length === 0) {
+            <p class="empty-panel-copy">No courses have been selected yet.</p>
+          } @else {
+            @for (course of selectedCourses(); track course.id) {
+              <article class="selected-course-row">
+                <div class="course-copy">
+                  <span class="course-code">{{ course.code }}</span>
+                  <strong class="course-title">{{ course.title }}</strong>
+                  <span class="units-pill">{{ course.units }} Units</span>
+                </div>
+
+                <button
+                  type="button"
+                  class="course-remove-btn"
+                  (click)="removeSelectedCourse(course.id)"
+                >
+                  <i class="bi bi-x-lg"></i>
+                </button>
+              </article>
+            }
+          }
+        </div>
+      </section>
+    </section>
+  }
+
+  @if (stage() === "classification") {
+    <section class="classification-card">
+      <p class="classification-copy">
+        Please indicate whether each course is compulsory or elective.
+      </p>
+
+      <div class="classification-list">
+        @for (course of selectedCourses(); track course.id) {
+          <article class="classification-row">
+            <div class="course-copy">
+              <span class="course-code">{{ course.code }}</span>
+              <strong class="course-title">{{ course.title }}</strong>
+              <span class="units-pill">{{ course.units }} Units</span>
+            </div>
+
+            <div class="requirement-toggle">
+              <button
+                type="button"
+                class="requirement-btn"
+                [class.is-active]="
+                  getRequirementType(course.id) === 'compulsory'
+                "
+                (click)="setRequirementType(course.id, 'compulsory')"
+              >
+                Compulsory
+              </button>
+              <button
+                type="button"
+                class="requirement-btn"
+                [class.is-active]="getRequirementType(course.id) === 'elective'"
+                (click)="setRequirementType(course.id, 'elective')"
+              >
+                Elective
+              </button>
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+  }
+</section>
+
+<app-course-publication-history-modal
+  [visible]="historyVisible()"
+  [records]="publicationHistory()"
+  (closed)="closeHistory()"
+  (duplicateRequested)="duplicateHistoryLevel($event)"
+/>
