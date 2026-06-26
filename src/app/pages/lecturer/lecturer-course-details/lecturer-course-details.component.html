@@ -109,6 +109,7 @@
                 <th>Exam</th>
                 <th>Total</th>
                 <th>Grade</th>
+                <th class="actions-col">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -117,16 +118,80 @@
                   <td class="student-name-cell">{{ student.studentName }}</td>
                   <td>{{ student.matricNo }}</td>
                   <td>
-                    <span class="score-pill">
-                      {{ student.continuousAssessmentScore }}
-                    </span>
+                    @if (editingStudentRowId() === student.id) {
+                      <input
+                        type="number"
+                        min="0"
+                        step="1"
+                        class="score-input"
+                        aria-label="Continuous assessment score"
+                        [value]="editedContinuousAssessmentScore() ?? 0"
+                        (input)="onEditedContinuousAssessmentChange($event)"
+                      />
+                    } @else {
+                      <span class="score-pill">
+                        {{ student.continuousAssessmentScore }}
+                      </span>
+                    }
                   </td>
                   <td>
-                    <span class="score-pill">{{ student.examScore }}</span>
+                    @if (editingStudentRowId() === student.id) {
+                      <input
+                        type="number"
+                        min="0"
+                        step="1"
+                        class="score-input"
+                        aria-label="Exam score"
+                        [value]="editedExamScore() ?? 0"
+                        (input)="onEditedExamScoreChange($event)"
+                      />
+                    } @else {
+                      <span class="score-pill">{{ student.examScore }}</span>
+                    }
                   </td>
-                  <td>{{ student.totalScore }}</td>
                   <td>
-                    <span class="grade-pill">{{ student.grade }}</span>
+                    @if (editingStudentRowId() === student.id) {
+                      {{ editedTotalScore() }}
+                    } @else {
+                      {{ student.totalScore }}
+                    }
+                  </td>
+                  <td>
+                    @if (editingStudentRowId() === student.id) {
+                      <span class="grade-pill">{{ editedGrade() }}</span>
+                    } @else {
+                      <span class="grade-pill">{{ student.grade }}</span>
+                    }
+                  </td>
+                  <td class="actions-cell">
+                    @if (editingStudentRowId() === student.id) {
+                      <div class="actions-stack">
+                        <app-button
+                          variant="primary"
+                          [disabled]="isSavingStudent()"
+                          (buttonClick)="
+                            saveStudentResult(activeCourse.id, student)
+                          "
+                        >
+                          Save
+                        </app-button>
+                        <app-button
+                          variant="muted"
+                          [disabled]="isSavingStudent()"
+                          (buttonClick)="cancelEditStudent()"
+                        >
+                          Cancel
+                        </app-button>
+                      </div>
+                    } @else {
+                      <app-button
+                        variant="outline"
+                        [disabled]="student.studentId === null"
+                        (buttonClick)="beginEditStudent(student)"
+                      >
+                        Edit
+                      </app-button>
+                    }
                   </td>
                 </tr>
               }
@@ -139,8 +204,15 @@
 } @else {
   <section class="course-details-page">
     <section class="scores-card">
-      <h1 class="section-title">Course not found</h1>
-      <p class="empty-copy">The selected course could not be loaded.</p>
+      @if (!hasLoaded()) {
+        <h1 class="section-title">Loading course...</h1>
+        <p class="empty-copy">
+          Please wait while assigned course information is loaded.
+        </p>
+      } @else {
+        <h1 class="section-title">Course not found</h1>
+        <p class="empty-copy">The selected course could not be loaded.</p>
+      }
     </section>
   </section>
 }

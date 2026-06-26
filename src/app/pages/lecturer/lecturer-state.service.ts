@@ -1,33 +1,130 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { finalize } from 'rxjs';
 import {
-  LECTURER_COURSES,
   LECTURER_DEFAULT_RESULT_TEMPLATE_NAME,
   LECTURER_PROFILE,
   LECTURER_RESULT_TEMPLATE_HEADERS,
 } from './lecturer.constants';
+import { LecturerCourseAssignmentService } from './lecturer-course-assignment.service';
+import { LecturerResultsService } from './lecturer-results.service';
 import {
   LecturerCourse,
   LecturerProfile,
   LecturerStudentResult,
 } from './lecturer.types';
+import { BusyIndicatorService } from '../../services/busy-indicator.service';
 
 interface LecturerCoursesState {
   courses: LecturerCourse[];
+  hasLoaded: boolean;
+  isLoading: boolean;
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class LecturerStateService {
+  private readonly lecturerCourseAssignmentService = inject(
+    LecturerCourseAssignmentService,
+  );
+  private readonly lecturerResultsService = inject(LecturerResultsService);
+  private readonly busyIndicatorService = inject(BusyIndicatorService);
+
+  constructor() {
+    this.loadAssignedCourses();
+  }
+
   private readonly state = signal<LecturerCoursesState>({
-    courses: LECTURER_COURSES,
+    courses: [],
+    hasLoaded: false,
+    isLoading: false,
   });
 
   readonly lecturerProfile = signal<LecturerProfile>(LECTURER_PROFILE);
   readonly courses = computed(() => this.state().courses);
+  readonly hasLoaded = computed(() => this.state().hasLoaded);
+  readonly isLoading = computed(() => this.state().isLoading);
 
   getCourseById(courseId: string): LecturerCourse | null {
     return this.courses().find((course) => course.id === courseId) ?? null;
+  }
+
+  loadAssignedCourses(): void {
+    this.state.update((currentState) => ({
+      ...currentState,
+      isLoading: true,
+    }));
+    this.busyIndicatorService.show();
+
+    this.lecturerCourseAssignmentService
+      .getAssignedCourses()
+      .pipe(
+        finalize(() => {
+          this.busyIndicatorService.hide();
+        }),
+      )
+      .subscribe({
+        next: (payload) => {
+          this.lecturerProfile.update((profile) => ({
+            ...profile,
+            fullName: payload.lecturerName ?? profile.fullName,
+            emailAddress: payload.lecturerEmail ?? profile.emailAddress,
+            roleLabel: payload.roleLabel ?? profile.roleLabel,
+          }));
+
+          this.state.update((currentState) => ({
+            courses: this.mergeCourses(payload.courses, currentState.courses),
+            hasLoaded: true,
+            isLoading: false,
+          }));
+        },
+        error: () => {
+          this.state.update((currentState) => ({
+            ...currentState,
+            courses: [],
+            hasLoaded: true,
+            isLoading: false,
+          }));
+        },
+      });
+  }
+
+  loadCourseResults(courseId: string): void {
+    const numericCourseId = Number(courseId);
+
+    if (!Number.isFinite(numericCourseId)) {
+      return;
+    }
+
+    this.lecturerResultsService
+      .getSingleCourseResults(numericCourseId)
+      .subscribe({
+        next: (students) => {
+          this.state.update((currentState) => ({
+            ...currentState,
+            courses: currentState.courses.map((course) =>
+              course.id === courseId ? { ...course, students } : course,
+            ),
+          }));
+        },
+      });
+  }
+
+  updateCourseUploadSummary(courseId: string, successMessage: string): void {
+    this.state.update((currentState) => ({
+      ...currentState,
+      courses: currentState.courses.map((course) =>
+        course.id === courseId
+          ? {
+              ...course,
+              uploadSummary: {
+                lastUploadedAt: this.formatUploadTimestamp(),
+                successMessage,
+              },
+            }
+          : course,
+      ),
+    }));
   }
 
   updateCourseStudents(
@@ -36,6 +133,7 @@ export class LecturerStateService {
     successMessage: string,
   ): void {
     this.state.update((currentState) => ({
+      ...currentState,
       courses: currentState.courses.map((course) =>
         course.id === courseId
           ? {
@@ -79,5 +177,24 @@ export class LecturerStateService {
       hour: '2-digit',
       minute: '2-digit',
     }).format(new Date());
+  }
+
+  private mergeCourses(
+    apiCourses: LecturerCourse[],
+    existingCourses: LecturerCourse[],
+  ): LecturerCourse[] {
+    const existingCourseByCode = new Map(
+      existingCourses.map((course) => [course.code, course]),
+    );
+
+    return apiCourses.map((course) => {
+      const existingCourse = existingCourseByCode.get(course.code) ?? null;
+
+      return {
+        ...course,
+        students: existingCourse?.students ?? course.students,
+        uploadSummary: existingCourse?.uploadSummary ?? course.uploadSummary,
+      };
+    });
   }
 }

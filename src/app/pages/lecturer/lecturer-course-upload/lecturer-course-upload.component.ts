@@ -1,15 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, computed, inject, signal } from '@angular/core';
+import { HttpEventType, HttpResponse } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { PortalContextService } from '../../../services/portal-context.service';
 import { ButtonComponent } from '../../../widgets/button/button.component';
 import {
   LECTURER_UPLOAD_ACCEPTED_FILE_TYPES,
-  LECTURER_UPLOAD_PROGRESS_INTERVAL_MS,
-  LECTURER_UPLOAD_PROGRESS_STEP,
   LECTURER_UPLOAD_STAGE,
-  buildLecturerStudents,
 } from '../lecturer.constants';
+import { LecturerResultsService } from '../lecturer-results.service';
 import { LecturerStateService } from '../lecturer-state.service';
 
 type LecturerUploadStage =
@@ -26,10 +26,11 @@ export class LecturerCourseUploadComponent implements OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly lecturerStateService = inject(LecturerStateService);
+  private readonly lecturerResultsService = inject(LecturerResultsService);
   private readonly portalContextService = inject(PortalContextService);
-  private uploadIntervalId: ReturnType<typeof globalThis.setInterval> | null =
-    null;
+  private uploadSubscription: Subscription | null = null;
 
+  readonly hasLoaded = this.lecturerStateService.hasLoaded;
   readonly courseId = computed(() =>
     this.route.snapshot.paramMap.get('courseId'),
   );
@@ -93,25 +94,64 @@ export class LecturerCourseUploadComponent implements OnDestroy {
     this.stage.set(LECTURER_UPLOAD_STAGE.processing);
     this.uploadProgress.set(0);
     this.processedRows.set(0);
-    this.clearUploadInterval();
+    const courseId = this.courseId();
 
-    this.uploadIntervalId = globalThis.setInterval(() => {
-      const nextProgress = Math.min(
-        100,
-        this.uploadProgress() + LECTURER_UPLOAD_PROGRESS_STEP,
-      );
-      const nextProcessedRows = Math.min(
-        this.totalRows(),
-        Math.round((nextProgress / 100) * this.totalRows()),
-      );
+    if (!courseId) {
+      this.stage.set(LECTURER_UPLOAD_STAGE.fileSelected);
+      return;
+    }
 
-      this.uploadProgress.set(nextProgress);
-      this.processedRows.set(nextProcessedRows);
+    const numericCourseId = Number(courseId);
 
-      if (nextProgress >= 100) {
-        this.completeUpload();
-      }
-    }, LECTURER_UPLOAD_PROGRESS_INTERVAL_MS);
+    if (!Number.isFinite(numericCourseId)) {
+      this.stage.set(LECTURER_UPLOAD_STAGE.fileSelected);
+      return;
+    }
+
+    this.uploadSubscription?.unsubscribe();
+    this.uploadSubscription = this.lecturerResultsService
+      .uploadResultsFile(numericCourseId, this.selectedFile)
+      .subscribe({
+        next: (event) => {
+          if (event.type === HttpEventType.UploadProgress) {
+            const totalBytes = event.total ?? null;
+
+            if (totalBytes && totalBytes > 0) {
+              const progress = Math.min(
+                99,
+                Math.round((event.loaded / totalBytes) * 100),
+              );
+              this.uploadProgress.set(progress);
+              this.processedRows.set(
+                Math.min(
+                  this.totalRows(),
+                  Math.round((progress / 100) * this.totalRows()),
+                ),
+              );
+              return;
+            }
+
+            const progress = Math.min(95, this.uploadProgress() + 4);
+            this.uploadProgress.set(progress);
+            this.processedRows.set(
+              Math.min(
+                this.totalRows(),
+                Math.round((progress / 100) * this.totalRows()),
+              ),
+            );
+            return;
+          }
+
+          if (event instanceof HttpResponse) {
+            this.completeUpload(event.body ?? null);
+          }
+        },
+        error: () => {
+          this.uploadProgress.set(0);
+          this.processedRows.set(0);
+          this.stage.set(LECTURER_UPLOAD_STAGE.fileSelected);
+        },
+      });
   }
 
   downloadTemplate(): void {
@@ -130,32 +170,43 @@ export class LecturerCourseUploadComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.clearUploadInterval();
+    this.uploadSubscription?.unsubscribe();
   }
 
-  private clearUploadInterval(): void {
-    if (this.uploadIntervalId !== null) {
-      globalThis.clearInterval(this.uploadIntervalId);
-      this.uploadIntervalId = null;
-    }
-  }
-
-  private completeUpload(): void {
+  private completeUpload(response: unknown): void {
     const course = this.course();
 
     if (!course) {
-      this.clearUploadInterval();
       return;
     }
 
-    this.clearUploadInterval();
+    const responseRecord =
+      response && typeof response === 'object'
+        ? (response as Record<string, unknown>)
+        : null;
+    const processedRows =
+      typeof responseRecord?.['processed_rows'] === 'number'
+        ? responseRecord['processed_rows']
+        : typeof responseRecord?.['processedRows'] === 'number'
+          ? responseRecord['processedRows']
+          : null;
+    const message =
+      typeof responseRecord?.['message'] === 'string'
+        ? responseRecord['message']
+        : typeof responseRecord?.['detail'] === 'string'
+          ? responseRecord['detail']
+          : null;
+
     this.processedRows.set(this.totalRows());
     this.uploadProgress.set(100);
-    this.lecturerStateService.updateCourseStudents(
+    const successMessage =
+      message ??
+      `${processedRows ?? this.totalRows()} rows processed successfully.`;
+    this.lecturerStateService.updateCourseUploadSummary(
       course.id,
-      buildLecturerStudents(this.totalRows()),
-      `${this.totalRows()} rows processed successfully.`,
+      successMessage,
     );
+    this.lecturerStateService.loadCourseResults(course.id);
     this.stage.set(LECTURER_UPLOAD_STAGE.complete);
   }
 

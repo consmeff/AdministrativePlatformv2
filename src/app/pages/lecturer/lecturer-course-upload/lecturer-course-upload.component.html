@@ -96,7 +96,11 @@
 } @else {
   <section class="lecturer-upload-page">
     <section class="upload-flow-shell">
-      <h1 class="flow-title">Course not found</h1>
+      @if (!hasLoaded()) {
+        <h1 class="flow-title">Loading course...</h1>
+      } @else {
+        <h1 class="flow-title">Course not found</h1>
+      }
     </section>
   </section>
 }

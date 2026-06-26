@@ -1,5 +1,6 @@
 export interface LecturerStudentResult {
   id: string;
+  studentId: number | null;
   studentName: string;
   matricNo: string;
   continuousAssessmentScore: number;
