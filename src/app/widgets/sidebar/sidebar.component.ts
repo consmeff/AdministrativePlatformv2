@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, HostListener, inject } from '@angular/core';
 import { Params, Router, RouterModule } from '@angular/router';
 import { sidebarStateDTO } from '../../model/page.dto';
+import { AuthService } from '../../services/auth.service';
 import { PortalContextService } from '../../services/portal-context.service';
 import { WidgetService } from '../../services/widget.service';
 
@@ -36,6 +37,7 @@ export class SidebarComponent {
   _widgetService = inject(WidgetService);
   portalContextService = inject(PortalContextService);
   router = inject(Router);
+  private readonly authService = inject(AuthService);
   openGroupRoute: string | null = null;
   readonly adminMenuSections: SidebarMenuSection[] = [
     {
@@ -313,9 +315,6 @@ export class SidebarComponent {
   }
 
   logOut() {
-    sessionStorage.clear();
-    setTimeout(() => {
-      this.router.navigateByUrl('/auth/login');
-    }, 1000);
+    this.authService.logoutToLogin();
   }
 }

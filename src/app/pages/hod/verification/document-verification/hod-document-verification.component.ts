@@ -40,7 +40,7 @@ export class HodDocumentVerificationComponent {
 
   readonly programmeOptions = HOD_PROGRAMME_FILTER_OPTIONS;
   readonly flagReasonOptions = [...HOD_FLAG_REASON_OPTIONS];
-  readonly flagDocumentOptions = [...HOD_FLAG_DOCUMENT_OPTIONS];
+  readonly fallbackFlagDocumentOptions = [...HOD_FLAG_DOCUMENT_OPTIONS];
   readonly activeTab = signal<DocumentVerificationTab>('pending');
   readonly searchTerm = signal('');
   readonly selectedProgramme = signal<HodProgrammeFilterOption>(
@@ -52,6 +52,7 @@ export class HodDocumentVerificationComponent {
   readonly pendingVerificationCount =
     this.hodStateService.pendingDocumentVerificationCount;
   readonly flaggedDocumentCount = this.hodStateService.flaggedDocumentCount;
+  readonly isLoading = this.hodStateService.isDocumentVerificationsLoading;
 
   readonly filteredRecords = computed(() => {
     const activeTab = this.activeTab();
@@ -101,6 +102,15 @@ export class HodDocumentVerificationComponent {
         .documentVerifications()
         .find((record) => record.id === recordId) ?? null
     );
+  });
+  readonly flagDocumentOptions = computed(() => {
+    const activeFlagRecord = this.activeFlagRecord();
+
+    if (activeFlagRecord === null || activeFlagRecord.documents.length === 0) {
+      return this.fallbackFlagDocumentOptions;
+    }
+
+    return activeFlagRecord.documents.map((document) => document.name);
   });
 
   setActiveTab(tab: DocumentVerificationTab): void {

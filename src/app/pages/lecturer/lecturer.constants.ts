@@ -91,13 +91,13 @@ export function buildLecturerStudents(
 }
 
 export const LECTURER_PROFILE: LecturerProfile = {
-  fullName: 'Dr. Amira Gbadegesin',
-  roleLabel: 'Lecturer',
-  departmentLabel: 'Nursing Science',
-  facultyLabel: 'School of Nursing',
-  emailAddress: 'amira.gbadegesin@consmmef.edu.ng',
-  phoneNumber: '+234 801 234 5678',
-  officeLocation: 'Faculty Building, Room 204',
+  fullName: 'Staff Member',
+  roleLabel: 'Staff',
+  departmentLabel: 'Department',
+  facultyLabel: 'Faculty',
+  emailAddress: '-',
+  phoneNumber: '-',
+  officeLocation: '-',
 };
 
 export const LECTURER_COURSES: LecturerCourse[] = [
