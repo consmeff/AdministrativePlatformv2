@@ -28,10 +28,16 @@ export interface HodDocumentVerificationApiStudent {
   name?: string | null;
   full_name?: string | null;
   student_name?: string | null;
+  matriculation_number?: string | null;
   matriculation_no?: string | null;
   matric_no?: string | null;
   application_no?: string | null;
   registration_number?: string | null;
+  admission_document_verified?: boolean | null;
+  admission_documents?: Record<
+    string,
+    HodDocumentVerificationApiDocument | null
+  > | null;
   level?: string | { name?: string | null } | null;
   level_label?: string | null;
   current_level?: string | null;

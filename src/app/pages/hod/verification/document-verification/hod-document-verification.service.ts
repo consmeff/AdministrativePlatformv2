@@ -134,16 +134,18 @@ export class HodDocumentVerificationService {
         this.readString(record, 'student_name') ??
         `Student ${index + 1}`,
       registrationNumber:
+        this.readString(sourceRecord, 'matriculation_number') ??
         this.readString(sourceRecord, 'matriculation_no') ??
         this.readString(sourceRecord, 'matric_no') ??
         this.readString(sourceRecord, 'application_no') ??
         this.readString(sourceRecord, 'registration_number') ??
+        this.readString(record, 'matriculation_number') ??
         this.readString(record, 'matriculation_no') ??
         this.readString(record, 'matric_no') ??
         this.readString(record, 'application_no') ??
         this.readString(record, 'registration_number') ??
         '-',
-      programmeType: levelLabel.startsWith('OND') ? 'OND' : 'HND',
+      programmeType: this.resolveProgrammeType(levelLabel),
       levelLabel,
       submittedAt: this.formatTimestamp(submittedAtValue),
       status: this.resolveStatus(record, sourceRecord, complianceDirective),
@@ -164,6 +166,25 @@ export class HodDocumentVerificationService {
     sourceRecord: UnknownRecord,
     index: number,
   ): HodVerificationDocument[] {
+    const admissionDocumentsRecord =
+      this.asRecord(record['admission_documents']) ??
+      this.asRecord(sourceRecord['admission_documents']);
+
+    if (admissionDocumentsRecord !== null) {
+      return Object.entries(admissionDocumentsRecord)
+        .map(([documentKey, documentValue], documentIndex) =>
+          this.mapNamedDocument(
+            documentKey,
+            documentValue,
+            index,
+            documentIndex,
+          ),
+        )
+        .filter(
+          (document): document is HodVerificationDocument => document !== null,
+        );
+    }
+
     const documentCandidates =
       (Array.isArray(record['documents']) ? record['documents'] : null) ??
       (Array.isArray(sourceRecord['documents'])
@@ -176,18 +197,47 @@ export class HodDocumentVerificationService {
     );
   }
 
+  private mapNamedDocument(
+    documentKey: string,
+    value: unknown,
+    recordIndex: number,
+    documentIndex: number,
+  ): HodVerificationDocument | null {
+    const record = this.asRecord(value);
+
+    if (record === null) {
+      return null;
+    }
+
+    const previewUrl = this.sanitizeUrl(
+      this.readString(record, 'file_url') ??
+        this.readString(record, 'preview_url') ??
+        this.readString(record, 'url') ??
+        this.readString(record, 'file') ??
+        this.readString(record, 'document'),
+    );
+    const rawFileSize = record['file_size'] ?? record['size'] ?? null;
+
+    return {
+      id: `hod-document-${recordIndex + 1}-${documentIndex + 1}`,
+      name: this.formatDocumentName(documentKey),
+      fileSizeLabel: this.formatFileSize(rawFileSize),
+      previewUrl,
+    };
+  }
+
   private mapDocument(
     value: unknown,
     recordIndex: number,
     documentIndex: number,
   ): HodVerificationDocument {
     const record = this.asRecord(value);
-    const previewUrl =
+    const previewUrl = this.sanitizeUrl(
       this.readString(record, 'preview_url') ??
-      this.readString(record, 'url') ??
-      this.readString(record, 'file') ??
-      this.readString(record, 'document') ??
-      '';
+        this.readString(record, 'url') ??
+        this.readString(record, 'file') ??
+        this.readString(record, 'document'),
+    );
     const rawFileSize = record?.['file_size'] ?? record?.['size'] ?? null;
 
     return {
@@ -247,6 +297,8 @@ export class HodDocumentVerificationService {
     complianceDirective: string | null,
   ): HodDocumentVerificationRecord['status'] {
     const isVerified =
+      this.readBoolean(record, 'admission_document_verified') ??
+      this.readBoolean(sourceRecord, 'admission_document_verified') ??
       this.readBoolean(record, 'is_verified') ??
       this.readBoolean(sourceRecord, 'is_verified') ??
       false;
@@ -260,6 +312,18 @@ export class HodDocumentVerificationService {
     }
 
     return 'pending';
+  }
+
+  private resolveProgrammeType(levelLabel: string): string {
+    if (levelLabel.startsWith('OND')) {
+      return 'OND';
+    }
+
+    if (levelLabel.startsWith('HND')) {
+      return 'HND';
+    }
+
+    return '-';
   }
 
   private buildFlagData(
@@ -315,6 +379,25 @@ export class HodDocumentVerificationService {
       hour: '2-digit',
       minute: '2-digit',
     }).format(parsedDate);
+  }
+
+  private formatDocumentName(value: string): string {
+    return value
+      .split('_')
+      .map((segment) =>
+        segment.length > 0
+          ? segment.charAt(0).toUpperCase() + segment.slice(1)
+          : '',
+      )
+      .join(' ');
+  }
+
+  private sanitizeUrl(value: string | null): string {
+    if (value === null) {
+      return '';
+    }
+
+    return value.replace(/[`"' ]/g, '');
   }
 
   private readString(record: UnknownRecord | null, key: string): string | null {
