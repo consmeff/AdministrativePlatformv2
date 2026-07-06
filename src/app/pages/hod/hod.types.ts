@@ -61,6 +61,7 @@ export interface HodDocumentFlag {
 
 export interface HodDocumentVerificationRecord {
   id: string;
+  studentId: number | null;
   studentName: string;
   registrationNumber: string;
   programmeType: string;

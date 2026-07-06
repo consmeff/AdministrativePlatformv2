@@ -66,6 +66,11 @@
   border-radius: 18px;
 }
 
+.table-card--empty {
+  padding: 28px 24px;
+  text-align: center;
+}
+
 .document-card {
   padding: 16px;
 }
@@ -187,6 +192,24 @@
   padding: 8px 12px;
   font-size: 13px;
   color: #94a3b8;
+}
+
+.view-document-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.empty-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.empty-copy {
+  margin: 8px 0 0;
+  color: #94a3b8;
+  font-size: 14px;
 }
 
 .table-card {

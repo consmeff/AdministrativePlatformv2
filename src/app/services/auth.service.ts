@@ -1,7 +1,8 @@
 import { inject, Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { catchError, map, Observable, of, tap } from 'rxjs';
+import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
 import { ProfilePayload, ProfileSuccessResponse } from '../model/auth.dto';
 import { DashboardinformationService } from './dashboardinformation.service';
 import { DashboardInfo } from '../model/dashboard/information.dto';
@@ -28,19 +29,26 @@ interface RefreshTokenResponse {
 })
 export class AuthService {
   private readonly http = inject(HttpClient);
-  apiRoot = environment.apiURL;
-  headers = new HttpHeaders({
+  private readonly router = inject(Router);
+  private readonly apiRoot = environment.apiURL;
+  private readonly headers = new HttpHeaders({
     'Content-Type': 'application/json',
     Accept: 'application/json',
   });
-  private readonly JWT_TOKEN = 'JWT_TOKEN';
-  private readonly REFRESH_TOKEN = 'REFRESH_TOKEN';
+  private readonly jwtTokenStorageKey = 'JWT_TOKEN';
+  private readonly refreshTokenStorageKey = 'REFRESH_TOKEN';
+  private readonly userTypeStorageKey = 'USER_TYPE';
+  private readonly applicationNumberStorageKey = 'APP_NO';
+  private readonly matricNumberStorageKey = 'MATRIC_NO';
+  private readonly profileEmailStorageKey = 'profile_email';
+  private readonly loginRoute = '/auth/login';
   private loggedUser: string | null | undefined;
-  dashInfoService = inject(DashboardinformationService);
-  _dash: DashboardInfo = {} as DashboardInfo;
+  private readonly dashInfoService = inject(DashboardinformationService);
+  private dashboardInfo: DashboardInfo = {} as DashboardInfo;
+
   constructor() {
     this.dashInfoService.dashInfo$.subscribe((val) => {
-      this._dash = val;
+      this.dashboardInfo = val;
     });
   }
 
@@ -106,25 +114,33 @@ export class AuthService {
 
   storeTokenFromOTP(username: string, token: OtpTokenResponse) {
     this.loggedUser = username;
-    sessionStorage.setItem(this.JWT_TOKEN, token.jwt);
-    sessionStorage.setItem(this.REFRESH_TOKEN, token.refreshToken);
+    sessionStorage.setItem(this.jwtTokenStorageKey, token.jwt);
+    sessionStorage.setItem(this.refreshTokenStorageKey, token.refreshToken);
   }
 
   storeAppNo(application_no: string) {
-    sessionStorage.setItem('APP_NO', application_no);
+    sessionStorage.setItem(this.applicationNumberStorageKey, application_no);
   }
+
   storeMatricNo(matric_no: string) {
-    sessionStorage.setItem('MATRIC_NO', matric_no);
+    sessionStorage.setItem(this.matricNumberStorageKey, matric_no);
   }
 
   storeRole(user_type: string) {
-    sessionStorage.setItem('USER_TYPE', user_type);
+    sessionStorage.setItem(this.userTypeStorageKey, user_type);
   }
 
-  refreshToken() {
+  refreshToken(): Observable<RefreshTokenResponse> {
+    const refreshToken = this.getRefreshToken();
+
+    if (!refreshToken) {
+      this.logoutToLogin();
+      return throwError(() => new Error('Refresh token is missing.'));
+    }
+
     return this.http
       .post<RefreshTokenResponse>(`${this.apiRoot}/refresh`, {
-        refreshToken: this.getRefreshToken(),
+        refreshToken,
       })
       .pipe(
         tap((tokens: RefreshTokenResponse) => {
@@ -133,33 +149,47 @@ export class AuthService {
       );
   }
 
-  private getRefreshToken() {
-    return sessionStorage.getItem(this.REFRESH_TOKEN);
+  getCurrentUserProfile(): Observable<unknown> {
+    return this.http.get<unknown>(`${this.apiRoot}/api/v1/auth/me`);
   }
 
-  private storeJwtToken(jwt: string) {
-    sessionStorage.setItem(this.JWT_TOKEN, jwt);
+  logoutToLogin(): void {
+    this.clearSessionData();
+    void this.router.navigateByUrl(this.loginRoute);
   }
 
-  getJwtToken() {
-    return sessionStorage.getItem(this.JWT_TOKEN);
+  private getRefreshToken(): string | null {
+    return sessionStorage.getItem(this.refreshTokenStorageKey);
   }
 
-  private storeTokens(tokens: LoginResponse) {
-    sessionStorage.setItem(this.JWT_TOKEN, tokens.access_token);
-    sessionStorage.setItem(this.REFRESH_TOKEN, tokens.refresh_token);
+  private storeJwtToken(jwt: string): void {
+    sessionStorage.setItem(this.jwtTokenStorageKey, jwt);
   }
 
-  private removeTokens() {
-    sessionStorage.removeItem(this.JWT_TOKEN);
-    sessionStorage.removeItem(this.REFRESH_TOKEN);
+  getJwtToken(): string | null {
+    return sessionStorage.getItem(this.jwtTokenStorageKey);
   }
 
-  private doLoginUser(username: string, tokens: LoginResponse) {
+  private storeTokens(tokens: LoginResponse): void {
+    sessionStorage.setItem(this.jwtTokenStorageKey, tokens.access_token);
+    sessionStorage.setItem(this.refreshTokenStorageKey, tokens.refresh_token);
+  }
+
+  private clearSessionData(): void {
+    sessionStorage.removeItem(this.jwtTokenStorageKey);
+    sessionStorage.removeItem(this.refreshTokenStorageKey);
+    sessionStorage.removeItem(this.userTypeStorageKey);
+    sessionStorage.removeItem(this.applicationNumberStorageKey);
+    sessionStorage.removeItem(this.matricNumberStorageKey);
+    sessionStorage.removeItem(this.profileEmailStorageKey);
+    this.loggedUser = null;
+  }
+
+  private doLoginUser(username: string, tokens: LoginResponse): void {
     if (username !== '') {
-      this._dash.username = username;
-      this._dash.role = tokens.user_type;
-      this.dashInfoService.setdashInfo(this._dash);
+      this.dashboardInfo.username = username;
+      this.dashboardInfo.role = tokens.user_type;
+      this.dashInfoService.setdashInfo(this.dashboardInfo);
     }
     this.loggedUser = username;
     this.storeTokens(tokens);

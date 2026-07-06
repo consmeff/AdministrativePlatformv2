@@ -637,6 +637,7 @@ function buildDocumentVerificationRecord(
 
   return {
     id: `hod-document-verification-${index + 1}`,
+    studentId: index + 1,
     studentName: 'ISHOLA, Gbadesin Hassan',
     registrationNumber: `CONSMMEFS/ENT-2025/${studentNumber}`,
     programmeType: getProgrammeTypeFromLevel(levelLabel),

@@ -39,74 +39,89 @@
     />
   </section>
 
-  @if (activeTab() === "pending") {
+  @if (isLoading()) {
+    <section class="table-card table-card--empty">
+      <h2 class="empty-title">Loading documents...</h2>
+      <p class="empty-copy">
+        Please wait while student document submissions are loaded.
+      </p>
+    </section>
+  } @else if (activeTab() === "pending") {
     <section class="document-card-list">
-      @for (record of paginatedRecords(); track record.id) {
-        <article class="document-card">
-          <div class="document-card-head">
-            <div class="student-meta">
-              <div class="student-avatar">
-                {{ record.studentName.charAt(0) }}
-              </div>
-              <div class="student-copy">
-                <h2 class="student-name">{{ record.studentName }}</h2>
-                <div class="student-id-row">
-                  <span>{{ record.registrationNumber }}</span>
-                  <span class="programme-pill">{{ record.levelLabel }}</span>
+      @if (paginatedRecords().length === 0) {
+        <section class="table-card table-card--empty">
+          <h2 class="empty-title">No pending document submissions</h2>
+          <p class="empty-copy">
+            New student document verifications will appear here when available.
+          </p>
+        </section>
+      } @else {
+        @for (record of paginatedRecords(); track record.id) {
+          <article class="document-card">
+            <div class="document-card-head">
+              <div class="student-meta">
+                <div class="student-avatar">
+                  {{ record.studentName.charAt(0) }}
                 </div>
-                <div class="submitted-text">
-                  <i class="bi bi-calendar2-event"></i>
-                  <span>{{ record.submittedAt }}</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="head-actions">
-              <app-button
-                variant="info"
-                [outline]="true"
-                iconClass="bi bi-exclamation-triangle"
-                (buttonClick)="openFlagModal(record.id)"
-              >
-                Flag
-              </app-button>
-              <app-button
-                variant="primary"
-                (buttonClick)="verifyDocuments(record.id)"
-              >
-                Verify
-              </app-button>
-            </div>
-          </div>
-
-          <div class="document-list">
-            @for (document of record.documents; track document.id) {
-              <div class="document-row">
-                <div class="document-meta">
-                  <span class="document-icon"
-                    ><i class="bi bi-file-earmark-text"></i
-                  ></span>
-                  <div class="document-copy">
-                    <span class="document-name">{{ document.name }}</span>
-                    <span class="document-size">{{
-                      document.fileSizeLabel
-                    }}</span>
+                <div class="student-copy">
+                  <h2 class="student-name">{{ record.studentName }}</h2>
+                  <div class="student-id-row">
+                    <span>{{ record.registrationNumber }}</span>
+                    <span class="programme-pill">{{ record.levelLabel }}</span>
+                  </div>
+                  <div class="submitted-text">
+                    <i class="bi bi-calendar2-event"></i>
+                    <span>{{ record.submittedAt }}</span>
                   </div>
                 </div>
-
-                <button
-                  type="button"
-                  class="view-document-btn"
-                  (click)="viewDocument(document.previewUrl)"
-                >
-                  View <i class="bi bi-eye"></i>
-                </button>
               </div>
-            }
-          </div>
-        </article>
+              <div class="head-actions">
+                <app-button
+                  variant="info"
+                  [outline]="true"
+                  iconClass="bi bi-exclamation-triangle"
+                  [disabled]="record.studentId === null"
+                  (buttonClick)="openFlagModal(record.id)"
+                >
+                  Flag
+                </app-button>
+                <app-button
+                  variant="primary"
+                  [disabled]="record.studentId === null"
+                  (buttonClick)="verifyDocuments(record.id)"
+                >
+                  Verify
+                </app-button>
+              </div>
+            </div>
+            <div class="document-list">
+              @for (document of record.documents; track document.id) {
+                <div class="document-row">
+                  <div class="document-meta">
+                    <span class="document-icon"
+                      ><i class="bi bi-file-earmark-text"></i
+                    ></span>
+                    <div class="document-copy">
+                      <span class="document-name">{{ document.name }}</span>
+                      <span class="document-size">{{
+                        document.fileSizeLabel
+                      }}</span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    class="view-document-btn"
+                    [disabled]="!document.previewUrl"
+                    (click)="viewDocument(document.previewUrl)"
+                  >
+                    View <i class="bi bi-eye"></i>
+                  </button>
+                </div>
+              }
+            </div>
+          </article>
+        }
       }
-
       <app-pagination
         [first]="first()"
         [rows]="rows()"
@@ -117,40 +132,51 @@
     </section>
   } @else {
     <section class="table-card">
-      <div class="review-table-wrap">
-        <table class="review-table">
-          <thead>
-            <tr>
-              <th>Date Flagged</th>
-              <th>Student Name</th>
-              <th>Registration Number</th>
-              <th>Programme Type</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (record of paginatedRecords(); track record.id) {
+      @if (paginatedRecords().length === 0) {
+        <section class="table-card--empty">
+          <h2 class="empty-title">No flagged documents</h2>
+          <p class="empty-copy">
+            Flagged document submissions will appear here after review.
+          </p>
+        </section>
+      } @else {
+        <div class="review-table-wrap">
+          <table class="review-table">
+            <thead>
               <tr>
-                <td class="date-cell">
-                  <span>{{
-                    record.flag?.flaggedAt ?? record.submittedAt
-                  }}</span>
-                </td>
-                <td class="student-name-cell">{{ record.studentName }}</td>
-                <td class="registration-number">
-                  {{ record.registrationNumber }}
-                </td>
-                <td>
-                  <span class="programme-pill">{{ record.programmeType }}</span>
-                </td>
-                <td>
-                  <app-status-indicator text="Flagged" tone="rejected" />
-                </td>
+                <th>Date Flagged</th>
+                <th>Student Name</th>
+                <th>Registration Number</th>
+                <th>Programme Type</th>
+                <th>Status</th>
               </tr>
-            }
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              @for (record of paginatedRecords(); track record.id) {
+                <tr>
+                  <td class="date-cell">
+                    <span>{{
+                      record.flag?.flaggedAt ?? record.submittedAt
+                    }}</span>
+                  </td>
+                  <td class="student-name-cell">{{ record.studentName }}</td>
+                  <td class="registration-number">
+                    {{ record.registrationNumber }}
+                  </td>
+                  <td>
+                    <span class="programme-pill">{{
+                      record.programmeType
+                    }}</span>
+                  </td>
+                  <td>
+                    <app-status-indicator text="Flagged" tone="rejected" />
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
 
       <app-pagination
         [first]="first()"
@@ -169,7 +195,7 @@
   prompt="This will notify the student to correct their submission"
   [showReasonSelect]="true"
   [reasonOptions]="flagReasonOptions"
-  [documentOptions]="flagDocumentOptions"
+  [documentOptions]="flagDocumentOptions()"
   confirmLabel="Flag Document"
   notesLabel="Additional Notes:"
   notesHint="(optional)"

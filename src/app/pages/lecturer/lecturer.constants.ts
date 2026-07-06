@@ -39,7 +39,21 @@ const COURSE_UPLOAD_STAGE = {
   complete: 'complete',
 } as const;
 
-function resolveGrade(totalScore: number): string {
+export const LECTURER_FALLBACK_SESSION_LABEL = 'Current Session';
+export const LECTURER_FALLBACK_LEVEL_LABEL = 'Assigned Course';
+export const LECTURER_SEMESTER_LABEL_BY_VALUE: Record<string, string> = {
+  first_semester: '1st Semester',
+  second_semester: '2nd Semester',
+};
+export const LECTURER_LEVEL_LABEL_BY_COURSE_PREFIX: Record<string, string> = {
+  '1': 'OND 1',
+  '2': 'OND 2',
+  '3': 'HND 1',
+  '4': 'HND 2',
+};
+export const LECTURER_GRADE_SCALE = GRADE_SCALE;
+
+export function resolveLecturerGrade(totalScore: number): string {
   const matchedGrade = GRADE_SCALE.find(
     (entry) => totalScore >= entry.minimumScore,
   );
@@ -57,12 +71,13 @@ function createStudent(index: number): LecturerStudentResult {
 
   return {
     id: `student-${paddedStudentNumber}`,
+    studentId: null,
     studentName: `Gbadegesin ${name}`,
     matricNo: `CONSMMEFS/ENT-2025/${paddedStudentNumber}`,
     continuousAssessmentScore,
     examScore,
     totalScore,
-    grade: resolveGrade(totalScore),
+    grade: resolveLecturerGrade(totalScore),
   };
 }
 
@@ -76,13 +91,13 @@ export function buildLecturerStudents(
 }
 
 export const LECTURER_PROFILE: LecturerProfile = {
-  fullName: 'Dr. Amira Gbadegesin',
-  roleLabel: 'Lecturer',
-  departmentLabel: 'Nursing Science',
-  facultyLabel: 'School of Nursing',
-  emailAddress: 'amira.gbadegesin@consmmef.edu.ng',
-  phoneNumber: '+234 801 234 5678',
-  officeLocation: 'Faculty Building, Room 204',
+  fullName: 'Staff Member',
+  roleLabel: 'Staff',
+  departmentLabel: 'Department',
+  facultyLabel: 'Faculty',
+  emailAddress: '-',
+  phoneNumber: '-',
+  officeLocation: '-',
 };
 
 export const LECTURER_COURSES: LecturerCourse[] = [

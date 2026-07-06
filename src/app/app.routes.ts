@@ -25,8 +25,8 @@ export const routes: Routes = [
           {
             path: 'dashboard',
             loadComponent: () =>
-              import('./pages/hod/hod-dashboard/hod-dashboard.component').then(
-                (m) => m.HodDashboardComponent,
+              import('./pages/lecturer/lecturer-dashboard/lecturer-dashboard.component').then(
+                (m) => m.LecturerDashboardComponent,
               ),
           },
           {
@@ -53,8 +53,8 @@ export const routes: Routes = [
           {
             path: 'profile',
             loadComponent: () =>
-              import('./pages/hod/hod-profile/hod-profile.component').then(
-                (m) => m.HodProfileComponent,
+              import('./pages/lecturer/lecturer-profile/lecturer-profile.component').then(
+                (m) => m.LecturerProfileComponent,
               ),
           },
           {
