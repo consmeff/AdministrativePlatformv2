@@ -3,6 +3,7 @@
   [ngModel]="model"
   (ngModelChange)="modelChange.emit($event)"
   [optionLabel]="optionLabel"
+  [optionValue]="optionValue || undefined"
   [placeholder]="placeholder"
   styleClass="app-filter-select"
 ></p-select>

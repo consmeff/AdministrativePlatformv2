@@ -1,0 +1,268 @@
+.course-details-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+}
+
+.breadcrumb-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--app-text-secondary);
+}
+
+.breadcrumb-row a {
+  color: var(--app-text-secondary);
+  text-decoration: none;
+}
+
+.course-summary-card,
+.scores-card {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 20px;
+}
+
+.course-summary-card {
+  display: grid;
+  grid-template-columns: 2.2fr 1fr 1fr 1fr auto;
+  gap: 0;
+  align-items: stretch;
+  padding: 10px;
+}
+
+.summary-block,
+.summary-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 78px;
+  padding: 0 18px;
+}
+
+.summary-block:not(:first-child),
+.summary-action {
+  border-left: 1px solid var(--app-border);
+}
+
+.summary-course {
+  align-items: flex-start;
+  justify-content: center;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.summary-code {
+  font-size: 14px;
+  color: #8ba0bf;
+}
+
+.summary-title,
+.section-title {
+  margin: 0;
+  color: var(--app-text-primary);
+}
+
+.summary-title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.summary-value {
+  font-size: 17px;
+  font-weight: 600;
+  color: #2f3d58;
+}
+
+.scores-card {
+  padding: 18px;
+}
+
+.scores-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.upload-note,
+.empty-copy {
+  margin: 8px 0 0;
+  color: var(--app-text-secondary);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.upload-note span {
+  display: inline-block;
+  margin-left: 8px;
+}
+
+.scores-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.scores-table-shell {
+  overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+}
+
+.scores-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.scores-table th,
+.scores-table td {
+  padding: 18px 16px;
+  border-bottom: 1px solid #e8edf5;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.scores-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.student-name-cell {
+  min-width: 240px;
+  font-weight: 600;
+  color: var(--app-text-primary);
+}
+
+.score-pill,
+.grade-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  min-height: 36px;
+  border-radius: 10px;
+}
+
+.score-pill {
+  border: 1px solid #dbe4f0;
+  color: #4d6180;
+}
+
+.grade-pill {
+  min-width: 40px;
+  min-height: 40px;
+  border-radius: 999px;
+  background: #f4f7fb;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.actions-col {
+  min-width: 180px;
+}
+
+.actions-cell {
+  vertical-align: middle;
+}
+
+.actions-stack {
+  display: flex;
+  gap: 10px;
+}
+
+.score-input {
+  width: 92px;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid #dbe4f0;
+  border-radius: 10px;
+  color: #4d6180;
+  background: #fff;
+  font-weight: 600;
+  text-align: center;
+}
+
+.score-input:focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 0.35);
+  outline-offset: 2px;
+}
+
+.empty-students-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 48px 20px;
+  text-align: center;
+  border: 1px dashed #dbe4f0;
+  border-radius: 18px;
+  background: #fbfdff;
+}
+
+.empty-icon {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #eef2ff;
+  color: var(--app-primary);
+  font-size: 30px;
+}
+
+.empty-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--app-text-primary);
+}
+
+@media (max-width: 1200px) {
+  .course-summary-card {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .summary-block:nth-child(3),
+  .summary-block:nth-child(5),
+  .summary-action {
+    border-left: 0;
+  }
+
+  .summary-block:nth-child(n + 3),
+  .summary-action {
+    border-top: 1px solid var(--app-border);
+  }
+}
+
+@media (max-width: 768px) {
+  .course-details-page {
+    padding: 16px;
+  }
+
+  .course-summary-card {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-block,
+  .summary-action {
+    justify-content: flex-start;
+    border-left: 0;
+  }
+
+  .summary-block:not(:first-child),
+  .summary-action {
+    border-top: 1px solid var(--app-border);
+  }
+
+  .scores-head {
+    flex-direction: column;
+  }
+}

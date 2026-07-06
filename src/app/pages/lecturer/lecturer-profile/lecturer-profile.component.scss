@@ -1,0 +1,103 @@
+.lecturer-profile-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+}
+
+.profile-card {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 24px;
+}
+
+.profile-hero {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 28px;
+}
+
+.avatar-badge {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #eef2ff;
+  color: var(--app-primary);
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.hero-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hero-eyebrow,
+.hero-subtitle,
+.detail-label {
+  color: var(--app-text-secondary);
+}
+
+.hero-eyebrow,
+.detail-label {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.hero-title {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.hero-subtitle {
+  margin: 0;
+  font-size: 16px;
+}
+
+.profile-details {
+  display: grid;
+  gap: 0;
+  padding: 8px 24px;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.detail-row:last-child {
+  border-bottom: 0;
+}
+
+.detail-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--app-text-primary);
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .lecturer-profile-page {
+    padding: 16px;
+  }
+
+  .profile-hero,
+  .detail-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .detail-value {
+    text-align: left;
+  }
+}

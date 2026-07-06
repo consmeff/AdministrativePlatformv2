@@ -1,0 +1,49 @@
+@if (visible) {
+  <div class="modal-backdrop" (click)="close()">
+    <section class="modal-card" (click)="$event.stopPropagation()">
+      <header class="modal-header">
+        <h2 class="modal-title">Courses Assignment History</h2>
+
+        <button
+          type="button"
+          class="modal-close-btn"
+          aria-label="Close history"
+          (click)="close()"
+        >
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </header>
+
+      <section class="history-list">
+        @if (records.length === 0) {
+          <p class="empty-copy">No publication history is available yet.</p>
+        } @else {
+          @for (record of records; track record.id) {
+            <article class="history-row">
+              <div class="history-main">
+                <strong class="history-title">
+                  {{ record.sessionLabel }} {{ record.levelLabel }}
+                </strong>
+                <span class="history-meta">
+                  {{ record.courseCount }} courses
+                  <span class="meta-dot"></span>
+                  {{ record.totalUnits }} units
+                  <span class="meta-dot"></span>
+                  {{ record.lecturerCount }} Lecturers
+                </span>
+              </div>
+
+              <button
+                type="button"
+                class="duplicate-btn"
+                (click)="duplicate(record.levelValue)"
+              >
+                Duplicate
+              </button>
+            </article>
+          }
+        }
+      </section>
+    </section>
+  </div>
+}

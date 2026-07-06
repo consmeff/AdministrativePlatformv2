@@ -1,0 +1,106 @@
+@if (course(); as activeCourse) {
+  <section class="lecturer-upload-page">
+    <nav class="breadcrumb-row" aria-label="Breadcrumb">
+      <a [routerLink]="[roleBasePath, 'my-courses', activeCourse.id]">
+        Course Details
+      </a>
+      <span><i class="bi bi-chevron-right"></i></span>
+      <span>{{ activeCourse.code }}</span>
+      <span><i class="bi bi-chevron-right"></i></span>
+      <span>Upload Result</span>
+    </nav>
+
+    <section class="upload-flow-shell">
+      <h1 class="flow-title">Upload Students Results File</h1>
+      <p class="flow-subtitle">
+        Upload the pre-filled Excel or CSV file with updated student score.
+      </p>
+
+      <input
+        #fileInput
+        type="file"
+        class="hidden-file-input"
+        [accept]="acceptedFileTypes"
+        (change)="onFileSelected($event)"
+      />
+
+      @if (stage() === "upload") {
+        <div class="upload-dropzone" (click)="triggerFileInput(fileInput)">
+          <span class="dropzone-icon"><i class="bi bi-folder2-open"></i></span>
+          <span class="dropzone-text"
+            >Click to Upload or drag and drop file</span
+          >
+        </div>
+
+        <app-button variant="primary" (buttonClick)="downloadTemplate()">
+          Download Template
+        </app-button>
+      } @else if (stage() === "file-selected") {
+        <article class="selected-file-card">
+          <div class="file-meta">
+            <span class="file-icon"
+              ><i class="bi bi-file-earmark-spreadsheet"></i
+            ></span>
+            <div>
+              <div class="file-name">{{ selectedFileName() }}</div>
+              <div class="file-size">{{ selectedFileSize() }}</div>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="remove-file-btn"
+            aria-label="Remove selected file"
+            (click)="removeSelectedFile(fileInput)"
+          >
+            <i class="bi bi-trash"></i>
+          </button>
+        </article>
+
+        <app-button variant="primary" (buttonClick)="startUpload()">
+          Apply Scores
+        </app-button>
+      } @else if (stage() === "processing") {
+        <section class="processing-card">
+          <h2 class="processing-title">Processing Document...</h2>
+
+          <div class="rows-counter">
+            <span class="rows-value">{{ processedRows() }}</span>
+            <span class="rows-total">of {{ totalRows() }} rows</span>
+          </div>
+
+          <div class="progress-row">
+            <div class="progress-track">
+              <div
+                class="progress-value"
+                [style.width.%]="uploadProgress()"
+              ></div>
+            </div>
+            <span class="progress-label">{{ uploadProgress() }}%</span>
+          </div>
+        </section>
+      } @else {
+        <section class="upload-success-state">
+          <div class="success-icon"><i class="bi bi-clipboard2-check"></i></div>
+          <h2 class="success-title">Result Upload complete</h2>
+          <p class="success-copy">
+            {{ processedRows() }} rows processed successfully.
+          </p>
+          <app-button variant="primary" (buttonClick)="goBackToCourse()">
+            Back to Course
+          </app-button>
+        </section>
+      }
+    </section>
+  </section>
+} @else {
+  <section class="lecturer-upload-page">
+    <section class="upload-flow-shell">
+      @if (!hasLoaded()) {
+        <h1 class="flow-title">Loading course...</h1>
+      } @else {
+        <h1 class="flow-title">Course not found</h1>
+      }
+    </section>
+  </section>
+}

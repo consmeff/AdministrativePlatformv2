@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Params, RouterModule } from '@angular/router';
 
 export type ButtonVariant =
   | 'primary'
@@ -13,7 +14,7 @@ export type ButtonVariant =
 @Component({
   selector: 'app-button',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './button.component.html',
   styleUrl: './button.component.scss',
 })
@@ -25,6 +26,8 @@ export class ButtonComponent {
   @Input() fullWidth = false;
   @Input() iconClass = '';
   @Input() iconPosition: 'left' | 'right' = 'left';
+  @Input() routerLink: string | unknown[] | null = null;
+  @Input() queryParams: Params | null = null;
 
   @Output() buttonClick = new EventEmitter<MouseEvent>();
 

@@ -1,0 +1,46 @@
+<section class="lecturer-courses-page">
+  <header class="courses-header">
+    <div>
+      <h1 class="page-title">My Courses</h1>
+      <p class="page-subtitle">Courses assigned to you this semester</p>
+    </div>
+
+    @if (courses()[0]; as firstCourse) {
+      <div class="course-tags">
+        <span class="course-tag">{{ firstCourse.departmentLabel }}</span>
+        <span class="course-tag">{{ firstCourse.sessionLabel }}</span>
+        <span class="course-tag">{{ firstCourse.semesterLabel }}</span>
+      </div>
+    }
+  </header>
+
+  <section class="course-grid">
+    @for (course of courses(); track course.id) {
+      <a
+        class="course-card"
+        [routerLink]="[roleBasePath, 'my-courses', course.id]"
+      >
+        <span class="course-code">{{ course.code }}</span>
+        <h2 class="course-title">{{ course.title }}</h2>
+
+        <div class="course-pill-row">
+          <span class="course-pill">{{ course.levelLabel }}</span>
+          <span class="course-pill">{{ course.units }} units</span>
+        </div>
+
+        <div class="course-divider"></div>
+
+        <div class="student-summary">
+          <span class="student-icon"><i class="bi bi-people"></i></span>
+          <span class="student-count">
+            @if (course.students.length === 0) {
+              No students yet
+            } @else {
+              {{ course.students.length }} Students
+            }
+          </span>
+        </div>
+      </a>
+    }
+  </section>
+</section>

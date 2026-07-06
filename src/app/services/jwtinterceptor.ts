@@ -8,22 +8,22 @@ interface RefreshTokenResponse {
   jwt: string;
 }
 
+let isRefreshing = false;
+const refreshTokenSubject = new BehaviorSubject<string | null>(null);
+
 export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
-
-  // Flags and subjects
-  let isRefreshing = false;
-  const refreshTokenSubject = new BehaviorSubject<string | null>(null);
-
-  // Clone and add token to the request
+  const isRefreshRequest = req.url.includes('/refresh');
+  const isAuthenticationRequest = req.url.includes('/api/v1/auth/');
   const addToken = (request: typeof req, token: string | null) =>
-    request.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    token === null
+      ? request
+      : request.clone({
+          setHeaders: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-  // Handle 401 errors and refresh the token
   const handle401Error = (request: typeof req) => {
     if (!isRefreshing) {
       isRefreshing = true;
@@ -37,30 +37,48 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
         }),
         catchError((error) => {
           isRefreshing = false;
+          authService.logoutToLogin();
           return throwError(() => error);
         }),
       );
-    } else {
-      return refreshTokenSubject.pipe(
-        filter((token) => token != null),
-        take(1),
-        switchMap((jwt) => {
-          return next(addToken(request, jwt));
-        }),
-      );
     }
+
+    return refreshTokenSubject.pipe(
+      filter((token) => token != null),
+      take(1),
+      switchMap((jwt) => {
+        return next(addToken(request, jwt));
+      }),
+    );
   };
 
-  // Main request handling
   const jwtToken = authService.getJwtToken();
-
-  const modifiedReq = jwtToken ? addToken(req, jwtToken) : req;
+  const modifiedReq = addToken(req, jwtToken);
 
   return next(modifiedReq).pipe(
     catchError((error) => {
+      if (error.status !== 401) {
+        return throwError(() => error);
+      }
+
+      if (isRefreshRequest) {
+        authService.logoutToLogin();
+        return throwError(() => error);
+      }
+
+      if (isAuthenticationRequest) {
+        return throwError(() => error);
+      }
+
+      if (jwtToken === null) {
+        authService.logoutToLogin();
+        return throwError(() => error);
+      }
+
       if (error.status === 401) {
         return handle401Error(modifiedReq);
       }
+
       return throwError(() => error);
     }),
   );

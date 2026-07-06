@@ -1,0 +1,270 @@
+.hod-assign-courses-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+}
+
+.breadcrumb-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.breadcrumb-link,
+.breadcrumb-current,
+.breadcrumb-separator {
+  font-size: 14px;
+  color: #94a3b8;
+  text-decoration: none;
+}
+
+.toolbar-card,
+.panel-card,
+.course-hero {
+  border-radius: 24px;
+  background: #ffffff;
+}
+
+.toolbar-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 22px;
+}
+
+.toolbar-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.filter-label {
+  font-size: 14px;
+  color: #0f172a;
+}
+
+.filter-wrap {
+  max-width: 280px;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+  gap: 14px;
+}
+
+.panel-card {
+  padding: 14px;
+}
+
+.panel-title {
+  margin: 0 0 14px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.course-list,
+.assignment-stack,
+.assigned-list,
+.available-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.course-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  border: 0;
+  border-radius: 16px;
+  background: #f8fafc;
+  padding: 14px;
+  text-align: left;
+}
+
+.course-item.is-active {
+  background: #eef2ff;
+}
+
+.course-item-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.course-item-code {
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.course-item-title {
+  font-size: 15px;
+  color: #0f172a;
+}
+
+.lecturer-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.lecturer-count.is-unassigned {
+  color: #f04438;
+}
+
+.units-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: #f1f5f9;
+  font-size: 12px;
+  color: #7487a9;
+  white-space: nowrap;
+}
+
+.course-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  background: #000080;
+  color: #ffffff;
+}
+
+.hero-code {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.hero-title {
+  margin: 6px 0 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.hero-units {
+  display: flex;
+  min-width: 56px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 8px 10px;
+  color: #7487a9;
+}
+
+.hero-units strong {
+  font-size: 20px;
+  line-height: 1;
+  color: #000080;
+}
+
+.hero-units span:last-child {
+  font-size: 11px;
+}
+
+.assigned-row,
+.available-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid #edf1f7;
+}
+
+.assigned-row:last-child,
+.available-row:last-child {
+  border-bottom: 0;
+}
+
+.assigned-name,
+.available-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.assign-btn,
+.remove-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 74px;
+  min-height: 30px;
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.assign-btn {
+  border: 1px solid #dbe4f0;
+  background: #ffffff;
+  color: #7487a9;
+}
+
+.remove-btn {
+  border: 1px solid #fecaca;
+  background: #fff5f5;
+  color: #f04438;
+}
+
+.empty-copy {
+  margin: 0;
+  font-size: 14px;
+  color: #64748b;
+}
+
+@media (max-width: 1100px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .hod-assign-courses-page {
+    padding: 16px;
+  }
+
+  .toolbar-card,
+  .toolbar-actions,
+  .course-item,
+  .course-hero,
+  .assigned-row,
+  .available-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-wrap {
+    max-width: none;
+  }
+}

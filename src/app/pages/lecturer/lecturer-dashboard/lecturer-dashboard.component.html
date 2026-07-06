@@ -1,0 +1,57 @@
+<section class="lecturer-dashboard-page">
+  <header class="dashboard-hero">
+    <div>
+      <p class="hero-eyebrow">{{ lecturerProfile().departmentLabel }}</p>
+      <h1 class="hero-title">Welcome back, {{ lecturerProfile().fullName }}</h1>
+      <p class="hero-copy">
+        Review assigned courses, update student scores, and monitor result
+        uploads for the current semester.
+      </p>
+    </div>
+
+    <app-button variant="primary" [routerLink]="[roleBasePath, 'my-courses']">
+      Open My Courses
+    </app-button>
+  </header>
+
+  <section class="metrics-grid">
+    @for (metric of dashboardMetrics(); track metric.label) {
+      <article class="metric-card">
+        <span class="metric-value">{{ metric.value }}</span>
+        <span class="metric-label">{{ metric.label }}</span>
+      </article>
+    }
+  </section>
+
+  @if (courses()[0]; as firstCourse) {
+    <section class="dashboard-summary-card">
+      <div class="summary-head">
+        <h2 class="summary-title">My semester snapshot</h2>
+        <span class="summary-badge">Lecturer dashboard</span>
+      </div>
+
+      <div class="summary-grid">
+        <div class="summary-item">
+          <span class="summary-label">Faculty</span>
+          <span class="summary-value">{{
+            lecturerProfile().facultyLabel
+          }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Department</span>
+          <span class="summary-value">{{
+            lecturerProfile().departmentLabel
+          }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Current session</span>
+          <span class="summary-value">{{ firstCourse.sessionLabel }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Semester</span>
+          <span class="summary-value">{{ firstCourse.semesterLabel }}</span>
+        </div>
+      </div>
+    </section>
+  }
+</section>

@@ -64,7 +64,21 @@ export class LoginComponent implements OnInit {
 
   destroyed(event: { type?: string }) {
     if (event.type === 'success') {
-      this.router.navigateByUrl('/pages/dashboard');
+      this.router.navigateByUrl(this.resolvePostLoginRoute());
     }
+  }
+
+  private resolvePostLoginRoute(): string {
+    const userType = sessionStorage.getItem('USER_TYPE')?.toLowerCase();
+
+    if (userType?.includes('hod')) {
+      return '/pages/hod/dashboard';
+    }
+
+    if (userType?.includes('lecturer')) {
+      return '/pages/lecturer/dashboard';
+    }
+
+    return '/pages/dashboard';
   }
 }

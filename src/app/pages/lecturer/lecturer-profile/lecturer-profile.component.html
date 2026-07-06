@@ -1,0 +1,36 @@
+<section class="lecturer-profile-page">
+  <header class="profile-card profile-hero">
+    <div class="avatar-badge">
+      {{ lecturerProfile().fullName.charAt(0) }}
+    </div>
+
+    <div class="hero-copy">
+      <p class="hero-eyebrow">{{ lecturerProfile().roleLabel }}</p>
+      <h1 class="hero-title">{{ lecturerProfile().fullName }}</h1>
+      <p class="hero-subtitle">{{ lecturerProfile().departmentLabel }}</p>
+    </div>
+  </header>
+
+  <section class="profile-card profile-details">
+    <article class="detail-row">
+      <span class="detail-label">Faculty</span>
+      <span class="detail-value">{{ lecturerProfile().facultyLabel }}</span>
+    </article>
+    <article class="detail-row">
+      <span class="detail-label">Department</span>
+      <span class="detail-value">{{ lecturerProfile().departmentLabel }}</span>
+    </article>
+    <article class="detail-row">
+      <span class="detail-label">Email address</span>
+      <span class="detail-value">{{ lecturerProfile().emailAddress }}</span>
+    </article>
+    <article class="detail-row">
+      <span class="detail-label">Phone number</span>
+      <span class="detail-value">{{ lecturerProfile().phoneNumber }}</span>
+    </article>
+    <article class="detail-row">
+      <span class="detail-label">Office location</span>
+      <span class="detail-value">{{ lecturerProfile().officeLocation }}</span>
+    </article>
+  </section>
+</section>
