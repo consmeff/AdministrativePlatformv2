@@ -94,6 +94,9 @@ export interface HodResultReviewRecord {
   passedStudents: number;
   failedStudents: number;
   approved: boolean;
+  departmentId?: string | null;
+  levelId?: string | null;
+  semesterId?: string | null;
   studentRows: HodResultStudentRow[];
 }
 

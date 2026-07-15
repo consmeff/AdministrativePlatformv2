@@ -96,6 +96,9 @@ export class HodResultReviewComponent {
   }
 
   toggleExpandedRecord(recordId: string): void {
+    if (!this.isRecordExpanded(recordId)) {
+      this.hodStateService.loadResultReviewStudentRows(recordId);
+    }
     this.expandedRecordIds.update((currentRecordIds) =>
       currentRecordIds.includes(recordId)
         ? currentRecordIds.filter(

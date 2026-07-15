@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { finalize } from 'rxjs';
+import { finalize, forkJoin, map, Observable, of, tap } from 'rxjs';
 import { BusyIndicatorService } from '../../services/busy-indicator.service';
 import { NotificationService } from '../../services/notification.service';
 import {
@@ -8,11 +8,9 @@ import {
   HOD_COURSE_OVERVIEW_LEVELS,
   HOD_COURSE_PUBLICATION_HISTORY,
   HOD_COURSE_REGISTRATION_RECORDS,
-  HOD_LECTURERS,
   HOD_LECTURER_ASSIGNMENT_HISTORY,
   HOD_LECTURER_COURSES,
   HOD_PROFILE,
-  HOD_RESULT_REVIEW_RECORDS,
   HOD_STUDENT_RECORDS,
 } from './hod.constants';
 import {
@@ -29,9 +27,12 @@ import {
   HodLecturerCourse,
   HodProfile,
   HodResultReviewRecord,
+  HodResultStudentRow,
   HodStudentRecord,
 } from './hod.types';
 import { HodDocumentVerificationService } from './verification/document-verification/hod-document-verification.service';
+import { HodLecturersService } from './lecturers/hod-lecturers.service';
+import { HodResultReviewService } from './result-review/hod-result-review.service';
 
 interface HodState {
   courseRegistrations: HodCourseRegistrationRecord[];
@@ -54,14 +55,16 @@ export class HodStateService {
   private readonly hodDocumentVerificationService = inject(
     HodDocumentVerificationService,
   );
+  private readonly hodLecturersService = inject(HodLecturersService);
+  private readonly hodResultReviewService = inject(HodResultReviewService);
   private readonly busyIndicatorService = inject(BusyIndicatorService);
   private readonly notificationService = inject(NotificationService);
   private readonly state = signal<HodState>({
     courseRegistrations: HOD_COURSE_REGISTRATION_RECORDS,
     documentVerifications: [],
-    resultReviews: HOD_RESULT_REVIEW_RECORDS,
+    resultReviews: [],
     studentRecords: HOD_STUDENT_RECORDS,
-    lecturers: HOD_LECTURERS,
+    lecturers: [],
     lecturerCourses: HOD_LECTURER_COURSES,
     lecturerAssignmentHistory: HOD_LECTURER_ASSIGNMENT_HISTORY,
     courseOverviewLevels: HOD_COURSE_OVERVIEW_LEVELS,
@@ -70,9 +73,14 @@ export class HodStateService {
     coursePublicationHistory: HOD_COURSE_PUBLICATION_HISTORY,
   });
   readonly isDocumentVerificationsLoading = signal(false);
+  readonly isResultReviewsLoading = signal(false);
+  readonly isLecturersLoading = signal(false);
+  readonly loadingResultReviewIds = signal<string[]>([]);
 
   constructor() {
     this.loadDocumentVerifications();
+    this.loadResultReviews();
+    this.loadLecturers();
   }
 
   readonly profile = signal<HodProfile>(HOD_PROFILE);
@@ -243,12 +251,93 @@ export class HodStateService {
   }
 
   approveResultReview(recordId: string): void {
-    this.state.update((currentState) => ({
-      ...currentState,
-      resultReviews: currentState.resultReviews.map((record) =>
-        record.id === recordId ? { ...record, approved: true } : record,
-      ),
-    }));
+    const matchedRecord =
+      this.resultReviews().find((record) => record.id === recordId) ?? null;
+    if (
+      matchedRecord === null ||
+      matchedRecord.departmentId === null ||
+      matchedRecord.departmentId === undefined ||
+      matchedRecord.levelId === null ||
+      matchedRecord.levelId === undefined ||
+      matchedRecord.semesterId === null ||
+      matchedRecord.semesterId === undefined
+    ) {
+      this.notificationService.warn(
+        'This result is missing department, level, or semester information.',
+      );
+      return;
+    }
+
+    this.busyIndicatorService.show();
+    this.hodResultReviewService
+      .approveCourseResults({
+        course_id: matchedRecord.id,
+        department_id: matchedRecord.departmentId,
+        level_id: matchedRecord.levelId,
+        semester_id: matchedRecord.semesterId,
+      })
+      .pipe(
+        finalize(() => {
+          this.busyIndicatorService.hide();
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.state.update((currentState) => ({
+            ...currentState,
+            resultReviews: currentState.resultReviews.map((record) =>
+              record.id === recordId ? { ...record, approved: true } : record,
+            ),
+          }));
+          this.notificationService.success('Results approved successfully.');
+        },
+      });
+  }
+
+  loadResultReviewStudentRows(recordId: string): void {
+    const courseId = Number(recordId);
+    if (!Number.isFinite(courseId)) {
+      return;
+    }
+
+    if (this.loadingResultReviewIds().includes(recordId)) {
+      return;
+    }
+
+    const matchedRecord =
+      this.resultReviews().find((record) => record.id === recordId) ?? null;
+    if (matchedRecord?.studentRows.length) {
+      return;
+    }
+
+    this.loadingResultReviewIds.update((ids) => [...ids, recordId]);
+    this.hodResultReviewService
+      .getCourseResultsDetail(courseId)
+      .pipe(
+        finalize(() => {
+          this.loadingResultReviewIds.update((ids) =>
+            ids.filter((id) => id !== recordId),
+          );
+        }),
+      )
+      .subscribe({
+        next: (studentRows: HodResultStudentRow[]) => {
+          this.state.update((currentState) => ({
+            ...currentState,
+            resultReviews: currentState.resultReviews.map((record) =>
+              record.id === recordId ? { ...record, studentRows } : record,
+            ),
+          }));
+        },
+        error: () => {
+          this.state.update((currentState) => ({
+            ...currentState,
+            resultReviews: currentState.resultReviews.map((record) =>
+              record.id === recordId ? { ...record, studentRows: [] } : record,
+            ),
+          }));
+        },
+      });
   }
 
   getStudentRecordById(recordId: string): HodStudentRecord | null {
@@ -319,6 +408,39 @@ export class HodStateService {
     }));
   }
 
+  saveLecturerCourseAssignments(
+    records: Omit<HodLecturerAssignmentHistoryRecord, 'id' | 'changedAt'>[],
+  ): Observable<void> {
+    if (records.length === 0) {
+      return of(void 0);
+    }
+
+    const assignmentPayloads = this.buildAssignCoursesRequestPayloads(records);
+
+    if (assignmentPayloads.length === 0) {
+      return of(void 0);
+    }
+
+    this.busyIndicatorService.show();
+
+    return forkJoin(
+      assignmentPayloads.map((payload) =>
+        this.hodLecturersService.assignCourses(payload),
+      ),
+    ).pipe(
+      tap(() => {
+        this.appendLecturerAssignmentHistory(records);
+        this.notificationService.success(
+          'Course assignments updated successfully.',
+        );
+      }),
+      map(() => void 0),
+      finalize(() => {
+        this.busyIndicatorService.hide();
+      }),
+    );
+  }
+
   appendLecturerAssignmentHistory(
     records: Omit<HodLecturerAssignmentHistoryRecord, 'id' | 'changedAt'>[],
   ): void {
@@ -339,6 +461,29 @@ export class HodStateService {
         ...currentState.lecturerAssignmentHistory,
       ],
     }));
+  }
+
+  private buildAssignCoursesRequestPayloads(
+    records: Omit<HodLecturerAssignmentHistoryRecord, 'id' | 'changedAt'>[],
+  ) {
+    const changedCourseIds = Array.from(
+      new Set(records.map((record) => record.courseId)),
+    );
+
+    return changedCourseIds
+      .map((courseId) => {
+        const matchedCourse = this.getLecturerCourseById(courseId);
+
+        if (!matchedCourse) {
+          return null;
+        }
+
+        return {
+          course_id: matchedCourse.id,
+          lecturer_ids: [...matchedCourse.assignedLecturerIds],
+        };
+      })
+      .filter((payload) => payload !== null);
   }
 
   getCourseOverviewLevel(levelValue: string): HodCourseOverviewLevel | null {
@@ -453,6 +598,64 @@ export class HodStateService {
           this.state.update((currentState) => ({
             ...currentState,
             documentVerifications: [],
+          }));
+        },
+      });
+  }
+
+  private loadResultReviews(): void {
+    this.isResultReviewsLoading.set(true);
+    this.busyIndicatorService.show();
+
+    this.hodResultReviewService
+      .getCourseResults({
+        department: this.profile().departmentLabel,
+      })
+      .pipe(
+        finalize(() => {
+          this.isResultReviewsLoading.set(false);
+          this.busyIndicatorService.hide();
+        }),
+      )
+      .subscribe({
+        next: (resultReviews) => {
+          this.state.update((currentState) => ({
+            ...currentState,
+            resultReviews,
+          }));
+        },
+        error: () => {
+          this.state.update((currentState) => ({
+            ...currentState,
+            resultReviews: [],
+          }));
+        },
+      });
+  }
+
+  private loadLecturers(): void {
+    this.isLecturersLoading.set(true);
+    this.busyIndicatorService.show();
+
+    this.hodLecturersService
+      .getLecturers()
+      .pipe(
+        finalize(() => {
+          this.isLecturersLoading.set(false);
+          this.busyIndicatorService.hide();
+        }),
+      )
+      .subscribe({
+        next: (lecturers) => {
+          this.state.update((currentState) => ({
+            ...currentState,
+            lecturers,
+          }));
+        },
+        error: () => {
+          this.state.update((currentState) => ({
+            ...currentState,
+            lecturers: [],
           }));
         },
       });
