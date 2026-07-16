@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { ButtonComponent } from '../../../../widgets/button/button.component';
 import { HodCourseRegistrationRecord } from '../../hod.types';
 
@@ -11,23 +11,31 @@ import { HodCourseRegistrationRecord } from '../../hod.types';
   styleUrl: './course-registration-review-drawer.component.scss',
 })
 export class CourseRegistrationReviewDrawerComponent {
-  @Input() record: HodCourseRegistrationRecord | null = null;
-  @Output() closed = new EventEmitter<void>();
-  @Output() approved = new EventEmitter<string>();
-  @Output() rejected = new EventEmitter<string>();
+  readonly record = input<HodCourseRegistrationRecord | null>(null);
+  readonly isLoading = input(false);
+  readonly isApproving = input(false);
+  readonly closed = output<void>();
+  readonly approved = output<string>();
+  readonly rejected = output<string>();
 
   get canApprove(): boolean {
     return (
-      this.record?.status !== 'approved' && this.record?.status !== 'rejected'
+      this.record()?.status !== 'approved' &&
+      this.record()?.status !== 'rejected' &&
+      !this.isApproving()
     );
   }
 
   get canReject(): boolean {
-    return this.record?.status !== 'rejected';
+    return (
+      this.record()?.status !== 'rejected' &&
+      this.record()?.status !== 'approved' &&
+      !this.isApproving()
+    );
   }
 
   get studentInitials(): string {
-    const record = this.record;
+    const record = this.record();
 
     if (!record) {
       return '';
@@ -42,14 +50,22 @@ export class CourseRegistrationReviewDrawerComponent {
   }
 
   approve(): void {
-    if (this.record && this.canApprove) {
-      this.approved.emit(this.record.id);
+    const record = this.record();
+
+    if (record && this.canApprove) {
+      this.approved.emit(record.id);
     }
   }
 
   reject(): void {
-    if (this.record && this.canReject) {
-      this.rejected.emit(this.record.id);
+    const record = this.record();
+
+    if (record && this.canReject) {
+      this.rejected.emit(record.id);
     }
+  }
+
+  close(): void {
+    this.closed.emit();
   }
 }

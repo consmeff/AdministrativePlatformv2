@@ -32,6 +32,10 @@ export interface HodRegisteredCourse {
 
 export interface HodCourseRegistrationRecord {
   id: string;
+  studentId: number | null;
+  departmentId: number | null;
+  levelId: number | null;
+  semesterId: number | null;
   studentName: string;
   registrationNumber: string;
   programmeType: string;
@@ -42,6 +46,7 @@ export interface HodCourseRegistrationRecord {
   status: HodRegistrationStatus;
   submittedAt: string;
   registeredCourses: HodRegisteredCourse[];
+  detailsLoaded: boolean;
 }
 
 export interface HodVerificationDocument {

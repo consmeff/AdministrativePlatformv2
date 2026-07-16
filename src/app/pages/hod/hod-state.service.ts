@@ -8,7 +8,6 @@ import {
   HOD_COURSE_LEVEL_CONFIGURATIONS,
   HOD_COURSE_OVERVIEW_LEVELS,
   HOD_COURSE_PUBLICATION_HISTORY,
-  HOD_COURSE_REGISTRATION_RECORDS,
   HOD_LECTURER_ASSIGNMENT_HISTORY,
   HOD_LECTURER_COURSES,
   HOD_PROFILE,
@@ -34,6 +33,7 @@ import {
 import { HodDocumentVerificationService } from './verification/document-verification/hod-document-verification.service';
 import { HodLecturersService } from './lecturers/hod-lecturers.service';
 import { HodResultReviewService } from './result-review/hod-result-review.service';
+import { HodCourseRegistrationReviewService } from './verification/course-registration-review/hod-course-registration-review.service';
 
 interface HodState {
   courseRegistrations: HodCourseRegistrationRecord[];
@@ -58,11 +58,14 @@ export class HodStateService {
   );
   private readonly hodLecturersService = inject(HodLecturersService);
   private readonly hodResultReviewService = inject(HodResultReviewService);
+  private readonly hodCourseRegistrationReviewService = inject(
+    HodCourseRegistrationReviewService,
+  );
   private readonly busyIndicatorService = inject(BusyIndicatorService);
   private readonly notificationService = inject(NotificationService);
   private readonly authService = inject(AuthService);
   private readonly state = signal<HodState>({
-    courseRegistrations: HOD_COURSE_REGISTRATION_RECORDS,
+    courseRegistrations: [],
     documentVerifications: [],
     resultReviews: [],
     studentRecords: HOD_STUDENT_RECORDS,
@@ -74,9 +77,12 @@ export class HodStateService {
     courseLevelConfigurations: HOD_COURSE_LEVEL_CONFIGURATIONS,
     coursePublicationHistory: HOD_COURSE_PUBLICATION_HISTORY,
   });
+  readonly isCourseRegistrationsLoading = signal(false);
   readonly isDocumentVerificationsLoading = signal(false);
   readonly isResultReviewsLoading = signal(false);
   readonly isLecturersLoading = signal(false);
+  readonly loadingCourseRegistrationIds = signal<string[]>([]);
+  readonly approvingCourseRegistrationIds = signal<string[]>([]);
   readonly loadingResultReviewIds = signal<string[]>([]);
 
   constructor() {
@@ -153,21 +159,123 @@ export class HodStateService {
   }
 
   approveCourseRegistration(recordId: string): void {
-    this.state.update((currentState) => ({
-      ...currentState,
-      courseRegistrations: currentState.courseRegistrations.map((record) =>
-        record.id === recordId ? { ...record, status: 'approved' } : record,
-      ),
-    }));
+    const matchedRecord = this.getCourseRegistrationById(recordId);
+
+    if (
+      matchedRecord === null ||
+      matchedRecord.studentId === null ||
+      matchedRecord.departmentId === null ||
+      matchedRecord.levelId === null ||
+      matchedRecord.semesterId === null
+    ) {
+      this.notificationService.warn(
+        'This registration is missing student, department, level, or semester information.',
+      );
+      return;
+    }
+
+    if (this.approvingCourseRegistrationIds().includes(recordId)) {
+      return;
+    }
+
+    this.approvingCourseRegistrationIds.update((ids) => [...ids, recordId]);
+    this.busyIndicatorService.show();
+    this.hodCourseRegistrationReviewService
+      .approveCourseRegistration({
+        student_id: matchedRecord.studentId,
+        semester_id: matchedRecord.semesterId,
+        department_id: matchedRecord.departmentId,
+        level_id: matchedRecord.levelId,
+      })
+      .pipe(
+        finalize(() => {
+          this.approvingCourseRegistrationIds.update((ids) =>
+            ids.filter((id) => id !== recordId),
+          );
+          this.busyIndicatorService.hide();
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.state.update((currentState) => ({
+            ...currentState,
+            courseRegistrations: currentState.courseRegistrations.map(
+              (record) =>
+                record.id === recordId
+                  ? { ...record, status: 'approved' }
+                  : record,
+            ),
+          }));
+          this.notificationService.success(
+            'Course registration approved successfully.',
+          );
+        },
+      });
   }
 
   rejectCourseRegistration(recordId: string): void {
-    this.state.update((currentState) => ({
-      ...currentState,
-      courseRegistrations: currentState.courseRegistrations.map((record) =>
-        record.id === recordId ? { ...record, status: 'rejected' } : record,
-      ),
-    }));
+    const matchedRecord = this.getCourseRegistrationById(recordId);
+
+    if (matchedRecord === null || matchedRecord.status === 'rejected') {
+      return;
+    }
+
+    this.notificationService.warn(
+      'Course registration rejection is not available yet.',
+    );
+  }
+
+  loadCourseRegistrationDetail(recordId: string): void {
+    const matchedRecord = this.getCourseRegistrationById(recordId);
+
+    if (
+      matchedRecord === null ||
+      matchedRecord.detailsLoaded ||
+      matchedRecord.studentId === null ||
+      matchedRecord.departmentId === null ||
+      matchedRecord.levelId === null ||
+      matchedRecord.semesterId === null ||
+      this.loadingCourseRegistrationIds().includes(recordId)
+    ) {
+      return;
+    }
+
+    this.loadingCourseRegistrationIds.update((ids) => [...ids, recordId]);
+    this.hodCourseRegistrationReviewService
+      .getCourseRegistrationDetail({
+        student_id: matchedRecord.studentId,
+        department_id: matchedRecord.departmentId,
+        level_id: matchedRecord.levelId,
+        semester_id: matchedRecord.semesterId,
+      })
+      .pipe(
+        finalize(() => {
+          this.loadingCourseRegistrationIds.update((ids) =>
+            ids.filter((id) => id !== recordId),
+          );
+        }),
+      )
+      .subscribe({
+        next: (detailRecord) => {
+          if (detailRecord === null) {
+            return;
+          }
+
+          this.state.update((currentState) => ({
+            ...currentState,
+            courseRegistrations: currentState.courseRegistrations.map(
+              (record) =>
+                record.id === recordId
+                  ? {
+                      ...record,
+                      ...detailRecord,
+                      detailsLoaded: detailRecord.detailsLoaded ?? true,
+                    }
+                  : record,
+            ),
+          }));
+        },
+      });
   }
 
   verifyDocuments(recordId: string): void {
@@ -639,6 +747,40 @@ export class HodStateService {
       });
   }
 
+  private loadCourseRegistrations(): void {
+    this.isCourseRegistrationsLoading.set(true);
+    this.busyIndicatorService.show();
+
+    const departmentId = this.profile().departmentId;
+    const departmentQueryValue =
+      departmentId === null ? undefined : String(departmentId);
+
+    this.hodCourseRegistrationReviewService
+      .getCourseRegistrations({
+        department: departmentQueryValue,
+      })
+      .pipe(
+        finalize(() => {
+          this.isCourseRegistrationsLoading.set(false);
+          this.busyIndicatorService.hide();
+        }),
+      )
+      .subscribe({
+        next: (courseRegistrations) => {
+          this.state.update((currentState) => ({
+            ...currentState,
+            courseRegistrations,
+          }));
+        },
+        error: () => {
+          this.state.update((currentState) => ({
+            ...currentState,
+            courseRegistrations: [],
+          }));
+        },
+      });
+  }
+
   private loadLecturers(): void {
     this.isLecturersLoading.set(true);
     this.busyIndicatorService.show();
@@ -676,9 +818,11 @@ export class HodStateService {
           ...profilePatch,
         }));
         this.loadResultReviews();
+        this.loadCourseRegistrations();
       },
       error: () => {
         this.loadResultReviews();
+        this.loadCourseRegistrations();
       },
     });
   }
