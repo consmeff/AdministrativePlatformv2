@@ -1,6 +1,7 @@
 export interface HodProfile {
   fullName: string;
   roleLabel: string;
+  departmentId: number | null;
   departmentLabel: string;
   facultyLabel: string;
   emailAddress: string;

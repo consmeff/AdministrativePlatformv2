@@ -2,6 +2,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { finalize, forkJoin, map, Observable, of, tap } from 'rxjs';
 import { BusyIndicatorService } from '../../services/busy-indicator.service';
 import { NotificationService } from '../../services/notification.service';
+import { AuthService } from '../../services/auth.service';
 import {
   HOD_COURSE_CATALOGUE_COURSES,
   HOD_COURSE_LEVEL_CONFIGURATIONS,
@@ -59,6 +60,7 @@ export class HodStateService {
   private readonly hodResultReviewService = inject(HodResultReviewService);
   private readonly busyIndicatorService = inject(BusyIndicatorService);
   private readonly notificationService = inject(NotificationService);
+  private readonly authService = inject(AuthService);
   private readonly state = signal<HodState>({
     courseRegistrations: HOD_COURSE_REGISTRATION_RECORDS,
     documentVerifications: [],
@@ -79,8 +81,8 @@ export class HodStateService {
 
   constructor() {
     this.loadDocumentVerifications();
-    this.loadResultReviews();
     this.loadLecturers();
+    this.loadCurrentUserProfile();
   }
 
   readonly profile = signal<HodProfile>(HOD_PROFILE);
@@ -607,9 +609,13 @@ export class HodStateService {
     this.isResultReviewsLoading.set(true);
     this.busyIndicatorService.show();
 
+    const departmentId = this.profile().departmentId;
+    const departmentQueryValue =
+      departmentId === null ? undefined : String(departmentId);
+
     this.hodResultReviewService
       .getCourseResults({
-        department: this.profile().departmentLabel,
+        department: departmentQueryValue,
       })
       .pipe(
         finalize(() => {
@@ -659,6 +665,140 @@ export class HodStateService {
           }));
         },
       });
+  }
+
+  private loadCurrentUserProfile(): void {
+    this.authService.getCurrentUserProfile().subscribe({
+      next: (response) => {
+        const profilePatch = this.mapCurrentUserProfile(response);
+        this.profile.update((profile) => ({
+          ...profile,
+          ...profilePatch,
+        }));
+        this.loadResultReviews();
+      },
+      error: () => {
+        this.loadResultReviews();
+      },
+    });
+  }
+
+  private mapCurrentUserProfile(response: unknown): Partial<HodProfile> {
+    const responseRecord = this.asRecord(response);
+    const dataRecord =
+      this.asRecord(responseRecord?.['data']) ?? responseRecord;
+    const userRecord = this.asRecord(dataRecord?.['user']) ?? dataRecord;
+    const departmentRecord =
+      this.asRecord(userRecord?.['department']) ??
+      this.asRecord(dataRecord?.['department']);
+    const facultyRecord =
+      this.asRecord(userRecord?.['faculty']) ??
+      this.asRecord(dataRecord?.['faculty']) ??
+      this.asRecord(userRecord?.['school']) ??
+      this.asRecord(dataRecord?.['school']);
+    const roleRecord =
+      this.asRecord(userRecord?.['role']) ??
+      this.asRecord(dataRecord?.['role']);
+
+    const departmentId =
+      this.readNumber(departmentRecord, 'id') ??
+      this.readNumber(userRecord, 'department_id') ??
+      this.readNumber(dataRecord, 'department_id') ??
+      null;
+
+    return {
+      fullName:
+        this.readString(userRecord, 'name') ??
+        this.readString(dataRecord, 'name') ??
+        this.readString(userRecord, 'full_name') ??
+        this.readString(dataRecord, 'full_name') ??
+        this.buildFullName(userRecord) ??
+        this.buildFullName(dataRecord) ??
+        undefined,
+      roleLabel:
+        this.readString(roleRecord, 'name') ??
+        this.readString(userRecord, 'user_type') ??
+        this.readString(dataRecord, 'user_type') ??
+        this.readString(userRecord, 'role') ??
+        this.readString(dataRecord, 'role') ??
+        undefined,
+      departmentId,
+      departmentLabel:
+        this.readString(userRecord, 'department') ??
+        this.readString(dataRecord, 'department') ??
+        this.readString(departmentRecord, 'name') ??
+        this.readString(userRecord, 'department_name') ??
+        this.readString(dataRecord, 'department_name') ??
+        undefined,
+      facultyLabel:
+        this.readString(facultyRecord, 'name') ??
+        this.readString(userRecord, 'faculty_name') ??
+        this.readString(dataRecord, 'faculty_name') ??
+        this.readString(userRecord, 'school_name') ??
+        this.readString(dataRecord, 'school_name') ??
+        undefined,
+      emailAddress:
+        this.readString(userRecord, 'email') ??
+        this.readString(dataRecord, 'email') ??
+        undefined,
+      officeLocation:
+        this.readString(userRecord, 'office_location') ??
+        this.readString(dataRecord, 'office_location') ??
+        this.readString(userRecord, 'office') ??
+        this.readString(dataRecord, 'office') ??
+        undefined,
+    };
+  }
+
+  private buildFullName(record: Record<string, unknown> | null): string | null {
+    if (record === null) {
+      return null;
+    }
+
+    const nameParts = [
+      this.readString(record, 'first_name'),
+      this.readString(record, 'last_name'),
+      this.readString(record, 'other_names'),
+    ].filter((value): value is string => value !== null);
+
+    return nameParts.length > 0 ? nameParts.join(' ') : null;
+  }
+
+  private asRecord(value: unknown): Record<string, unknown> | null {
+    return value !== null && typeof value === 'object'
+      ? (value as Record<string, unknown>)
+      : null;
+  }
+
+  private readString(
+    record: Record<string, unknown> | null,
+    key: string,
+  ): string | null {
+    if (record === null) {
+      return null;
+    }
+
+    const value = record[key];
+    return typeof value === 'string' && value.trim().length > 0 ? value : null;
+  }
+
+  private readNumber(
+    record: Record<string, unknown> | null,
+    key: string,
+  ): number | null {
+    if (record === null) {
+      return null;
+    }
+
+    const value = record[key];
+    const numericValue =
+      typeof value === 'number'
+        ? value
+        : typeof value === 'string'
+          ? Number(value)
+          : NaN;
+
+    return Number.isFinite(numericValue) ? numericValue : null;
   }
 
   private buildComplianceDirective(

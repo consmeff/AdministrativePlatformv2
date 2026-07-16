@@ -64,7 +64,10 @@ export class HodResultReviewService {
   ): HodResultStudentRow[] {
     const responseData = this.extractResponseData(response);
     const dataCandidate = responseData ?? response;
-    const listCandidate = this.extractArrayCandidate(dataCandidate);
+    const listCandidate =
+      this.extractArrayCandidate(dataCandidate) ??
+      this.extractArrayCandidate(responseData) ??
+      this.extractArrayCandidate(response);
 
     if (!listCandidate) {
       return [];
@@ -213,8 +216,10 @@ export class HodResultReviewService {
     const matricNo =
       this.readString(record, 'matric_no') ??
       this.readString(record, 'matricNo') ??
+      this.readString(record, 'matriculation_number') ??
       this.readString(studentRecord, 'matric_no') ??
       this.readString(studentRecord, 'matriculation_no') ??
+      this.readString(studentRecord, 'matriculation_number') ??
       '-';
 
     const continuousAssessmentScore =
@@ -289,6 +294,7 @@ export class HodResultReviewService {
       'courses',
       'course_results',
       'studentRows',
+      'students',
     ];
 
     for (const key of possibleKeys) {

@@ -665,6 +665,7 @@ function buildDocumentVerificationRecord(
 export const HOD_PROFILE: HodProfile = {
   fullName: 'Dr. Amira Gbadegesin',
   roleLabel: 'Head of Department',
+  departmentId: null,
   departmentLabel: 'Nursing Science',
   facultyLabel: 'School of Nursing',
   emailAddress: 'amira.gbadegesin@consmmef.edu.ng',
