@@ -53,6 +53,7 @@ interface HodState {
   providedIn: 'root',
 })
 export class HodStateService {
+  private readonly pendingProfileCallbacks: (() => void)[] = [];
   private readonly hodDocumentVerificationService = inject(
     HodDocumentVerificationService,
   );
@@ -79,17 +80,13 @@ export class HodStateService {
   });
   readonly isCourseRegistrationsLoading = signal(false);
   readonly isDocumentVerificationsLoading = signal(false);
+  readonly isProfileLoading = signal(false);
   readonly isResultReviewsLoading = signal(false);
   readonly isLecturersLoading = signal(false);
+  readonly hasLoadedProfile = signal(false);
   readonly loadingCourseRegistrationIds = signal<string[]>([]);
   readonly approvingCourseRegistrationIds = signal<string[]>([]);
   readonly loadingResultReviewIds = signal<string[]>([]);
-
-  constructor() {
-    this.loadDocumentVerifications();
-    this.loadLecturers();
-    this.loadCurrentUserProfile();
-  }
 
   readonly profile = signal<HodProfile>(HOD_PROFILE);
   readonly courseRegistrations = computed(
@@ -685,7 +682,24 @@ export class HodStateService {
     }).format(new Date());
   }
 
-  private loadDocumentVerifications(): void {
+  ensureProfileLoaded(callback?: () => void): void {
+    if (this.hasLoadedProfile()) {
+      callback?.();
+      return;
+    }
+
+    if (callback) {
+      this.pendingProfileCallbacks.push(callback);
+    }
+
+    if (this.isProfileLoading()) {
+      return;
+    }
+
+    this.loadCurrentUserProfile();
+  }
+
+  loadDocumentVerifications(): void {
     this.isDocumentVerificationsLoading.set(true);
     this.busyIndicatorService.show();
 
@@ -713,7 +727,47 @@ export class HodStateService {
       });
   }
 
-  private loadResultReviews(): void {
+  loadResultReviews(): void {
+    this.ensureProfileLoaded(() => {
+      this.fetchResultReviews();
+    });
+  }
+
+  loadCourseRegistrations(): void {
+    this.ensureProfileLoaded(() => {
+      this.fetchCourseRegistrations();
+    });
+  }
+
+  loadLecturers(): void {
+    this.isLecturersLoading.set(true);
+    this.busyIndicatorService.show();
+
+    this.hodLecturersService
+      .getLecturers()
+      .pipe(
+        finalize(() => {
+          this.isLecturersLoading.set(false);
+          this.busyIndicatorService.hide();
+        }),
+      )
+      .subscribe({
+        next: (lecturers) => {
+          this.state.update((currentState) => ({
+            ...currentState,
+            lecturers,
+          }));
+        },
+        error: () => {
+          this.state.update((currentState) => ({
+            ...currentState,
+            lecturers: [],
+          }));
+        },
+      });
+  }
+
+  private fetchResultReviews(): void {
     this.isResultReviewsLoading.set(true);
     this.busyIndicatorService.show();
 
@@ -747,7 +801,7 @@ export class HodStateService {
       });
   }
 
-  private loadCourseRegistrations(): void {
+  private fetchCourseRegistrations(): void {
     this.isCourseRegistrationsLoading.set(true);
     this.busyIndicatorService.show();
 
@@ -781,35 +835,8 @@ export class HodStateService {
       });
   }
 
-  private loadLecturers(): void {
-    this.isLecturersLoading.set(true);
-    this.busyIndicatorService.show();
-
-    this.hodLecturersService
-      .getLecturers()
-      .pipe(
-        finalize(() => {
-          this.isLecturersLoading.set(false);
-          this.busyIndicatorService.hide();
-        }),
-      )
-      .subscribe({
-        next: (lecturers) => {
-          this.state.update((currentState) => ({
-            ...currentState,
-            lecturers,
-          }));
-        },
-        error: () => {
-          this.state.update((currentState) => ({
-            ...currentState,
-            lecturers: [],
-          }));
-        },
-      });
-  }
-
   private loadCurrentUserProfile(): void {
+    this.isProfileLoading.set(true);
     this.authService.getCurrentUserProfile().subscribe({
       next: (response) => {
         const profilePatch = this.mapCurrentUserProfile(response);
@@ -817,14 +844,21 @@ export class HodStateService {
           ...profile,
           ...profilePatch,
         }));
-        this.loadResultReviews();
-        this.loadCourseRegistrations();
+        this.hasLoadedProfile.set(true);
+        this.isProfileLoading.set(false);
+        this.flushPendingProfileCallbacks();
       },
       error: () => {
-        this.loadResultReviews();
-        this.loadCourseRegistrations();
+        this.isProfileLoading.set(false);
+        this.flushPendingProfileCallbacks();
       },
     });
+  }
+
+  private flushPendingProfileCallbacks(): void {
+    const callbacks = [...this.pendingProfileCallbacks];
+    this.pendingProfileCallbacks.length = 0;
+    callbacks.forEach((callback) => callback());
   }
 
   private mapCurrentUserProfile(response: unknown): Partial<HodProfile> {

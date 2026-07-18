@@ -12,5 +12,9 @@ import { HodStateService } from '../hod-state.service';
 export class HodProfileComponent {
   private readonly hodStateService = inject(HodStateService);
 
+  constructor() {
+    this.hodStateService.ensureProfileLoaded();
+  }
+
   readonly profile = this.hodStateService.profile;
 }

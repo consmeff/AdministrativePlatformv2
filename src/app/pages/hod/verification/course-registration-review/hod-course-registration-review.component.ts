@@ -37,6 +37,11 @@ type CourseRegistrationTab = 'pending' | 'rejected';
 export class HodCourseRegistrationReviewComponent {
   private readonly hodStateService = inject(HodStateService);
 
+  constructor() {
+    this.hodStateService.ensureProfileLoaded();
+    this.hodStateService.loadCourseRegistrations();
+  }
+
   readonly programmeOptions = HOD_PROGRAMME_FILTER_OPTIONS;
   readonly activeTab = signal<CourseRegistrationTab>('pending');
   readonly searchTerm = signal('');

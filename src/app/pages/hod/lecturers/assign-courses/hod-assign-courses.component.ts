@@ -40,6 +40,11 @@ interface PendingAssignmentChange {
 export class HodAssignCoursesComponent {
   private readonly hodStateService = inject(HodStateService);
 
+  constructor() {
+    this.hodStateService.ensureProfileLoaded();
+    this.hodStateService.loadLecturers();
+  }
+
   readonly levelOptions = HOD_LEVEL_FILTER_OPTIONS;
   readonly selectedLevel = signal<HodLevelFilterOption>(this.levelOptions[0]);
   readonly lecturerSearchTerm = signal('');

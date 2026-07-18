@@ -12,6 +12,12 @@ import { HodStateService } from '../hod-state.service';
 export class HodOverviewComponent {
   private readonly hodStateService = inject(HodStateService);
 
+  constructor() {
+    this.hodStateService.ensureProfileLoaded();
+    this.hodStateService.loadCourseRegistrations();
+    this.hodStateService.loadDocumentVerifications();
+  }
+
   readonly overviewMetrics = computed(() => [
     {
       label: 'Registrations awaiting review',
