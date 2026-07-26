@@ -27,6 +27,11 @@ type ResultReviewTab = 'pending' | 'approved';
 export class HodResultReviewComponent {
   private readonly hodStateService = inject(HodStateService);
 
+  constructor() {
+    this.hodStateService.ensureProfileLoaded();
+    this.hodStateService.loadResultReviews();
+  }
+
   readonly programmeOptions = HOD_PROGRAMME_FILTER_OPTIONS;
   readonly activeTab = signal<ResultReviewTab>('pending');
   readonly searchTerm = signal('');
@@ -96,6 +101,9 @@ export class HodResultReviewComponent {
   }
 
   toggleExpandedRecord(recordId: string): void {
+    if (!this.isRecordExpanded(recordId)) {
+      this.hodStateService.loadResultReviewStudentRows(recordId);
+    }
     this.expandedRecordIds.update((currentRecordIds) =>
       currentRecordIds.includes(recordId)
         ? currentRecordIds.filter(

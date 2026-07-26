@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { map, Observable } from 'rxjs';
@@ -13,6 +13,7 @@ import {
   LecturerAssignedCoursesPayload,
   StaffAssignedCourseApiItem,
   StaffAssignedCoursesApiResponse,
+  StaffAssignedCoursesQuery,
 } from './lecturer-course-assignment.types';
 import { LecturerCourse } from './lecturer.types';
 
@@ -23,11 +24,14 @@ export class LecturerCourseAssignmentService {
   private readonly apiRoot = environment.apiURL;
   private readonly http = inject(HttpClient);
 
-  getAssignedCourses(): Observable<LecturerAssignedCoursesPayload> {
+  getAssignedCourses(
+    query?: StaffAssignedCoursesQuery,
+  ): Observable<LecturerAssignedCoursesPayload> {
     const url = `${this.apiRoot}/api/v1/staffs/courses-assigned`;
+    const params = this.buildAssignedCoursesQueryParams(query);
 
     return this.http
-      .get<StaffAssignedCoursesApiResponse>(url)
+      .get<StaffAssignedCoursesApiResponse>(url, { params })
       .pipe(map((response) => this.mapAssignedCoursesResponse(response)));
   }
 
@@ -99,6 +103,24 @@ export class LecturerCourseAssignmentService {
     const parsedUnits = Number(rawUnits);
 
     return Number.isFinite(parsedUnits) ? parsedUnits : 0;
+  }
+
+  private buildAssignedCoursesQueryParams(
+    query?: StaffAssignedCoursesQuery,
+  ): HttpParams {
+    let params = new HttpParams();
+
+    if (query?.course_id) {
+      params = params.set('course_id', query.course_id);
+    }
+    if (query?.department_id) {
+      params = params.set('department_id', query.department_id);
+    }
+    if (query?.lecturer_id) {
+      params = params.set('lecturer_id', query.lecturer_id);
+    }
+
+    return params;
   }
 
   private resolveSessionLabel(createdAt: string): string {

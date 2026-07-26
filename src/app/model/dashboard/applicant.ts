@@ -39,6 +39,7 @@ export interface Application {
   primary_parent_or_guardian?: PrimaryParentOrGuardian;
   secondary_parent_or_guardian?: PrimaryParentOrGuardian | null;
   approval_status: string;
+  checked?: boolean;
   payment_record?: Record<string, unknown> | null;
   program?: Program;
   session?: Session;

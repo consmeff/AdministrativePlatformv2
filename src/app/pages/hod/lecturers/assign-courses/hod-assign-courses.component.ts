@@ -40,10 +40,16 @@ interface PendingAssignmentChange {
 export class HodAssignCoursesComponent {
   private readonly hodStateService = inject(HodStateService);
 
+  constructor() {
+    this.hodStateService.ensureProfileLoaded();
+    this.hodStateService.loadLecturers();
+  }
+
   readonly levelOptions = HOD_LEVEL_FILTER_OPTIONS;
   readonly selectedLevel = signal<HodLevelFilterOption>(this.levelOptions[0]);
   readonly lecturerSearchTerm = signal('');
   readonly historyVisible = signal(false);
+  readonly isSavingChanges = signal(false);
   readonly pendingChanges = signal<PendingAssignmentChange[]>([]);
   readonly selectedCourseId = signal<string | null>(
     this.getFirstCourseIdByLevel(this.levelOptions[0].value),
@@ -148,12 +154,22 @@ export class HodAssignCoursesComponent {
   saveChanges(): void {
     const pendingChanges = this.pendingChanges();
 
-    if (pendingChanges.length === 0) {
+    if (pendingChanges.length === 0 || this.isSavingChanges()) {
       return;
     }
 
-    this.hodStateService.appendLecturerAssignmentHistory(pendingChanges);
-    this.pendingChanges.set([]);
+    this.isSavingChanges.set(true);
+    this.hodStateService
+      .saveLecturerCourseAssignments(pendingChanges)
+      .subscribe({
+        next: () => {
+          this.pendingChanges.set([]);
+          this.isSavingChanges.set(false);
+        },
+        error: () => {
+          this.isSavingChanges.set(false);
+        },
+      });
   }
 
   openHistory(): void {

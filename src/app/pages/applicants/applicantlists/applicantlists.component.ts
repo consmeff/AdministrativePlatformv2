@@ -72,6 +72,7 @@ interface ApplicationListRow {
   status_tone: StatusTone;
   status_description: string;
   status_key: string;
+  disable_checked: boolean;
   disable_compliance: boolean;
   disable_shortlist: boolean;
 }
@@ -313,6 +314,7 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
         status_tone: status.tone,
         status_description: status.description,
         status_key: status.key,
+        disable_checked: item.checked === true,
         disable_compliance: shouldDisableComplianceAction(status.key),
         disable_shortlist: shouldDisableShortlistAction(status.key),
       };
@@ -497,6 +499,32 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
 
   isComplianceActionDisabled(row: ApplicationListRow): boolean {
     return row.status_tone === 'directive' || row.status_tone === 'rejected';
+  }
+
+  markSingleAsChecked(row: ApplicationListRow): void {
+    if (row.disable_checked) {
+      return;
+    }
+
+    this.performApplicantAction(
+      this.applicationService.markApplicantsAsChecked({
+        applicant_ids: [row.id],
+      }),
+      'Application marked as checked successfully.',
+    );
+  }
+
+  markSelectedAsChecked(): void {
+    if (this.selectedApplicantIds.length === 0) {
+      return;
+    }
+
+    this.performApplicantAction(
+      this.applicationService.markApplicantsAsChecked({
+        applicant_ids: this.selectedApplicantIds,
+      }),
+      'Applications marked as checked successfully.',
+    );
   }
 
   closeApplicantDrawer() {

@@ -181,6 +181,17 @@
           <app-button
             [fullWidth]="true"
             variant="muted"
+            iconClass="bi bi-check2-square"
+            [disabled]="isMarkingAsChecked || !application.id || isChecked()"
+            (buttonClick)="markApplicantAsChecked()"
+          >
+            {{
+              isMarkingAsChecked ? "Marking as Checked..." : "Mark as Checked"
+            }}
+          </app-button>
+          <app-button
+            [fullWidth]="true"
+            variant="muted"
             iconClass="bi bi-check"
             [disabled]="
               isShortlisting || !application.id || isComplianceBaseState()
@@ -420,6 +431,14 @@
         </app-button>
         <app-button
           class="mx-5"
+          variant="muted"
+          iconClass="bi bi-check2-square"
+          [disabled]="isMarkingAsChecked || !application.id || isChecked()"
+          (buttonClick)="markApplicantAsChecked()"
+        >
+          {{ isMarkingAsChecked ? "Marking as Checked..." : "Mark as Checked" }}
+        </app-button>
+        <app-button
           variant="muted"
           iconClass="bi bi-check"
           [disabled]="

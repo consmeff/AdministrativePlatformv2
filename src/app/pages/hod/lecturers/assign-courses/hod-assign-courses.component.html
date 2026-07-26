@@ -36,10 +36,10 @@
 
       <app-button
         variant="primary"
-        [disabled]="!hasUnsavedChanges()"
+        [disabled]="!hasUnsavedChanges() || isSavingChanges()"
         (buttonClick)="saveChanges()"
       >
-        Save Changes
+        {{ isSavingChanges() ? "Saving..." : "Save Changes" }}
       </app-button>
     </div>
   </section>

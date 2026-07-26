@@ -1,4 +1,4 @@
-@if (record; as activeRecord) {
+@if (record(); as activeRecord) {
   <section class="drawer-shell">
     <header class="drawer-hero">
       <div class="hero-left">
@@ -14,7 +14,7 @@
         </div>
       </div>
 
-      <button type="button" class="drawer-close-btn" (click)="closed.emit()">
+      <button type="button" class="drawer-close-btn" (click)="close()">
         <i class="bi bi-x-lg"></i>
       </button>
     </header>
@@ -36,15 +36,25 @@
       </div>
 
       <div class="registered-course-list">
-        @for (
-          course of activeRecord.registeredCourses;
-          track course.code + course.title
-        ) {
+        @if (isLoading()) {
           <div class="registered-course-row">
-            <span class="course-code">{{ course.code }}</span>
-            <span class="course-title">{{ course.title }}</span>
-            <span class="course-units">{{ course.units }} Units</span>
+            <span class="course-title">Loading registered courses...</span>
           </div>
+        } @else if (activeRecord.registeredCourses.length === 0) {
+          <div class="registered-course-row">
+            <span class="course-title">No registered courses found.</span>
+          </div>
+        } @else {
+          @for (
+            course of activeRecord.registeredCourses;
+            track course.code + course.title
+          ) {
+            <div class="registered-course-row">
+              <span class="course-code">{{ course.code }}</span>
+              <span class="course-title">{{ course.title }}</span>
+              <span class="course-units">{{ course.units }} Units</span>
+            </div>
+          }
         }
       </div>
     </div>
@@ -65,7 +75,7 @@
         [disabled]="!canApprove"
         (buttonClick)="approve()"
       >
-        Approve
+        {{ isApproving() ? "Approving..." : "Approve" }}
       </app-button>
     </footer>
   </section>

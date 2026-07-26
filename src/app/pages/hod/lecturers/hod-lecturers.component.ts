@@ -23,6 +23,11 @@ import { LecturerAssignedCoursesModalComponent } from './lecturer-assigned-cours
 export class HodLecturersComponent {
   private readonly hodStateService = inject(HodStateService);
 
+  constructor() {
+    this.hodStateService.ensureProfileLoaded();
+    this.hodStateService.loadLecturers();
+  }
+
   readonly searchTerm = signal('');
   readonly activeLecturerId = signal<string | null>(null);
   readonly lecturers = this.hodStateService.lecturers;
