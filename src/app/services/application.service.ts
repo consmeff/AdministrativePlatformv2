@@ -254,6 +254,13 @@ export class ApplicationService {
     return this.http.post(url, payload);
   }
 
+  markApplicantsAsChecked(
+    payload: ApplicantActionPayload,
+  ): Observable<unknown> {
+    const url = `${this.apiRoot}/api/v1/applicants/mark-as-checked`;
+    return this.http.post(url, payload);
+  }
+
   markAsAdmittedInternally(
     payload: MarkAsAdmittedPayload,
   ): Observable<unknown> {

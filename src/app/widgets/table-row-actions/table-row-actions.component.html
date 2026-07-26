@@ -9,6 +9,18 @@
   >
     <i class="bi bi-eye"></i>
   </button>
+  @if (showCheckedAction) {
+    <button
+      class="action-btn"
+      type="button"
+      [attr.aria-label]="checkedTooltip"
+      [attr.data-tooltip]="checkedTooltip"
+      [disabled]="disableChecked"
+      (click)="checked.emit()"
+    >
+      <i [class]="checkedIconClass"></i>
+    </button>
+  }
   <button
     class="action-btn"
     type="button"
