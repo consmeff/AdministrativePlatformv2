@@ -615,6 +615,10 @@ function buildCourseRegistrationRecord(
 
   return {
     id: `hod-course-registration-${index + 1}`,
+    studentId: index + 1,
+    departmentId: null,
+    levelId: null,
+    semesterId: null,
     studentName: 'Gbadegesin Ishola Dada',
     registrationNumber: `CONSMMEFS/ENT-2025/${studentNumber}`,
     programmeType: getProgrammeTypeFromLevel(levelLabel),
@@ -625,6 +629,7 @@ function buildCourseRegistrationRecord(
     status,
     submittedAt: '24 Jan 2026 22:58 AM',
     registeredCourses: buildRegisteredCourses(courseCount),
+    detailsLoaded: true,
   };
 }
 
@@ -665,6 +670,7 @@ function buildDocumentVerificationRecord(
 export const HOD_PROFILE: HodProfile = {
   fullName: 'Dr. Amira Gbadegesin',
   roleLabel: 'Head of Department',
+  departmentId: null,
   departmentLabel: 'Nursing Science',
   facultyLabel: 'School of Nursing',
   emailAddress: 'amira.gbadegesin@consmmef.edu.ng',

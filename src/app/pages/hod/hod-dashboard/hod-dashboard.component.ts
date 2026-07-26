@@ -14,6 +14,12 @@ import { HodStateService } from '../hod-state.service';
 export class HodDashboardComponent {
   private readonly hodStateService = inject(HodStateService);
 
+  constructor() {
+    this.hodStateService.ensureProfileLoaded();
+    this.hodStateService.loadCourseRegistrations();
+    this.hodStateService.loadDocumentVerifications();
+  }
+
   readonly profile = this.hodStateService.profile;
   readonly dashboardCards = computed(() => [
     {

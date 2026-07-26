@@ -31,6 +31,12 @@ export interface StaffAssignedCoursesApiResponse {
     | null;
 }
 
+export interface StaffAssignedCoursesQuery {
+  course_id?: string;
+  department_id?: string;
+  lecturer_id?: string;
+}
+
 export interface LecturerAssignedCoursesPayload {
   courses: LecturerCourse[];
   lecturerName: string | null;

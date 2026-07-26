@@ -29,6 +29,15 @@
         </app-button>
         <app-button
           variant="primary"
+          [outline]="true"
+          iconClass="bi bi-check2-square"
+          (buttonClick)="markSelectedAsChecked()"
+          [disabled]="selectedApplicantIds.length === 0"
+        >
+          Mark as Checked
+        </app-button>
+        <app-button
+          variant="primary"
           (buttonClick)="shortlistSelected()"
           [disabled]="selectedApplicantIds.length === 0"
         >
@@ -136,9 +145,12 @@
           <td>
             <div class="action-buttons">
               <app-table-row-actions
+                [showCheckedAction]="true"
+                [disableChecked]="row.disable_checked"
                 [disableCompliance]="row.disable_compliance"
                 [disableShortlist]="row.disable_shortlist"
                 (view)="viewProfile(row)"
+                (checked)="markSingleAsChecked(row)"
                 (shortlist)="shortlistSingle(row)"
                 (compliance)="openComplianceForSingle(row)"
               />

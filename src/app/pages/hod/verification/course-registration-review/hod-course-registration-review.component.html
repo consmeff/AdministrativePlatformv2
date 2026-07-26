@@ -57,63 +57,80 @@
           </tr>
         </thead>
         <tbody>
-          @for (record of paginatedRecords(); track record.id) {
+          @if (
+            isCourseRegistrationsLoading() && filteredRecords().length === 0
+          ) {
             <tr>
-              <td class="checkbox-col">
-                <input type="checkbox" aria-label="Select row" />
-              </td>
-              <td class="student-name">{{ record.studentName }}</td>
-              <td class="registration-number">
-                {{ record.registrationNumber }}
-              </td>
-              <td>
-                <span class="level-pill">{{ record.levelLabel }}</span>
-              </td>
-              <td>{{ record.courseCount }}</td>
-              <td>{{ record.totalUnits }}</td>
-              <td>
-                <app-status-indicator
-                  [text]="getStatusText(record)"
-                  [tone]="getStatusTone(record)"
-                />
-              </td>
-              <td class="actions-col">
-                <div class="row-actions">
-                  <button
-                    type="button"
-                    class="row-action-btn"
-                    aria-label="Open details"
-                    (click)="openDrawer(record.id)"
-                  >
-                    <i class="bi bi-eye"></i>
-                  </button>
-                  <button
-                    type="button"
-                    class="row-action-btn"
-                    aria-label="Approve registration"
-                    [disabled]="isApproveDisabled(record)"
-                    (click)="approveRecord(record.id)"
-                  >
-                    <i class="bi bi-check-lg"></i>
-                  </button>
-                  <button
-                    type="button"
-                    class="row-action-btn"
-                    aria-label="Reject registration"
-                    [disabled]="isRejectDisabled(record)"
-                    (click)="rejectRecord(record.id)"
-                  >
-                    <i class="bi bi-exclamation-triangle"></i>
-                  </button>
-                </div>
+              <td colspan="8" class="text-center py-4">
+                Loading course registrations...
               </td>
             </tr>
+          } @else if (paginatedRecords().length === 0) {
+            <tr>
+              <td colspan="8" class="text-center py-4">
+                No course registrations found.
+              </td>
+            </tr>
+          } @else {
+            @for (record of paginatedRecords(); track record.id) {
+              <tr>
+                <td class="checkbox-col">
+                  <input type="checkbox" aria-label="Select row" />
+                </td>
+                <td class="student-name">{{ record.studentName }}</td>
+                <td class="registration-number">
+                  {{ record.registrationNumber }}
+                </td>
+                <td>
+                  <span class="level-pill">{{ record.levelLabel }}</span>
+                </td>
+                <td>{{ record.courseCount }}</td>
+                <td>{{ record.totalUnits }}</td>
+                <td>
+                  <app-status-indicator
+                    [text]="getStatusText(record)"
+                    [tone]="getStatusTone(record)"
+                  />
+                </td>
+                <td class="actions-col">
+                  <div class="row-actions">
+                    <button
+                      type="button"
+                      class="row-action-btn"
+                      aria-label="Open details"
+                      (click)="openDrawer(record.id)"
+                    >
+                      <i class="bi bi-eye"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="row-action-btn"
+                      aria-label="Approve registration"
+                      [disabled]="isApproveDisabled(record)"
+                      (click)="approveRecord(record.id)"
+                    >
+                      <i class="bi bi-check-lg"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="row-action-btn"
+                      aria-label="Reject registration"
+                      [disabled]="isRejectDisabled(record)"
+                      (click)="rejectRecord(record.id)"
+                    >
+                      <i class="bi bi-exclamation-triangle"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
           }
         </tbody>
       </table>
     </div>
 
     <app-pagination
+      [visible]="filteredRecords().length > 0"
       [first]="first()"
       [rows]="rows()"
       [totalRecords]="filteredRecords().length"
@@ -136,6 +153,8 @@
 >
   <app-course-registration-review-drawer
     [record]="activeDrawerRecord()"
+    [isLoading]="isActiveDrawerLoading()"
+    [isApproving]="isActiveRecordApproving()"
     (closed)="closeDrawer()"
     (approved)="approveRecord($event)"
     (rejected)="rejectRecord($event)"

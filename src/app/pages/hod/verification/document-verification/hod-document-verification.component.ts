@@ -38,6 +38,11 @@ type DocumentVerificationTab = 'pending' | 'flagged';
 export class HodDocumentVerificationComponent {
   private readonly hodStateService = inject(HodStateService);
 
+  constructor() {
+    this.hodStateService.ensureProfileLoaded();
+    this.hodStateService.loadDocumentVerifications();
+  }
+
   readonly programmeOptions = HOD_PROGRAMME_FILTER_OPTIONS;
   readonly flagReasonOptions = [...HOD_FLAG_REASON_OPTIONS];
   readonly fallbackFlagDocumentOptions = [...HOD_FLAG_DOCUMENT_OPTIONS];

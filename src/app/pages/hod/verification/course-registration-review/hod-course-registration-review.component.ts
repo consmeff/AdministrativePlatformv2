@@ -37,6 +37,11 @@ type CourseRegistrationTab = 'pending' | 'rejected';
 export class HodCourseRegistrationReviewComponent {
   private readonly hodStateService = inject(HodStateService);
 
+  constructor() {
+    this.hodStateService.ensureProfileLoaded();
+    this.hodStateService.loadCourseRegistrations();
+  }
+
   readonly programmeOptions = HOD_PROGRAMME_FILTER_OPTIONS;
   readonly activeTab = signal<CourseRegistrationTab>('pending');
   readonly searchTerm = signal('');
@@ -46,6 +51,8 @@ export class HodCourseRegistrationReviewComponent {
   readonly first = signal(0);
   readonly rows = signal(10);
   readonly activeDrawerRecordId = signal<string | null>(null);
+  readonly isCourseRegistrationsLoading =
+    this.hodStateService.isCourseRegistrationsLoading;
   readonly pendingReviewCount =
     this.hodStateService.pendingCourseRegistrationCount;
   readonly rejectedRegistrationCount =
@@ -100,6 +107,22 @@ export class HodCourseRegistrationReviewComponent {
 
     return this.hodStateService.getCourseRegistrationById(recordId);
   });
+  readonly isActiveDrawerLoading = computed(() => {
+    const recordId = this.activeDrawerRecordId();
+
+    return (
+      recordId !== null &&
+      this.hodStateService.loadingCourseRegistrationIds().includes(recordId)
+    );
+  });
+  readonly isActiveRecordApproving = computed(() => {
+    const recordId = this.activeDrawerRecordId();
+
+    return (
+      recordId !== null &&
+      this.hodStateService.approvingCourseRegistrationIds().includes(recordId)
+    );
+  });
 
   setActiveTab(tab: CourseRegistrationTab): void {
     this.activeTab.set(tab);
@@ -123,6 +146,7 @@ export class HodCourseRegistrationReviewComponent {
 
   openDrawer(recordId: string): void {
     this.activeDrawerRecordId.set(recordId);
+    this.hodStateService.loadCourseRegistrationDetail(recordId);
   }
 
   closeDrawer(): void {
@@ -131,12 +155,10 @@ export class HodCourseRegistrationReviewComponent {
 
   approveRecord(recordId: string): void {
     this.hodStateService.approveCourseRegistration(recordId);
-    this.closeDrawer();
   }
 
   rejectRecord(recordId: string): void {
     this.hodStateService.rejectCourseRegistration(recordId);
-    this.closeDrawer();
   }
 
   getStatusText(record: HodCourseRegistrationRecord): string {
@@ -172,10 +194,18 @@ export class HodCourseRegistrationReviewComponent {
   }
 
   isApproveDisabled(record: HodCourseRegistrationRecord): boolean {
-    return record.status === 'approved' || record.status === 'rejected';
+    return (
+      record.status === 'approved' ||
+      record.status === 'rejected' ||
+      this.hodStateService.approvingCourseRegistrationIds().includes(record.id)
+    );
   }
 
   isRejectDisabled(record: HodCourseRegistrationRecord): boolean {
-    return record.status === 'rejected';
+    return (
+      record.status === 'rejected' ||
+      record.status === 'approved' ||
+      this.hodStateService.approvingCourseRegistrationIds().includes(record.id)
+    );
   }
 }

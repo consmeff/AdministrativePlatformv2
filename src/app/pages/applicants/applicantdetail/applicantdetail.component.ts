@@ -74,6 +74,7 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
 
   app_no: string | null = '';
   isIssuingCompliance = false;
+  isMarkingAsChecked = false;
   isRejecting = false;
   isShortlisting = false;
   isReasonModalVisible = false;
@@ -477,6 +478,32 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
     );
   }
 
+  markApplicantAsChecked(): void {
+    if (
+      !this.application?.id ||
+      this.isMarkingAsChecked ||
+      this.application.checked === true
+    ) {
+      return;
+    }
+
+    this.performApplicantAction(
+      this._applicationservice.markApplicantsAsChecked({
+        applicant_ids: [this.application.id],
+      }),
+      'Application marked as checked successfully.',
+      () => {
+        this.loadApplication();
+      },
+      () => {
+        this.isMarkingAsChecked = true;
+      },
+      () => {
+        this.isMarkingAsChecked = false;
+      },
+    );
+  }
+
   rejectApplicant() {
     if (!this.application?.id || this.isRejecting || this.isRejected()) {
       return;
@@ -762,6 +789,10 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
   isRejected(): boolean {
     const statusKey = this.getResolvedStatus().key;
     return statusKey === 'rejected' || statusKey === 'auto_rejected';
+  }
+
+  isChecked(): boolean {
+    return this.application.checked === true;
   }
 
   getDisplayStatus(): string {
