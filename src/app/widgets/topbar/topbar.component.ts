@@ -27,10 +27,6 @@ export class TopbarComponent implements OnDestroy {
   private readonly subscriptions = new Subscription();
 
   constructor() {
-    if (this.portalContextService.isHodContext()) {
-      this.hodStateService.ensureProfileLoaded();
-    }
-
     this.subscriptions.add(
       this.dashInfoService.dashInfo$.subscribe((val) => {
         if (val) {

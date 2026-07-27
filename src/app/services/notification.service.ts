@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { BusyIndicatorService } from './busy-indicator.service';
+import { SessionStateService } from './session-state.service';
 
 type NotificationSeverity = 'success' | 'info' | 'warn' | 'error';
 
@@ -10,6 +11,11 @@ type NotificationSeverity = 'success' | 'info' | 'warn' | 'error';
 export class NotificationService {
   private readonly messageService = inject(MessageService);
   private readonly busyService = inject(BusyIndicatorService);
+  private readonly sessionStateService = inject(SessionStateService);
+
+  constructor() {
+    this.sessionStateService.registerResetHandler(() => this.reset());
+  }
 
   success(detail: string, summary = 'Success'): void {
     this.show('success', summary, detail);
@@ -33,6 +39,11 @@ export class NotificationService {
     detail: string,
   ): void {
     this.messageService.add({ severity, summary, detail });
+    this.busyService.hide();
+  }
+
+  reset(): void {
+    this.messageService.clear();
     this.busyService.hide();
   }
 }

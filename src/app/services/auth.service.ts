@@ -6,6 +6,7 @@ import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
 import { ProfilePayload, ProfileSuccessResponse } from '../model/auth.dto';
 import { DashboardinformationService } from './dashboardinformation.service';
 import { DashboardInfo } from '../model/dashboard/information.dto';
+import { SessionStateService } from './session-state.service';
 
 interface LoginResponse {
   access_token: string;
@@ -44,6 +45,7 @@ export class AuthService {
   private readonly loginRoute = '/auth/login';
   private loggedUser: string | null | undefined;
   private readonly dashInfoService = inject(DashboardinformationService);
+  private readonly sessionStateService = inject(SessionStateService);
   private dashboardInfo: DashboardInfo = {} as DashboardInfo;
 
   constructor() {
@@ -176,12 +178,8 @@ export class AuthService {
   }
 
   private clearSessionData(): void {
-    sessionStorage.removeItem(this.jwtTokenStorageKey);
-    sessionStorage.removeItem(this.refreshTokenStorageKey);
-    sessionStorage.removeItem(this.userTypeStorageKey);
-    sessionStorage.removeItem(this.applicationNumberStorageKey);
-    sessionStorage.removeItem(this.matricNumberStorageKey);
-    sessionStorage.removeItem(this.profileEmailStorageKey);
+    sessionStorage.clear();
+    this.sessionStateService.resetAll();
     this.loggedUser = null;
   }
 

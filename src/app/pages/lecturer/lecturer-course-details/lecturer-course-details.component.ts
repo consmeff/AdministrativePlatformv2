@@ -39,6 +39,11 @@ export class LecturerCourseDetailsComponent implements OnInit, OnDestroy {
   readonly editedExamScore = signal<number | null>(null);
   readonly isSavingStudent = signal(false);
 
+  constructor() {
+    this.lecturerStateService.ensureProfileLoaded();
+    this.lecturerStateService.loadAssignedCourses();
+  }
+
   readonly editedTotalScore = computed(() => {
     const continuousAssessmentScore =
       this.editedContinuousAssessmentScore() ?? 0;

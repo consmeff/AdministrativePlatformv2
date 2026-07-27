@@ -30,6 +30,11 @@ export class LecturerCourseUploadComponent implements OnDestroy {
   private readonly portalContextService = inject(PortalContextService);
   private uploadSubscription: Subscription | null = null;
 
+  constructor() {
+    this.lecturerStateService.ensureProfileLoaded();
+    this.lecturerStateService.loadAssignedCourses();
+  }
+
   readonly hasLoaded = this.lecturerStateService.hasLoaded;
   readonly courseId = computed(() =>
     this.route.snapshot.paramMap.get('courseId'),
