@@ -98,6 +98,21 @@
   font-size: 13px;
 }
 
+.checked-state {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.checked-state.is-checked {
+  color: #15803d;
+}
+
+.checked-state.is-unchecked {
+  color: #b45309;
+}
+
 .applicant-name {
   font-weight: 600;
   font-size: 12px;
