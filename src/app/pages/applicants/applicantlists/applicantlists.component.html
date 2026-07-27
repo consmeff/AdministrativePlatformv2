@@ -136,6 +136,15 @@
             <div class="cell-primary">{{ row.programme }}</div>
           </td>
           <td>
+            <span
+              class="checked-state"
+              [class.is-checked]="row.checked"
+              [class.is-unchecked]="!row.checked"
+            >
+              {{ row.checked ? "Checked" : "Unchecked" }}
+            </span>
+          </td>
+          <td>
             <app-status-indicator
               [text]="row.status_text"
               [tone]="row.status_tone"

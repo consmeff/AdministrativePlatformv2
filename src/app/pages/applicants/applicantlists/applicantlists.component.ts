@@ -68,6 +68,7 @@ interface ApplicationListRow {
   o_level: number | string;
   submission_date: string;
   programme: string;
+  checked: boolean;
   status_text: string;
   status_tone: StatusTone;
   status_description: string;
@@ -126,6 +127,7 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
     'O Level',
     'Submission Date',
     'Programme',
+    'Checked',
     'Status',
     'Actions',
   ];
@@ -310,6 +312,7 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
           item.updated_at ?? item.created_at ?? '',
         ),
         programme: this.getProgrammeName(item),
+        checked: item.checked === true,
         status_text: status.text,
         status_tone: status.tone,
         status_description: status.description,
