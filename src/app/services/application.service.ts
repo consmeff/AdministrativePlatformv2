@@ -129,6 +129,7 @@ export interface AdmissionAdminDashboardResponse {
 
 export interface ApplicationAdminDashboardResponse {
   total_applicants: number;
+  total_submitted?: number;
   total_pending: number;
   total_shortlisted: number;
   total_compliance_required: number;

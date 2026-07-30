@@ -1,0 +1,48 @@
+{
+  "nodes": [
+    {
+      "id": "src_app_pages_admissions_admissions_component_admissionspage",
+      "label": "Admissions Page",
+      "file_type": "code",
+      "source_file": "src/app/pages/admissions/admissions.component.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "src_app_pages_admissions_admissions_component_admissionspage",
+      "target": "src_app_pages_admissions_upload_flow_admissions_upload_flow_component_uploadflow",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/app/pages/admissions/admissions.component.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "src_app_pages_admissions_admissions_component_admissionspage",
+      "target": "src_app_pages_admissions_change_programme_modal_change_programme_modal_component_changeprogrammemodal",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/app/pages/admissions/admissions.component.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "src_app_pages_admissions_admissions_component_admissionspage",
+      "target": "src_app_pages_applicants_applicantdetail_applicantdetail_component_applicantdetail",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/app/pages/admissions/admissions.component.html",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

@@ -1,0 +1,28 @@
+{
+  "nodes": [
+    {
+      "id": "src_app_widgets_update_file_modal_update_file_modal_component_template",
+      "label": "UpdateFileModalComponent Template",
+      "file_type": "code",
+      "source_file": "src/app/widgets/update-file-modal/update-file-modal.component.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "src_app_widgets_update_file_modal_update_file_modal_component_template",
+      "target": "src_app_widgets_button_button_component_template",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/app/widgets/update-file-modal/update-file-modal.component.html",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

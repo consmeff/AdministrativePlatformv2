@@ -1,0 +1,38 @@
+{
+  "nodes": [
+    {
+      "id": "src_app_pages_hod_result_review_hod_result_review_component",
+      "label": "HOD Result Review Page",
+      "file_type": "code",
+      "source_file": "src/app/pages/hod/result-review/hod-result-review.component.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "src_app_pages_hod_result_review_hod_result_review_component",
+      "target": "src_app_widgets_app_pagination_app_pagination_component",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/app/pages/hod/result-review/hod-result-review.component.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "src_app_pages_hod_result_review_hod_result_review_component",
+      "target": "src_app_pages_lecturer_lecturer_course_details_lecturer_course_details_component",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "src/app/pages/hod/result-review/hod-result-review.component.html",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

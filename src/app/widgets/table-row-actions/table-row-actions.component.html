@@ -21,24 +21,28 @@
       <i [class]="checkedIconClass"></i>
     </button>
   }
-  <button
-    class="action-btn"
-    type="button"
-    [attr.aria-label]="shortlistTooltip"
-    [attr.data-tooltip]="shortlistTooltip"
-    [disabled]="disableShortlist"
-    (click)="shortlist.emit()"
-  >
-    <i [class]="shortlistIconClass"></i>
-  </button>
-  <button
-    class="action-btn"
-    type="button"
-    [attr.aria-label]="complianceTooltip"
-    [attr.data-tooltip]="complianceTooltip"
-    [disabled]="disableCompliance || disableShortlist"
-    (click)="compliance.emit()"
-  >
-    <i [class]="complianceIconClass"></i>
-  </button>
+  @if (showShortlistAction) {
+    <button
+      class="action-btn"
+      type="button"
+      [attr.aria-label]="shortlistTooltip"
+      [attr.data-tooltip]="shortlistTooltip"
+      [disabled]="disableShortlist"
+      (click)="shortlist.emit()"
+    >
+      <i [class]="shortlistIconClass"></i>
+    </button>
+  }
+  @if (showComplianceAction) {
+    <button
+      class="action-btn"
+      type="button"
+      [attr.aria-label]="complianceTooltip"
+      [attr.data-tooltip]="complianceTooltip"
+      [disabled]="disableCompliance || disableShortlist"
+      (click)="compliance.emit()"
+    >
+      <i [class]="complianceIconClass"></i>
+    </button>
+  }
 </div>

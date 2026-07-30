@@ -50,6 +50,9 @@ import {
 } from '../../widgets/update-file-modal/update-file-modal.component';
 import { APPLICATION_STATUS_LABELS } from '../../constants/application-status.constants';
 import { getApplicationStatusDefinition } from '../../constants/application-status.utils';
+import { APP_PERMISSIONS } from '../../constants/permissions.constants';
+import { HasPermissionDirective } from '../../directives/has-permission.directive';
+import { PermissionService } from '../../services/permission.service';
 
 interface PagingEvent {
   first: number;
@@ -119,6 +122,7 @@ interface ChangeProgrammeSelection {
     ChangeProgrammeModalComponent,
     ButtonComponent,
     UpdateFileModalComponent,
+    HasPermissionDirective,
   ],
   templateUrl: './admissions.component.html',
   styleUrl: './admissions.component.scss',
@@ -129,6 +133,8 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   busyService = inject(BusyIndicatorService);
   notification = inject(NotificationService);
   cd = inject(ChangeDetectorRef);
+  permissionService = inject(PermissionService);
+  readonly permissions = APP_PERMISSIONS;
   application!: Application[];
   subscriptions = new Subscription();
   selectedStatus: appstatus = { name: 'All', code: 0 };
@@ -800,11 +806,17 @@ export class AdmissionsComponent implements OnInit, OnDestroy {
   }
 
   get showPublishAdmissionButton(): boolean {
-    return this.activeCardFilter === 'pending-publish';
+    return (
+      this.activeCardFilter === 'pending-publish' && this.canManageApplicants
+    );
   }
 
   get canPublishAdmissions(): boolean {
     return this.getPublishableRows().length > 0;
+  }
+
+  get canManageApplicants(): boolean {
+    return this.permissionService.has(APP_PERMISSIONS.MANAGE_APPLICANTS);
   }
 
   private getBulkEligibleRows(): AdmissionTableRow[] {

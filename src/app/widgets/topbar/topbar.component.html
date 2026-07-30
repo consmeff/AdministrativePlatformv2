@@ -10,7 +10,27 @@
     </button>
     <div class="top-title">{{ currentModuleName }}</div>
   </div>
-  <div class="d-flex justify-content-end tb-icon">
+  <div class="d-flex justify-content-end align-items-center tb-icon">
+    @if (canSwitchToAdminPortal) {
+      <button
+        type="button"
+        class="portal-switch-btn"
+        (click)="switchToAdminPortal()"
+      >
+        <i class="bi bi-arrow-left-right"></i>
+        <span>Admin Dashboard</span>
+      </button>
+    }
+    @if (canSwitchToHomePortal) {
+      <button
+        type="button"
+        class="portal-switch-btn"
+        (click)="switchToHomePortal()"
+      >
+        <i class="bi bi-arrow-left-right"></i>
+        <span>{{ homePortalLabel }}</span>
+      </button>
+    }
     <i class="bi bi-bell mx-3"></i>
     <i class="bi bi-person-circle mx-3"></i>
     <div class="d-flex flex-column">

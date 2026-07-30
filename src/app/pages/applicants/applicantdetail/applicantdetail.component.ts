@@ -33,6 +33,8 @@ import { ActionNoteModalComponent } from '../../../widgets/action-note-modal/act
 import { ButtonComponent } from '../../../widgets/button/button.component';
 import { getApplicationStatusDefinition } from '../../../constants/application-status.utils';
 import { ApplicationStatusDefinition } from '../../../constants/application-status.types';
+import { APP_PERMISSIONS } from '../../../constants/permissions.constants';
+import { HasPermissionDirective } from '../../../directives/has-permission.directive';
 
 type ApplicantDocumentFile =
   | Certificate
@@ -52,6 +54,7 @@ type ApplicantDocumentFile =
     ReusableTableComponent,
     ActionNoteModalComponent,
     ButtonComponent,
+    HasPermissionDirective,
   ],
   templateUrl: './applicantdetail.component.html',
   styleUrl: './applicantdetail.component.scss',
@@ -61,6 +64,7 @@ export class ApplicantdetailComponent implements OnInit, OnChanges {
   private readonly complianceAction = 'compliance';
   _applicationservice = inject(ApplicationService);
   notification = inject(NotificationService);
+  readonly permissions = APP_PERMISSIONS;
   application: Application = {} as Application;
   route = inject(ActivatedRoute);
 

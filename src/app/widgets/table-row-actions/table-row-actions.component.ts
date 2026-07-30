@@ -11,6 +11,8 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 export class TableRowActionsComponent {
   @Input() disableView = false;
   @Input() showCheckedAction = false;
+  @Input() showShortlistAction = true;
+  @Input() showComplianceAction = true;
   @Input() disableChecked = false;
   @Input() disableShortlist = false;
   @Input() disableCompliance = false;

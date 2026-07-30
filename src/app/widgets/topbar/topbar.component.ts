@@ -8,6 +8,8 @@ import { filter, Subscription } from 'rxjs';
 import { HodStateService } from '../../pages/hod/hod-state.service';
 import { LecturerStateService } from '../../pages/lecturer/lecturer-state.service';
 import { PortalContextService } from '../../services/portal-context.service';
+import { PermissionService } from '../../services/permission.service';
+import { APP_PERMISSIONS } from '../../constants/permissions.constants';
 
 @Component({
   selector: 'app-topbar',
@@ -21,6 +23,7 @@ export class TopbarComponent implements OnDestroy {
   lecturerStateService = inject(LecturerStateService);
   hodStateService = inject(HodStateService);
   portalContextService = inject(PortalContextService);
+  permissionService = inject(PermissionService);
   router = inject(Router);
   dashinfo: DashboardInfo = {} as DashboardInfo;
   currentModuleName = 'Dashboard';
@@ -78,6 +81,36 @@ export class TopbarComponent implements OnDestroy {
     }
 
     return this.dashinfo.role || 'Academic Officer';
+  }
+
+  /** Staff on a department portal who also administer applicants. */
+  get canSwitchToAdminPortal(): boolean {
+    return (
+      !this.portalContextService.isAdminContext() &&
+      this.permissionService.has(APP_PERMISSIONS.MANAGE_APPLICANTS)
+    );
+  }
+
+  /** Shown once they have switched, so they can get back to their own portal. */
+  get canSwitchToHomePortal(): boolean {
+    return (
+      this.portalContextService.isAdminContext() &&
+      this.portalContextService.getHomeRole() !== 'admin'
+    );
+  }
+
+  get homePortalLabel(): string {
+    return this.portalContextService.getHomeRole() === 'hod'
+      ? 'Department Portal'
+      : 'Lecturer Portal';
+  }
+
+  switchToAdminPortal(): void {
+    this.portalContextService.switchToAdminPortal();
+  }
+
+  switchToHomePortal(): void {
+    this.portalContextService.switchToHomePortal();
   }
 
   private resolveModuleName(url: string): string {

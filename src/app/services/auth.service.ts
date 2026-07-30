@@ -7,11 +7,17 @@ import { ProfilePayload, ProfileSuccessResponse } from '../model/auth.dto';
 import { DashboardinformationService } from './dashboardinformation.service';
 import { DashboardInfo } from '../model/dashboard/information.dto';
 import { SessionStateService } from './session-state.service';
+import { PermissionService } from './permission.service';
+import { PortalContextService } from './portal-context.service';
 
 interface LoginResponse {
   access_token: string;
   refresh_token: string;
   user_type: string;
+  name?: string;
+  roles?: string[];
+  permissions?: string[];
+  password_reset_required?: boolean;
   application_no?: string;
   matriculation_no?: string;
 }
@@ -46,6 +52,8 @@ export class AuthService {
   private loggedUser: string | null | undefined;
   private readonly dashInfoService = inject(DashboardinformationService);
   private readonly sessionStateService = inject(SessionStateService);
+  private readonly permissionService = inject(PermissionService);
+  private readonly portalContextService = inject(PortalContextService);
   private dashboardInfo: DashboardInfo = {} as DashboardInfo;
 
   constructor() {
@@ -185,13 +193,15 @@ export class AuthService {
 
   private doLoginUser(username: string, tokens: LoginResponse): void {
     if (username !== '') {
-      this.dashboardInfo.username = username;
+      this.dashboardInfo.username = tokens.name?.trim() || username;
       this.dashboardInfo.role = tokens.user_type;
       this.dashInfoService.setdashInfo(this.dashboardInfo);
     }
     this.loggedUser = username;
     this.storeTokens(tokens);
     this.storeRole(tokens.user_type);
+    this.permissionService.setFromLogin(tokens.permissions, tokens.roles);
+    this.portalContextService.resetPortalOverride();
     if (tokens.application_no) {
       this.storeAppNo(tokens.application_no);
     }

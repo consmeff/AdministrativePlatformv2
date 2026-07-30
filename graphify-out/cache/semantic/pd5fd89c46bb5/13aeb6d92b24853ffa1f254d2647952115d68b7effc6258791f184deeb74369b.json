@@ -1,0 +1,17 @@
+{
+  "nodes": [
+    {
+      "id": "src_app_pages_hod_hod_overview_hod_overview_component_hodoverview",
+      "label": "HOD Department Overview Page",
+      "file_type": "code",
+      "source_file": "src/app/pages/hod/hod-overview/hod-overview.component.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [],
+  "hyperedges": []
+}

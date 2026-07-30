@@ -54,6 +54,9 @@ import {
   shouldDisableComplianceAction,
   shouldDisableShortlistAction,
 } from '../../../constants/application-status.utils';
+import { APP_PERMISSIONS } from '../../../constants/permissions.constants';
+import { HasPermissionDirective } from '../../../directives/has-permission.directive';
+import { PermissionService } from '../../../services/permission.service';
 
 interface FilterOption {
   label: string;
@@ -85,10 +88,20 @@ interface ApplicantFilterCard {
 
 type ApplicantCardFilter =
   | 'all'
+  | 'submitted'
   | 'pending'
   | 'shortlisted'
   | 'directive'
   | 'resubmitted';
+
+const CARD_FILTER_APPROVAL_STATUS: Record<ApplicantCardFilter, string> = {
+  all: 'all',
+  submitted: 'submitted',
+  pending: 'pending',
+  shortlisted: 'shortlisted',
+  directive: 'compliance_required',
+  resubmitted: 'resubmitted',
+};
 
 @Component({
   selector: 'app-applicantlists',
@@ -108,6 +121,7 @@ type ApplicantCardFilter =
     MetricCardComponent,
     ApplicantExportModalComponent,
     UpdateFileModalComponent,
+    HasPermissionDirective,
   ],
   templateUrl: './applicantlists.component.html',
   styleUrl: './applicantlists.component.scss',
@@ -120,6 +134,9 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   private readonly busyService = inject(BusyIndicatorService);
   private readonly notification = inject(NotificationService);
   private readonly route = inject(ActivatedRoute);
+  private readonly permissionService = inject(PermissionService);
+
+  readonly permissions = APP_PERMISSIONS;
 
   readonly tableColumns = [
     'Applicant',
@@ -162,6 +179,7 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   activeCardFilter: ApplicantCardFilter = 'all';
   readonly filterCards: ApplicantFilterCard[] = [
     { label: 'All Applicants', filter: 'all' },
+    { label: APPLICATION_STATUS_LABELS.submitted, filter: 'submitted' },
     { label: APPLICATION_STATUS_LABELS.pending, filter: 'pending' },
     { label: APPLICATION_STATUS_LABELS.shortlisted, filter: 'shortlisted' },
     {
@@ -173,6 +191,7 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
 
   metrics: ApplicationAdminDashboardResponse = {
     total_applicants: 0,
+    total_submitted: 0,
     total_pending: 0,
     total_shortlisted: 0,
     total_compliance_required: 0,
@@ -299,6 +318,10 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
     return !!this.nextPageUrl || !!this.prevPageUrl;
   }
 
+  get canManageApplicants(): boolean {
+    return this.permissionService.has(APP_PERMISSIONS.MANAGE_APPLICANTS);
+  }
+
   private populateSummary() {
     this.appRows = this.applicationList.map((item) => {
       const status = this.resolveStatus(item.approval_status);
@@ -338,7 +361,7 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
     this.activeCardFilter = filter;
     this.selectedStatus =
       this.statusOptions.find(
-        (item) => item.value === this.getApprovalStatusForCardFilter(filter),
+        (item) => item.value === CARD_FILTER_APPROVAL_STATUS[filter],
       ) ?? this.statusOptions[0];
     this.first = 0;
     this.fetchRecords();
@@ -354,6 +377,9 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
     if (filter === 'all') {
       return metrics.total_applicants || this.total_record_count;
     }
+    if (filter === 'submitted') {
+      return metrics.total_submitted ?? 0;
+    }
     if (filter === 'pending') {
       return metrics.total_pending ?? 0;
     }
@@ -367,35 +393,14 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   }
 
   private getCardFilterFromStatus(value: string): ApplicantCardFilter {
-    if (value === 'shortlisted') {
-      return 'shortlisted';
-    }
-    if (value === 'compliance_required') {
-      return 'directive';
-    }
-    if (value === 'resubmitted') {
-      return 'resubmitted';
-    }
-    if (value === 'pending') {
-      return 'pending';
-    }
-    return 'all';
-  }
-
-  private getApprovalStatusForCardFilter(filter: ApplicantCardFilter): string {
-    if (filter === 'pending') {
-      return 'pending';
-    }
-    if (filter === 'shortlisted') {
-      return 'shortlisted';
-    }
-    if (filter === 'directive') {
-      return 'compliance_required';
-    }
-    if (filter === 'resubmitted') {
-      return 'resubmitted';
-    }
-    return 'all';
+    const cardFilters = Object.keys(
+      CARD_FILTER_APPROVAL_STATUS,
+    ) as ApplicantCardFilter[];
+    return (
+      cardFilters.find(
+        (filter) => CARD_FILTER_APPROVAL_STATUS[filter] === value,
+      ) ?? 'all'
+    );
   }
 
   private syncProgrammeFromQuery(programme: string | null): void {
@@ -600,6 +605,13 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   }
 
   submitUpdateWithFile(selection: UpdateFileSelection): void {
+    if (!this.canManageApplicants) {
+      this.notification.error(
+        'You do not have permission to manage applicants.',
+      );
+      return;
+    }
+
     this.isUpdatingWithFile = true;
     this.applicationService
       .bulkUpdateApplicants({
@@ -705,6 +717,14 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
     successMessage: string,
     onSuccess?: () => void,
   ) {
+    if (!this.canManageApplicants) {
+      this.notification.error(
+        'You do not have permission to manage applicants.',
+      );
+      this.isReasonActionLoading = false;
+      return;
+    }
+
     this.busyService.show();
     request.subscribe({
       next: () => {
