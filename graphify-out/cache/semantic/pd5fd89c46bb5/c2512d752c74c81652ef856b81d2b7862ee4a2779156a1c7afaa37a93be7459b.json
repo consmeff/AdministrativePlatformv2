@@ -1,0 +1,28 @@
+{
+  "nodes": [
+    {
+      "id": "src_app_pages_lecturer_lecturer_my_courses_lecturer_my_courses_component",
+      "label": "Lecturer My Courses Page",
+      "file_type": "code",
+      "source_file": "src/app/pages/lecturer/lecturer-my-courses/lecturer-my-courses.component.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "src_app_pages_lecturer_lecturer_my_courses_lecturer_my_courses_component",
+      "target": "src_app_pages_lecturer_lecturer_course_details_lecturer_course_details_component",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/app/pages/lecturer/lecturer-my-courses/lecturer-my-courses.component.html",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

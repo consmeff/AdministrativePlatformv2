@@ -5,6 +5,11 @@ import { sidebarStateDTO } from '../../model/page.dto';
 import { AuthService } from '../../services/auth.service';
 import { PortalContextService } from '../../services/portal-context.service';
 import { WidgetService } from '../../services/widget.service';
+import { PermissionService } from '../../services/permission.service';
+import {
+  APP_PERMISSIONS,
+  AppPermission,
+} from '../../constants/permissions.constants';
 
 interface SidebarSubMenuItem {
   label: string;
@@ -18,6 +23,8 @@ interface SidebarMenuItem {
   route: string;
   exact?: boolean;
   children?: SidebarSubMenuItem[];
+  /** Item is hidden unless the user holds at least one of these. */
+  permissions?: AppPermission[];
 }
 
 interface SidebarMenuSection {
@@ -36,6 +43,7 @@ export class SidebarComponent {
   isMobileViewport = false;
   _widgetService = inject(WidgetService);
   portalContextService = inject(PortalContextService);
+  permissionService = inject(PermissionService);
   router = inject(Router);
   private readonly authService = inject(AuthService);
   openGroupRoute: string | null = null;
@@ -53,6 +61,11 @@ export class SidebarComponent {
           label: 'Applications',
           iconClass: 'bi bi-people',
           route: '/pages/applicants',
+          permissions: [
+            APP_PERMISSIONS.VIEW_APPLICANTS,
+            APP_PERMISSIONS.VIEW_APPLICATIONS,
+            APP_PERMISSIONS.MANAGE_APPLICANTS,
+          ],
           children: [
             {
               label: 'OND',
@@ -70,6 +83,10 @@ export class SidebarComponent {
           label: 'Admissions',
           iconClass: 'bi bi-card-list',
           route: '/pages/admissions',
+          permissions: [
+            APP_PERMISSIONS.MANAGE_APPLICANTS,
+            APP_PERMISSIONS.VIEW_APPLICANTS,
+          ],
           children: [
             {
               label: 'OND',
@@ -87,6 +104,10 @@ export class SidebarComponent {
           label: 'Payment Records',
           iconClass: 'bi bi-wallet2',
           route: '/pages/payment-records',
+          permissions: [
+            APP_PERMISSIONS.MANAGE_FEES,
+            APP_PERMISSIONS.MANAGE_APPLICATION_FEES_MANUALLY,
+          ],
         },
       ],
     },
@@ -243,14 +264,29 @@ export class SidebarComponent {
 
   get activeMenuSections(): SidebarMenuSection[] {
     if (this.portalContextService.isHodContext()) {
-      return this.hodMenuSections;
+      return this.applyPermissions(this.hodMenuSections);
     }
 
     if (this.portalContextService.isLecturerContext()) {
-      return this.lecturerMenuSections;
+      return this.applyPermissions(this.lecturerMenuSections);
     }
 
-    return this.adminMenuSections;
+    return this.applyPermissions(this.adminMenuSections);
+  }
+
+  private applyPermissions(
+    sections: SidebarMenuSection[],
+  ): SidebarMenuSection[] {
+    return sections
+      .map((section) => ({
+        ...section,
+        items: section.items.filter(
+          (item) =>
+            !item.permissions ||
+            this.permissionService.hasAny(item.permissions),
+        ),
+      }))
+      .filter((section) => section.items.length > 0);
   }
 
   isGroupOpen(item: SidebarMenuItem): boolean {

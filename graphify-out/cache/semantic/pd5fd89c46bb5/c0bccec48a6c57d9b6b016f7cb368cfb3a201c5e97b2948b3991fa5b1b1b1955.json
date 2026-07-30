@@ -1,0 +1,28 @@
+{
+  "nodes": [
+    {
+      "id": "src_app_pages_hod_courses_hod_courses_component_hodcoursesoverview",
+      "label": "HOD Courses Level Overview",
+      "file_type": "code",
+      "source_file": "src/app/pages/hod/courses/hod-courses.component.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "src_app_pages_hod_courses_hod_courses_component_hodcoursesoverview",
+      "target": "src_app_pages_hod_courses_setup_hod_course_setup_component_hodcoursesetup",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "src/app/pages/hod/courses/hod-courses.component.html",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

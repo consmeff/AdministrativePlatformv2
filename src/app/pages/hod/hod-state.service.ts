@@ -3,6 +3,7 @@ import { finalize, forkJoin, map, Observable, of, tap } from 'rxjs';
 import { BusyIndicatorService } from '../../services/busy-indicator.service';
 import { NotificationService } from '../../services/notification.service';
 import { AuthService } from '../../services/auth.service';
+import { SessionStateService } from '../../services/session-state.service';
 import {
   HOD_COURSE_CATALOGUE_COURSES,
   HOD_COURSE_LEVEL_CONFIGURATIONS,
@@ -65,19 +66,8 @@ export class HodStateService {
   private readonly busyIndicatorService = inject(BusyIndicatorService);
   private readonly notificationService = inject(NotificationService);
   private readonly authService = inject(AuthService);
-  private readonly state = signal<HodState>({
-    courseRegistrations: [],
-    documentVerifications: [],
-    resultReviews: [],
-    studentRecords: HOD_STUDENT_RECORDS,
-    lecturers: [],
-    lecturerCourses: HOD_LECTURER_COURSES,
-    lecturerAssignmentHistory: HOD_LECTURER_ASSIGNMENT_HISTORY,
-    courseOverviewLevels: HOD_COURSE_OVERVIEW_LEVELS,
-    courseCatalogueCourses: HOD_COURSE_CATALOGUE_COURSES,
-    courseLevelConfigurations: HOD_COURSE_LEVEL_CONFIGURATIONS,
-    coursePublicationHistory: HOD_COURSE_PUBLICATION_HISTORY,
-  });
+  private readonly sessionStateService = inject(SessionStateService);
+  private readonly state = signal<HodState>(this.getInitialState());
   readonly isCourseRegistrationsLoading = signal(false);
   readonly isDocumentVerificationsLoading = signal(false);
   readonly isProfileLoading = signal(false);
@@ -145,6 +135,10 @@ export class HodStateService {
   readonly approvedResultReviewCount = computed(
     () => this.resultReviews().filter((record) => record.approved).length,
   );
+
+  constructor() {
+    this.sessionStateService.registerResetHandler(() => this.resetState());
+  }
 
   getCourseRegistrationById(
     recordId: string,
@@ -859,6 +853,37 @@ export class HodStateService {
     const callbacks = [...this.pendingProfileCallbacks];
     this.pendingProfileCallbacks.length = 0;
     callbacks.forEach((callback) => callback());
+  }
+
+  private resetState(): void {
+    this.pendingProfileCallbacks.length = 0;
+    this.state.set(this.getInitialState());
+    this.profile.set(HOD_PROFILE);
+    this.isCourseRegistrationsLoading.set(false);
+    this.isDocumentVerificationsLoading.set(false);
+    this.isProfileLoading.set(false);
+    this.isResultReviewsLoading.set(false);
+    this.isLecturersLoading.set(false);
+    this.hasLoadedProfile.set(false);
+    this.loadingCourseRegistrationIds.set([]);
+    this.approvingCourseRegistrationIds.set([]);
+    this.loadingResultReviewIds.set([]);
+  }
+
+  private getInitialState(): HodState {
+    return {
+      courseRegistrations: [],
+      documentVerifications: [],
+      resultReviews: [],
+      studentRecords: HOD_STUDENT_RECORDS,
+      lecturers: [],
+      lecturerCourses: HOD_LECTURER_COURSES,
+      lecturerAssignmentHistory: HOD_LECTURER_ASSIGNMENT_HISTORY,
+      courseOverviewLevels: HOD_COURSE_OVERVIEW_LEVELS,
+      courseCatalogueCourses: HOD_COURSE_CATALOGUE_COURSES,
+      courseLevelConfigurations: HOD_COURSE_LEVEL_CONFIGURATIONS,
+      coursePublicationHistory: HOD_COURSE_PUBLICATION_HISTORY,
+    };
   }
 
   private mapCurrentUserProfile(response: unknown): Partial<HodProfile> {

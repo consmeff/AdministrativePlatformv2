@@ -1,0 +1,28 @@
+{
+  "nodes": [
+    {
+      "id": "src_app_pages_admissions_upload_flow_admissions_upload_flow_component_uploadflow",
+      "label": "Admissions Upload Flow (CBT Wizard)",
+      "file_type": "code",
+      "source_file": "src/app/pages/admissions/upload-flow/admissions-upload-flow.component.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "src_app_pages_admissions_upload_flow_admissions_upload_flow_component_uploadflow",
+      "target": "src_app_pages_hod_courses_setup_hod_course_setup_component_hodcoursesetup",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "src/app/pages/admissions/upload-flow/admissions-upload-flow.component.html",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

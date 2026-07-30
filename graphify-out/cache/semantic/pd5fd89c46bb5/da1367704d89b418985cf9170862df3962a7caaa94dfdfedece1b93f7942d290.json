@@ -1,0 +1,52 @@
+{
+  "nodes": [
+    {
+      "id": "src_app_pages_applicants_applicantlists_applicantlists_component_applicantlistpage",
+      "label": "Applicant List Page",
+      "file_type": "code",
+      "source_file": "src/app/pages/applicants/applicantlists/applicantlists.component.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "src_app_pages_applicants_applicantlists_applicantlists_component_applicantlistpage",
+      "target": "src_app_pages_applicants_applicantdetail_applicantdetail_component_applicantdetail",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/app/pages/applicants/applicantlists/applicantlists.component.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "src_app_pages_applicants_applicantlists_applicantlists_component_applicantlistpage",
+      "target": "src_app_pages_applicants_applicantlists_export_modal_applicant_export_modal_component_exportmodal",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/app/pages/applicants/applicantlists/applicantlists.component.html",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "applicant_table_pattern",
+      "label": "Shared Applicant Table & Row-Actions Pattern",
+      "nodes": [
+        "src_app_pages_admissions_admissions_component_admissionspage",
+        "src_app_pages_applicants_applicantlists_applicantlists_component_applicantlistpage",
+        "src_app_pages_dashboard_dashboard_component_dashboardpage"
+      ],
+      "relation": "participate_in",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "src/app/pages/applicants/applicantlists/applicantlists.component.html"
+    }
+  ]
+}

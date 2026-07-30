@@ -12,5 +12,9 @@ import { LecturerStateService } from '../lecturer-state.service';
 export class LecturerProfileComponent {
   private readonly lecturerStateService = inject(LecturerStateService);
 
+  constructor() {
+    this.lecturerStateService.ensureProfileLoaded();
+  }
+
   readonly lecturerProfile = this.lecturerStateService.lecturerProfile;
 }

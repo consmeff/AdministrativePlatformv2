@@ -1,0 +1,28 @@
+{
+  "nodes": [
+    {
+      "id": "src_app_pages_hod_courses_setup_hod_course_setup_component_hodcoursesetup",
+      "label": "HOD Course Setup Wizard",
+      "file_type": "code",
+      "source_file": "src/app/pages/hod/courses/setup/hod-course-setup.component.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "src_app_pages_hod_courses_setup_hod_course_setup_component_hodcoursesetup",
+      "target": "src_app_pages_hod_courses_course_publication_history_modal_component_publicationhistorymodal",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/app/pages/hod/courses/setup/hod-course-setup.component.html",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

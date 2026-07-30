@@ -48,6 +48,31 @@
   font-size: 24px;
 }
 
+.portal-switch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-right: 0.75rem;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--app-primary);
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--app-primary);
+  font-family: Lato;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.portal-switch-btn:hover {
+  background: var(--app-primary);
+  color: #fff;
+}
+
+.tb-icon .portal-switch-btn .bi {
+  font-size: 15px;
+}
+
 @media (max-width: 991px) {
   .top-bar {
     padding: 0.75rem 1rem;
@@ -70,6 +95,15 @@
 @media (max-width: 575px) {
   .flex-column span:last-child {
     display: none;
+  }
+
+  .portal-switch-btn span {
+    display: none;
+  }
+
+  .portal-switch-btn {
+    padding: 0.4rem 0.55rem;
+    margin-right: 0.35rem;
   }
 
   .top-title {

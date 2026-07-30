@@ -1,0 +1,38 @@
+{
+  "nodes": [
+    {
+      "id": "src_app_pages_hod_lecturers_assign_courses_hod_assign_courses_component",
+      "label": "HOD Assign Courses Page",
+      "file_type": "code",
+      "source_file": "src/app/pages/hod/lecturers/assign-courses/hod-assign-courses.component.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "src_app_pages_hod_lecturers_assign_courses_hod_assign_courses_component",
+      "target": "src_app_pages_hod_lecturers_lecturer_assignment_history_modal_component",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/app/pages/hod/lecturers/assign-courses/hod-assign-courses.component.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "src_app_pages_hod_lecturers_assign_courses_hod_assign_courses_component",
+      "target": "src_app_pages_hod_lecturers_lecturer_assigned_courses_modal_component",
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "src/app/pages/hod/lecturers/assign-courses/hod-assign-courses.component.html",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

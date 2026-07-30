@@ -1,0 +1,33 @@
+{
+  "nodes": [
+    {
+      "id": "src_app_widgets_app_pagination_app_pagination_component",
+      "label": "App Pagination Widget",
+      "file_type": "code",
+      "source_file": "src/app/widgets/app-pagination/app-pagination.component.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [],
+  "hyperedges": [
+    {
+      "id": "pagination_widget_usage_pattern",
+      "label": "Shared Pagination Pattern Across HOD List Pages",
+      "nodes": [
+        "src_app_widgets_app_pagination_app_pagination_component",
+        "src_app_pages_hod_result_review_hod_result_review_component",
+        "src_app_pages_hod_students_record_hod_students_record_component",
+        "src_app_pages_hod_verification_course_registration_review_hod_course_registration_review_component",
+        "src_app_pages_hod_verification_document_verification_hod_document_verification_component"
+      ],
+      "relation": "participate_in",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "src/app/widgets/app-pagination/app-pagination.component.html"
+    }
+  ]
+}

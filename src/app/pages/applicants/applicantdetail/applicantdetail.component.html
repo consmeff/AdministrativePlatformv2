@@ -143,7 +143,10 @@
     </div>
 
     @if (shouldShowAdmissionsActions() || embeddedMode !== "admissions") {
-      <footer class="drawer-actions">
+      <footer
+        class="drawer-actions"
+        *appHasPermission="permissions.MANAGE_APPLICANTS"
+      >
         @if (shouldShowAdmissionsActions()) {
           <app-button
             [fullWidth]="true"
@@ -370,7 +373,10 @@
     </div>
   </div>
 
-  <div class="fourth-row my-5 d-flex justify-content-between flex-row">
+  <div
+    class="fourth-row my-5 d-flex justify-content-between flex-row"
+    *appHasPermission="permissions.MANAGE_APPLICANTS"
+  >
     @if (isComplianceBaseState()) {
       <div class="status-note compliance-note w-100 text-center">
         {{

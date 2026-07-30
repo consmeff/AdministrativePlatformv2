@@ -1,0 +1,31 @@
+{
+  "nodes": [
+    {
+      "id": "src_index_template",
+      "label": "index.html (App Root Document)",
+      "file_type": "code",
+      "source_file": "src/index.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [],
+  "hyperedges": [
+    {
+      "id": "app_shell_layout",
+      "label": "Application Shell Layout (sidebar, topbar, root document)",
+      "nodes": [
+        "src_app_widgets_sidebar_sidebar_component_template",
+        "src_app_widgets_topbar_topbar_component_template",
+        "src_index_template"
+      ],
+      "relation": "form",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "src/index.html"
+    }
+  ]
+}

@@ -67,6 +67,14 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
   ];
   selectedSession: FilterOption = this.sessionOptions[0];
 
+  readonly statusOptions: FilterOption[] = [
+    { label: 'All Status', value: 'all' },
+    { label: 'Successful', value: 'successful' },
+    { label: 'Pending', value: 'pending' },
+    { label: 'Failed', value: 'failed' },
+  ];
+  selectedStatus: FilterOption = this.statusOptions[0];
+
   readonly orderingOptions: FilterOption[] = [
     { label: 'Newest First', value: '-created_at' },
     { label: 'Oldest First', value: 'created_at' },
@@ -132,6 +140,11 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
   }
 
   onOrderingChange(): void {
+    this.first = 0;
+    this.subscriptions.add(this.fetchPayments().subscribe());
+  }
+
+  onStatusChange(): void {
     this.first = 0;
     this.subscriptions.add(this.fetchPayments().subscribe());
   }
@@ -215,6 +228,10 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
       .getPayments({
         page,
         search: this.searchText.trim() || undefined,
+        status:
+          this.selectedStatus.value === 'all'
+            ? undefined
+            : this.selectedStatus.value,
         // ordering: this.selectedOrdering.value || undefined,
       })
       .pipe(

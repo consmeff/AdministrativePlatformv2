@@ -1,0 +1,62 @@
+{
+  "nodes": [
+    {
+      "id": "src_app_pages_hod_verification_course_registration_review_hod_course_registration_review_component",
+      "label": "HOD Course Registration Review Page",
+      "file_type": "code",
+      "source_file": "src/app/pages/hod/verification/course-registration-review/hod-course-registration-review.component.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "src_app_pages_hod_verification_course_registration_review_hod_course_registration_review_component",
+      "target": "src_app_widgets_app_pagination_app_pagination_component",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/app/pages/hod/verification/course-registration-review/hod-course-registration-review.component.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "src_app_pages_hod_verification_course_registration_review_hod_course_registration_review_component",
+      "target": "src_app_pages_hod_verification_course_registration_review_course_registration_review_drawer_component",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/app/pages/hod/verification/course-registration-review/hod-course-registration-review.component.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "src_app_pages_hod_verification_course_registration_review_hod_course_registration_review_component",
+      "target": "src_app_pages_hod_verification_document_verification_hod_document_verification_component",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "src/app/pages/hod/verification/course-registration-review/hod-course-registration-review.component.html",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "hod_approval_review_workflow",
+      "label": "HOD Pending/Approve Review Workflow",
+      "nodes": [
+        "src_app_pages_hod_result_review_hod_result_review_component",
+        "src_app_pages_hod_verification_course_registration_review_hod_course_registration_review_component",
+        "src_app_pages_hod_verification_document_verification_hod_document_verification_component"
+      ],
+      "relation": "implement",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/app/pages/hod/verification/course-registration-review/hod-course-registration-review.component.html"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "nodes": [
+    {
+      "id": "src_app_widgets_htmlicon_htmlicon_component_template",
+      "label": "HtmliconComponent Template",
+      "file_type": "code",
+      "source_file": "src/app/widgets/htmlicon/htmlicon.component.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [],
+  "hyperedges": []
+}

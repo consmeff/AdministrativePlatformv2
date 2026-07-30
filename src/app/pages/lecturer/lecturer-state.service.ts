@@ -14,6 +14,7 @@ import {
 } from './lecturer.types';
 import { AuthService } from '../../services/auth.service';
 import { BusyIndicatorService } from '../../services/busy-indicator.service';
+import { SessionStateService } from '../../services/session-state.service';
 
 interface LecturerCoursesState {
   courses: LecturerCourse[];
@@ -27,17 +28,18 @@ type UnknownRecord = Record<string, unknown>;
   providedIn: 'root',
 })
 export class LecturerStateService {
+  private readonly pendingProfileCallbacks: (() => void)[] = [];
   private readonly authService = inject(AuthService);
   private readonly lecturerCourseAssignmentService = inject(
     LecturerCourseAssignmentService,
   );
   private readonly lecturerResultsService = inject(LecturerResultsService);
   private readonly busyIndicatorService = inject(BusyIndicatorService);
+  private readonly sessionStateService = inject(SessionStateService);
 
   constructor() {
     this.applyStoredRoleLabel();
-    this.loadCurrentUserProfile();
-    this.loadAssignedCourses();
+    this.sessionStateService.registerResetHandler(() => this.resetState());
   }
 
   private readonly state = signal<LecturerCoursesState>({
@@ -50,12 +52,37 @@ export class LecturerStateService {
   readonly courses = computed(() => this.state().courses);
   readonly hasLoaded = computed(() => this.state().hasLoaded);
   readonly isLoading = computed(() => this.state().isLoading);
+  readonly hasLoadedProfile = signal(false);
+  readonly isProfileLoading = signal(false);
 
   getCourseById(courseId: string): LecturerCourse | null {
     return this.courses().find((course) => course.id === courseId) ?? null;
   }
 
+  ensureProfileLoaded(callback?: () => void): void {
+    if (this.hasLoadedProfile()) {
+      callback?.();
+      return;
+    }
+
+    if (callback) {
+      this.pendingProfileCallbacks.push(callback);
+    }
+
+    if (this.isProfileLoading()) {
+      return;
+    }
+
+    this.loadCurrentUserProfile();
+  }
+
   loadAssignedCourses(): void {
+    this.ensureProfileLoaded(() => {
+      this.fetchAssignedCourses();
+    });
+  }
+
+  private fetchAssignedCourses(): void {
     this.state.update((currentState) => ({
       ...currentState,
       isLoading: true,
@@ -102,19 +129,29 @@ export class LecturerStateService {
       });
   }
 
-  loadCurrentUserProfile(): void {
-    this.authService.getCurrentUserProfile().subscribe((response) => {
-      const profilePatch = this.mapCurrentUserProfile(response);
+  private loadCurrentUserProfile(): void {
+    this.isProfileLoading.set(true);
+    this.authService.getCurrentUserProfile().subscribe({
+      next: (response) => {
+        const profilePatch = this.mapCurrentUserProfile(response);
 
-      this.lecturerProfile.update((profile) => {
-        const nextProfile = {
-          ...profile,
-          ...profilePatch,
-        };
+        this.lecturerProfile.update((profile) => {
+          const nextProfile = {
+            ...profile,
+            ...profilePatch,
+          };
 
-        return nextProfile;
-      });
-      this.syncCourseDepartmentLabels(this.lecturerProfile().departmentLabel);
+          return nextProfile;
+        });
+        this.syncCourseDepartmentLabels(this.lecturerProfile().departmentLabel);
+        this.hasLoadedProfile.set(true);
+        this.isProfileLoading.set(false);
+        this.flushPendingProfileCallbacks();
+      },
+      error: () => {
+        this.isProfileLoading.set(false);
+        this.flushPendingProfileCallbacks();
+      },
     });
   }
 
@@ -255,6 +292,24 @@ export class LecturerStateService {
           : '',
       )
       .join(' ');
+  }
+
+  private flushPendingProfileCallbacks(): void {
+    const callbacks = [...this.pendingProfileCallbacks];
+    this.pendingProfileCallbacks.length = 0;
+    callbacks.forEach((callback) => callback());
+  }
+
+  private resetState(): void {
+    this.pendingProfileCallbacks.length = 0;
+    this.state.set({
+      courses: [],
+      hasLoaded: false,
+      isLoading: false,
+    });
+    this.lecturerProfile.set(LECTURER_PROFILE);
+    this.hasLoadedProfile.set(false);
+    this.isProfileLoading.set(false);
   }
 
   private mapCurrentUserProfile(response: unknown): Partial<LecturerProfile> {

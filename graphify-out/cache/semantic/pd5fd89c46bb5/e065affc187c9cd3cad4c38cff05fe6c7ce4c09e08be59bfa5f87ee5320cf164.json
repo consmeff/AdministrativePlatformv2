@@ -1,0 +1,17 @@
+{
+  "nodes": [
+    {
+      "id": "src_app_pages_hod_verification_course_registration_review_course_registration_review_drawer_component",
+      "label": "Course Registration Review Drawer",
+      "file_type": "code",
+      "source_file": "src/app/pages/hod/verification/course-registration-review/course-registration-review-drawer.component.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [],
+  "hyperedges": []
+}
