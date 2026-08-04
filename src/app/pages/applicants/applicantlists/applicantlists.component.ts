@@ -153,6 +153,11 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
     { label: 'All Status', value: 'all' },
     ...APPLICATION_STATUS_OPTIONS,
   ];
+  readonly checkedOptions: FilterOption[] = [
+    { label: 'All Applicants', value: 'all' },
+    { label: 'Checked', value: 'checked' },
+    { label: 'Unchecked', value: 'unchecked' },
+  ];
   readonly orderingOptions: FilterOption[] = [
     { label: 'Newest First', value: '-created_at' },
     { label: 'Oldest First', value: 'created_at' },
@@ -174,6 +179,7 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   ];
 
   selectedStatus: FilterOption = this.statusOptions[0];
+  selectedChecked: FilterOption = this.checkedOptions[0];
   selectedOrdering: FilterOption = this.orderingOptions[0];
   currentProgrammeKey: string | undefined = undefined;
   activeCardFilter: ApplicantCardFilter = 'all';
@@ -268,6 +274,10 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
           : this.selectedStatus.value,
       programme: this.currentProgrammeKey,
       ordering: this.selectedOrdering.value,
+      checked:
+        this.selectedChecked.value === 'all'
+          ? undefined
+          : this.selectedChecked.value === 'checked',
     };
 
     this.applicationService
@@ -294,6 +304,12 @@ export class ApplicantlistsComponent implements OnInit, OnDestroy {
   onStatusChange(option: FilterOption) {
     this.selectedStatus = option;
     this.activeCardFilter = this.getCardFilterFromStatus(option.value);
+    this.first = 0;
+    this.fetchRecords();
+  }
+
+  onCheckedChange(option: FilterOption) {
+    this.selectedChecked = option;
     this.first = 0;
     this.fetchRecords();
   }

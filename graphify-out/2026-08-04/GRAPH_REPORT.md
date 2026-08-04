@@ -1,19 +1,19 @@
-# Graph Report - AdministrativePlatformv2 (2026-08-04)
+# Graph Report - AdministrativePlatformv2 (2026-07-30)
 
 ## Corpus Check
 
-- 133 files · ~88,334 words
+- 133 files · ~88,245 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
 
-- 1481 nodes · 2716 edges · 118 communities (62 shown, 56 thin omitted)
+- 1479 nodes · 2712 edges · 118 communities (61 shown, 57 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 24 edges (avg confidence: 0.77)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
 
-- Built from commit: `03ae70f6`
+- Built from commit: `7c0c2af2`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -35,25 +35,26 @@
 - HodResultReviewService
 - AuthService
 - hod-document-verification.component.ts
-- hod.types.ts
+- hod-state.service.ts
 - application.service.ts
 - lecturer-state.service.ts
-- TopbarComponent
+- topbar.component.ts
 - HodCourseSetupComponent
 - LecturerStateService
 - ApplicationService
 - DashboardComponent
-- applicantlists.component.ts
+- admissions.component.ts
 - AdmissionsUploadFlowComponent
-- dashboard.component.ts
+- ActionNoteModalComponent
 - hod-students-record.component.ts
 - hod-assign-courses.component.ts
 - PortalContextService
 - lecturer-results.service.ts
-- ButtonComponent
+- applicantlists.component.ts
+- CourseRegistrationReviewDrawerComponent
 - dependencies
 - LecturerCourseDetailsComponent
-- hod-state.service.ts
+- BusyIndicatorService
 - LecturerCourseUploadComponent
 - options
 - NotificationService
@@ -79,7 +80,7 @@
 - styles
 - HtmliconComponent
 - ApplicantsComponent
-- lecturer-course-details.component.ts
+- LecturerMyCoursesComponent
 - App Root Shell Template
 - HodModulePlaceholderComponent
 - StatusIndicatorComponent Template
@@ -87,9 +88,9 @@
 - @angular/cdk
 - @angular/common
 - @angular/compiler
-- topbar.component.ts
+- HodLecturersService
 - @angular/forms
-- DoughnutComponent
+- @angular/platform-browser
 - @angular/platform-browser-dynamic
 - CI Quality Job
 - @ngrx/signals
@@ -128,20 +129,22 @@
 - sblogo.png (School/Institution Crest Logo)
 - Status Checkmark Icon (statuslogo.png)
 - index.html (App Root Document)
-- ActionModalPayload
+- hod-profile.component.ts
 - HasPermissionDirective
-- admissions.component.ts
-- .exportApplicantsList
-- @angular/core
+- ChangeProgrammeModalComponent
+- environment.ts
+- admin-dashboard.dto.ts
+- admissions-upload-flow.component.ts
+- LecturerDashboardComponent
 - chart.js
 
 ## God Nodes (most connected - your core abstractions)
 
 1. `AdmissionsComponent` - 76 edges
 2. `ApplicantdetailComponent` - 63 edges
-3. `ApplicantlistsComponent` - 54 edges
+3. `ApplicantlistsComponent` - 53 edges
 4. `HodStateService` - 52 edges
-5. `PaymentRecordComponent` - 36 edges
+5. `PaymentRecordComponent` - 35 edges
 6. `LecturerStateService` - 29 edges
 7. `ApplicationService` - 29 edges
 8. `DashboardComponent` - 28 edges
@@ -177,31 +180,31 @@
 - **Dashboard Summary Widgets (chart, metric, loading state)** — src_app_widgets_doughnut_doughnut_component_template, src_app_widgets_metric_card_metric_card_component_template, src_app_widgets_busy_indicator_busy_indicator_component_template [INFERRED 0.65]
 - **Application Shell Layout (sidebar, topbar, root document)** — src_app_widgets_sidebar_sidebar_component_template, src_app_widgets_topbar_topbar_component_template, src_index_template [INFERRED 0.75]
 
-## Communities (118 total, 56 thin omitted)
+## Communities (118 total, 57 thin omitted)
 
 ### Community 0 - "AdmissionsComponent"
 
 Cohesion: 0.05
-Nodes (4): AdmissionsComponent, Component, ApplicationSetupItem, UpdateFileSelection
+Nodes (3): AdmissionsComponent, Component, ApplicationSetupItem
 
 ### Community 1 - "PaymentRecordComponent"
 
-Cohesion: 0.07
-Nodes (20): PaymentRecordComponent, Component, PAYMENT_BREAKDOWN_CARD_ORDER, FilterOption, PaymentBreakdown, PaymentDashboardDto, PaymentDetailDto, PaymentsListItemDto (+12 more)
+Cohesion: 0.06
+Nodes (24): AdmissionTableRow, ApplicationListRow, DashboardRow, PaymentRecordComponent, Component, PAYMENT_BREAKDOWN_CARD_ORDER, FilterOption, PaymentBreakdown (+16 more)
 
 ### Community 2 - "ApplicantdetailComponent"
 
-Cohesion: 0.06
-Nodes (6): ApplicationStatusDefinition, AcademicHistory, ApplicantdetailComponent, Component, Input, Output
+Cohesion: 0.07
+Nodes (5): AcademicHistory, ApplicantdetailComponent, Component, Input, Output
 
 ### Community 3 - "HodStateService"
 
 Cohesion: 0.06
-Nodes (12): HodCoursesComponent, Component, HodOverviewComponent, Component, HodProfileComponent, Component, HodStateService, Injectable (+4 more)
+Nodes (13): HodCoursesComponent, Component, HodOverviewComponent, Component, HodStateService, Injectable, HodDocumentFlag, HodLecturerAssignmentHistoryRecord (+5 more)
 
 ### Community 4 - "HodCourseRegistrationReviewService"
 
-Cohesion: 0.11
+Cohesion: 0.10
 Nodes (10): HodCourseRegistrationRecord, HodRegisteredCourse, HodCourseRegistrationApprovePayload, HodCourseRegistrationDetailQuery, HodCourseRegistrationQuery, HodCourseRegistrationReviewComponent, Component, HodCourseRegistrationReviewService (+2 more)
 
 ### Community 5 - "hod.constants.ts"
@@ -209,15 +212,15 @@ Nodes (10): HodCourseRegistrationRecord, HodRegisteredCourse, HodCourseRegistrat
 Cohesion: 0.09
 Nodes (28): buildCourseLevelConfiguration(), buildCoursePublicationHistoryRecord(), buildCourseRegistrationRecord(), buildDocumentVerificationRecord(), buildRegisteredCourses(), buildResultReviewRecord(), buildResultStudentRows(), buildStudentAcademicPerformance() (+20 more)
 
+### Community 6 - "ApplicantlistsComponent"
+
+Cohesion: 0.06
+Nodes (4): Application, ApplicantlistsComponent, Component, ActionModalPayload
+
 ### Community 7 - "devDependencies"
 
 Cohesion: 0.05
 Nodes (43): @angular/compiler-cli, @angular-devkit/build-angular, angular-eslint, eslint, husky, jasmine-core, karma, karma-chrome-launcher (+35 more)
-
-### Community 8 - "HodAssignCoursesComponent"
-
-Cohesion: 0.12
-Nodes (7): HodLecturerCourse, HodAssignCoursesComponent, Component, LecturerAssignedCoursesModalComponent, Component, Input, Output
 
 ### Community 9 - "SidebarComponent"
 
@@ -226,8 +229,8 @@ Nodes (3): HostListener, SidebarComponent, Component
 
 ### Community 10 - "applicant.ts"
 
-Cohesion: 0.08
-Nodes (24): AdmissionSummary, Application, ApplicationListResponse, ApplicationSummary, CertificateOfBirth, CertificateOfOrigin, CorrespondenceAddress, Country (+16 more)
+Cohesion: 0.09
+Nodes (22): AdmissionSummary, ApplicationSummary, CertificateOfBirth, CertificateOfOrigin, CorrespondenceAddress, Country, Country2, Department (+14 more)
 
 ### Community 11 - "http.interceptor.ts"
 
@@ -236,8 +239,8 @@ Nodes (19): AppComponent, Component, appConfig, collectMessages(), collectMessag
 
 ### Community 12 - "HodDocumentVerificationService"
 
-Cohesion: 0.07
-Nodes (17): HodDocumentVerificationRecord, HodLecturer, HodVerificationDocument, AssignCoursesRequestPayload, HodLecturersComponent, Component, HodLecturersService, Injectable (+9 more)
+Cohesion: 0.14
+Nodes (9): HodDocumentVerificationRecord, HodVerificationDocument, HodDocumentFlagIssuePayload, HodDocumentVerificationApiDocument, HodDocumentVerificationApiStudent, HodDocumentVerificationStatusPayload, HodDocumentVerificationService, Injectable (+1 more)
 
 ### Community 13 - "HodResultReviewService"
 
@@ -251,83 +254,88 @@ Nodes (6): NgModule, LoginComponent, Component, AuthService, Injectable, ShareMo
 
 ### Community 15 - "hod-document-verification.component.ts"
 
+Cohesion: 0.13
+Nodes (18): HOD_FLAG_DOCUMENT_OPTIONS, HOD_FLAG_REASON_OPTIONS, HOD_PROGRAMME_FILTER_OPTIONS, HodProgrammeFilterOption, ResultReviewTab, CourseRegistrationTab, DocumentVerificationTab, AppPaginationComponent (+10 more)
+
+### Community 16 - "hod-state.service.ts"
+
 Cohesion: 0.09
-Nodes (20): HOD_FLAG_DOCUMENT_OPTIONS, HOD_FLAG_REASON_OPTIONS, HOD_PROGRAMME_FILTER_OPTIONS, ResultReviewTab, CourseRegistrationReviewDrawerComponent, Component, CourseRegistrationTab, DocumentVerificationTab (+12 more)
-
-### Community 16 - "hod.types.ts"
-
-Cohesion: 0.12
-Nodes (17): CoursePublicationHistoryModalComponent, Component, Input, Output, CourseCatalogueSection, CourseSetupStage, HodState, HodCourseCatalogueCourse (+9 more)
+Nodes (27): CoursePublicationHistoryModalComponent, Component, Input, Output, CourseCatalogueSection, CourseSetupStage, HOD_COURSE_CATALOGUE_COURSES, HOD_COURSE_LEVEL_CONFIGURATIONS (+19 more)
 
 ### Community 17 - "application.service.ts"
 
-Cohesion: 0.11
-Nodes (16): AdminDashboardMetrics, ApprovalStatusBreakdown, PaymentStatusCount, TopCourseMetric, ApplicantActionPayload, ApplicationAdminDashboardResponse, ApplicationSetupListResponse, ApproveApplicantsDataItem (+8 more)
+Cohesion: 0.13
+Nodes (14): AdmissionAdminDashboardResponse, ApplicantActionPayload, ApplicationAdminDashboardResponse, ApplicationSetupListResponse, ApproveApplicantsDataItem, ApproveApplicantsPayload, BulkUpdateApplicantsPayload, ExportApplicantsPayload (+6 more)
 
 ### Community 18 - "lecturer-state.service.ts"
 
-Cohesion: 0.15
+Cohesion: 0.13
 Nodes (20): buildLecturerStudents(), COURSE_UPLOAD_STAGE, createStudent(), GRADE_SCALE, LECTURER_COURSES, LECTURER_LEVEL_LABEL_BY_COURSE_PREFIX, LECTURER_PROFILE, LECTURER_RESULT_TEMPLATE_HEADERS (+12 more)
 
-### Community 19 - "TopbarComponent"
+### Community 19 - "topbar.component.ts"
 
-Cohesion: 0.12
-Nodes (4): AdminLayoutComponent, Component, TopbarComponent, Component
+Cohesion: 0.11
+Nodes (7): AdminLayoutComponent, Component, DashboardInfo, DashboardinformationService, Injectable, TopbarComponent, Component
 
 ### Community 20 - "HodCourseSetupComponent"
 
 Cohesion: 0.10
-Nodes (4): HodCourseSetupComponent, Component, HodCourseRequirementType, HodLevelFilterOption
+Nodes (3): HodCourseSetupComponent, Component, HodCourseRequirementType
+
+### Community 22 - "ApplicationService"
+
+Cohesion: 0.10
+Nodes (3): ApplicationListResponse, ApplicationService, Injectable
 
 ### Community 23 - "DashboardComponent"
 
-Cohesion: 0.12
-Nodes (3): SetCutoffPayload, DashboardComponent, Component
+Cohesion: 0.06
+Nodes (22): APPLICATION_STATUS_DEFINITIONS, APPLICATION_STATUS_DESCRIPTIONS, APPLICATION_STATUS_LABELS, APPLICATION_STATUS_ORDER, APPLICATION_STATUS_TONES, ApplicationStatusDefinition, ApplicationStatusKey, ApplicationStatusOption (+14 more)
 
-### Community 24 - "applicantlists.component.ts"
+### Community 24 - "admissions.component.ts"
 
-Cohesion: 0.12
-Nodes (15): APPLICATION_STATUS_OPTIONS, ApplicantCardFilter, ApplicantFilterCard, CARD_FILTER_APPROVAL_STATUS, FilterOption, ExportOption, ExportApplicantsPayload, MetricCardComponent (+7 more)
+Cohesion: 0.10
+Nodes (18): appstatus, Column, role, AdmissionDecisionFilter, AdmissionFilterCard, ChangeProgrammeSelection, LazyLoadEvent, PagingEvent (+10 more)
 
 ### Community 25 - "AdmissionsUploadFlowComponent"
 
 Cohesion: 0.12
 Nodes (4): AdmissionsUploadFlowComponent, Component, Input, Output
 
-### Community 26 - "dashboard.component.ts"
+### Community 26 - "ActionNoteModalComponent"
 
-Cohesion: 0.18
-Nodes (15): APPLICATION_STATUS_DEFINITIONS, APPLICATION_STATUS_DESCRIPTIONS, APPLICATION_STATUS_LABELS, APPLICATION_STATUS_ORDER, APPLICATION_STATUS_TONES, ApplicationStatusKey, ApplicationStatusOption, APPLICATION_ACTION_DISABLED_STATUS_KEYS (+7 more)
+Cohesion: 0.25
+Nodes (4): ActionNoteModalComponent, Component, Input, Output
 
 ### Community 27 - "hod-students-record.component.ts"
 
-Cohesion: 0.11
-Nodes (10): HodProgrammeFilterOption, HodStudentRecord, HodStudentRecordDrawerTab, HodStudentsRecordComponent, Component, StudentRecordDetailsDrawerComponent, StudentRecordDrawerTabOption, Component (+2 more)
+Cohesion: 0.15
+Nodes (9): HodStudentRecord, HodStudentRecordDrawerTab, HodStudentsRecordComponent, Component, StudentRecordDetailsDrawerComponent, StudentRecordDrawerTabOption, Component, Input (+1 more)
 
 ### Community 28 - "hod-assign-courses.component.ts"
 
-Cohesion: 0.27
-Nodes (7): HOD_LEVEL_FILTER_OPTIONS, HodLecturerAssignmentHistoryRecord, PendingAssignmentChange, LecturerAssignmentHistoryModalComponent, Component, Input, Output
+Cohesion: 0.13
+Nodes (13): HOD_LEVEL_FILTER_OPTIONS, HodLecturer, HodLecturerCourse, HodLecturersComponent, Component, LecturerAssignedCoursesModalComponent, Component, Input (+5 more)
 
 ### Community 30 - "lecturer-results.service.ts"
 
 Cohesion: 0.20
 Nodes (7): LecturerCourseSingleResponse, LecturerResultsUploadResponse, LecturerStudentResultUpdatePayload, LecturerResultsService, Injectable, UnknownRecord, LecturerStudentResult
 
-### Community 31 - "ButtonComponent"
+### Community 31 - "applicantlists.component.ts"
 
-Cohesion: 0.11
-Nodes (13): ProgrammeOption, OptionItem, AdmissionUploadMode, AdmissionUploadStage, UploadFlowConfig, HodDashboardComponent, Component, ButtonComponent (+5 more)
+Cohesion: 0.09
+Nodes (18): APPLICATION_STATUS_OPTIONS, ProgrammeOption, OptionItem, ApplicantCardFilter, ApplicantFilterCard, CARD_FILTER_APPROVAL_STATUS, FilterOption, ApplicantExportSelection (+10 more)
 
 ### Community 33 - "dependencies"
 
 Cohesion: 0.13
-Nodes (15): angular2-notifications, @angular/animations, @angular/platform-browser, @angular/router, bootstrap, bootstrap-icons, dependencies, angular2-notifications (+7 more)
+Nodes (15): angular2-notifications, @angular/animations, @angular/core, @angular/router, bootstrap, bootstrap-icons, dependencies, angular2-notifications (+7 more)
 
-### Community 35 - "hod-state.service.ts"
+### Community 35 - "BusyIndicatorService"
 
-Cohesion: 0.12
-Nodes (13): HOD_COURSE_CATALOGUE_COURSES, HOD_COURSE_LEVEL_CONFIGURATIONS, HOD_COURSE_OVERVIEW_LEVELS, HOD_COURSE_PUBLICATION_HISTORY, HOD_LECTURER_ASSIGNMENT_HISTORY, HOD_LECTURER_COURSES, HOD_PROFILE, HOD_STUDENT_RECORDS (+5 more)
+Cohesion: 0.19
+Nodes (5): BusyIndicatorService, Injectable, NotificationSeverity, SessionStateService, Injectable
 
 ### Community 37 - "options"
 
@@ -336,8 +344,8 @@ Nodes (13): options, assets, browser, index, inlineStyleLanguage, outputPath, po
 
 ### Community 39 - "LecturerCourseAssignmentService"
 
-Cohesion: 0.29
-Nodes (4): LecturerCourseAssignmentService, Injectable, StaffAssignedCourseApiItem, StaffAssignedCoursesQuery
+Cohesion: 0.24
+Nodes (7): LecturerCourseAssignmentService, Injectable, LecturerAssignedCoursesPayload, StaffAssignedCourseApiCourse, StaffAssignedCourseApiItem, StaffAssignedCoursesApiResponse, StaffAssignedCoursesQuery
 
 ### Community 40 - "Applicant Detail View"
 
@@ -377,7 +385,7 @@ Nodes (4): ApplicantExportModalComponent, Component, Input, Output
 ### Community 48 - "development"
 
 Cohesion: 0.20
-Nodes (10): build, builder, configurations, defaultConfiguration, development, buildTarget, extractLicenses, fileReplacements (+2 more)
+Nodes (10): serve, development, buildTarget, extractLicenses, fileReplacements, optimization, sourceMap, builder (+2 more)
 
 ### Community 49 - "scripts"
 
@@ -386,13 +394,13 @@ Nodes (10): scripts, build, format, format:write, lint, ng, prepare, start (+2 m
 
 ### Community 50 - "applicantdetail.component.ts"
 
-Cohesion: 0.10
-Nodes (13): ContentChild, Certificate, OLevelResult, ApplicantDocumentFile, ComplianceDirectivePayload, ActionNoteModalComponent, Component, Input (+5 more)
+Cohesion: 0.18
+Nodes (9): ContentChild, Certificate, OLevelResult, ApplicantDocumentFile, ComplianceDirectivePayload, ReusableTableColumn, ReusableTableComponent, Component (+1 more)
 
 ### Community 51 - "production"
 
 Cohesion: 0.22
-Nodes (9): serve, production, budgets, buildTarget, fileReplacements, outputHashing, builder, configurations (+1 more)
+Nodes (9): build, builder, configurations, defaultConfiguration, production, budgets, buildTarget, fileReplacements (+1 more)
 
 ### Community 52 - "package.json"
 
@@ -416,8 +424,8 @@ Nodes (6): schematicCollections, angular, { defineConfig }, eslint, tseslint, an
 
 ### Community 56 - "sidebar.component.ts"
 
-Cohesion: 0.17
-Nodes (9): appstatus, Column, role, sidebarStateDTO, Injectable, WidgetService, SidebarMenuItem, SidebarMenuSection (+1 more)
+Cohesion: 0.22
+Nodes (6): sidebarStateDTO, Injectable, WidgetService, SidebarMenuItem, SidebarMenuSection, SidebarSubMenuItem
 
 ### Community 57 - "BusyIndicatorComponent"
 
@@ -434,11 +442,6 @@ Nodes (5): styles, node_modules/bootstrap/dist/css/bootstrap.min.css, node_modul
 Cohesion: 0.50
 Nodes (3): HtmliconComponent, Component, Input
 
-### Community 61 - "lecturer-course-details.component.ts"
-
-Cohesion: 0.15
-Nodes (7): LECTURER_UPLOAD_STAGE, LecturerUploadStage, LecturerDashboardComponent, Component, LecturerMyCoursesComponent, Component, AcademicPortalRole
-
 ### Community 62 - "App Root Shell Template"
 
 Cohesion: 1.00
@@ -454,47 +457,57 @@ Nodes (3): BusyIndicatorComponent Template, MetricCardComponent Template, Status
 Cohesion: 0.67
 Nodes (3): SidebarComponent Template, TableRowActionsComponent Template, TopbarComponent Template
 
-### Community 69 - "topbar.component.ts"
+### Community 110 - "hod-profile.component.ts"
 
-Cohesion: 0.36
-Nodes (3): DashboardInfo, DashboardinformationService, Injectable
-
-### Community 71 - "DoughnutComponent"
-
-Cohesion: 0.43
-Nodes (3): DoughnutComponent, Component, Input
+Cohesion: 0.25
+Nodes (4): HodProfileComponent, Component, LecturerProfileComponent, Component
 
 ### Community 111 - "HasPermissionDirective"
 
 Cohesion: 0.38
 Nodes (3): Directive, HasPermissionDirective, Input
 
-### Community 112 - "admissions.component.ts"
+### Community 112 - "ChangeProgrammeModalComponent"
 
-Cohesion: 0.09
-Nodes (19): ApplicationStatusTone, AdmissionDecisionFilter, AdmissionFilterCard, AdmissionTableRow, ChangeProgrammeSelection, LazyLoadEvent, PagingEvent, ProgrammeOption (+11 more)
+Cohesion: 0.29
+Nodes (4): ChangeProgrammeModalComponent, Component, Input, Output
+
+### Community 113 - "environment.ts"
+
+Cohesion: 0.38
+Nodes (3): AssignCoursesRequestPayload, UnknownRecord, environment
+
+### Community 114 - "admin-dashboard.dto.ts"
+
+Cohesion: 0.33
+Nodes (4): AdminDashboardMetrics, ApprovalStatusBreakdown, PaymentStatusCount, TopCourseMetric
+
+### Community 115 - "admissions-upload-flow.component.ts"
+
+Cohesion: 0.50
+Nodes (3): AdmissionUploadMode, AdmissionUploadStage, UploadFlowConfig
 
 ## Knowledge Gaps
 
 - **252 isolated node(s):** `$schema`, `version`, `newProjectRoot`, `projectType`, `style` (+247 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **56 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **57 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `ApplicantdetailComponent` connect `ApplicantdetailComponent` to `applicant.ts`, `admissions.component.ts`, `applicantdetail.component.ts`, `applicantlists.component.ts`, `dashboard.component.ts`?**
+- **Why does `ApplicantdetailComponent` connect `ApplicantdetailComponent` to `admissions.component.ts`, `applicantdetail.component.ts`, `ApplicantlistsComponent`, `applicantlists.component.ts`?**
   _High betweenness centrality (0.088) - this node is a cross-community bridge._
-- **Why does `AdmissionsComponent` connect `AdmissionsComponent` to `admissions.component.ts`, `applicant.ts`, `sidebar.component.ts`?**
-  _High betweenness centrality (0.075) - this node is a cross-community bridge._
-- **Why does `BusyIndicatorService` connect `hod-state.service.ts` to `PaymentRecordComponent`, `http.interceptor.ts`, `admissions.component.ts`, `lecturer-state.service.ts`, `applicantlists.component.ts`, `dashboard.component.ts`, `lecturer-course-details.component.ts`?**
-  _High betweenness centrality (0.051) - this node is a cross-community bridge._
+- **Why does `AdmissionsComponent` connect `AdmissionsComponent` to `admissions.component.ts`, `application.service.ts`, `ApplicantlistsComponent`?**
+  _High betweenness centrality (0.076) - this node is a cross-community bridge._
+- **Why does `BusyIndicatorService` connect `BusyIndicatorService` to `PaymentRecordComponent`, `http.interceptor.ts`, `hod-state.service.ts`, `lecturer-state.service.ts`, `admissions.component.ts`, `applicantlists.component.ts`?**
+  _High betweenness centrality (0.043) - this node is a cross-community bridge._
 - **What connects `$schema`, `version`, `newProjectRoot` to the rest of the system?**
   _252 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `AdmissionsComponent` be split into smaller, more focused modules?**
-  _Cohesion score 0.05289193302891933 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.0539906103286385 - nodes in this community are weakly interconnected._
 - **Should `PaymentRecordComponent` be split into smaller, more focused modules?**
-  _Cohesion score 0.0679563492063492 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06277436347673397 - nodes in this community are weakly interconnected._
 - **Should `ApplicantdetailComponent` be split into smaller, more focused modules?**
-  _Cohesion score 0.06453634085213032 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06623376623376623 - nodes in this community are weakly interconnected._
