@@ -338,9 +338,9 @@
     "word_count": 2286
   },
   "src/app/pages/applicants/applicantlists/applicantlists.component.html": {
-    "size": 7353,
-    "mtime_ns": 1785432156175523800,
-    "word_count": 357
+    "size": 7553,
+    "mtime_ns": 1785861657574559400,
+    "word_count": 365
   },
   "src/app/pages/applicants/applicantlists/applicantlists.component.spec.ts": {
     "size": 644,
@@ -348,9 +348,9 @@
     "word_count": 48
   },
   "src/app/pages/applicants/applicantlists/applicantlists.component.ts": {
-    "size": 22499,
-    "mtime_ns": 1785432181563428100,
-    "word_count": 1811
+    "size": 23010,
+    "mtime_ns": 1785861652703735000,
+    "word_count": 1861
   },
   "src/app/pages/applicants/applicantlists/export-modal/applicant-export-modal.component.html": {
     "size": 2248,
@@ -783,9 +783,9 @@
     "word_count": 218
   },
   "src/app/pages/payment-record/payment-record.component.ts": {
-    "size": 13442,
-    "mtime_ns": 1785431205192772300,
-    "word_count": 1103
+    "size": 13693,
+    "mtime_ns": 1785861620788158600,
+    "word_count": 1124
   },
   "src/app/pages/payment-record/payment-record.constants.ts": {
     "size": 149,
@@ -816,9 +816,9 @@
     "word_count": 36
   },
   "src/app/services/application.service.ts": {
-    "size": 8970,
-    "mtime_ns": 1785431187721968400,
-    "word_count": 716
+    "size": 9098,
+    "mtime_ns": 1785861633463144000,
+    "word_count": 728
   },
   "src/app/services/auth.service.spec.ts": {
     "size": 347,
@@ -1207,11 +1207,11 @@
     }
   },
   ".claude/settings.json": {
-    "size": 71,
-    "mtime_ns": 1785431805501004900,
-    "word_count": 11,
+    "size": 59,
+    "mtime_ns": 1785433188969444600,
+    "word_count": 9,
     "hashes": {
-      ".claude/settings.json": "4f3bb9f5bc20047c62f90f236b279c895c922f9ca25a434ba3e8535b407430bf"
+      ".claude/settings.json": "064eb606ea19349b7d218ac816b4a47b5b84288627e3d2cbbc513d7c739f6e8f"
     }
   },
   ".claude/settings.local.json": {

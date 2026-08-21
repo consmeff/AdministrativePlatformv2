@@ -66,6 +66,13 @@
       (modelChange)="onStatusChange($event)"
     />
     <app-filter-select
+      [options]="checkedOptions"
+      [model]="selectedChecked"
+      optionLabel="label"
+      placeholder="Check Status"
+      (modelChange)="onCheckedChange($event)"
+    />
+    <app-filter-select
       [options]="orderingOptions"
       [model]="selectedOrdering"
       optionLabel="label"

@@ -231,7 +231,7 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
         status:
           this.selectedStatus.value === 'all'
             ? undefined
-            : this.selectedStatus.value,
+            : this.toTitleCase(this.selectedStatus.value),
         // ordering: this.selectedOrdering.value || undefined,
       })
       .pipe(
@@ -377,6 +377,14 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
         subtext: '',
       })),
     ];
+  }
+
+  private toTitleCase(value: string): string {
+    return value
+      .split(/[\s_-]+/)
+      .filter((word) => word.length > 0)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
   }
 
   private normalizeStatus(status: string): PaymentStatus {
