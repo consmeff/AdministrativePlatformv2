@@ -12,6 +12,7 @@ export interface GetPaymentsQuery {
   ordering?: string;
   page?: number;
   search?: string;
+  status?: string;
 }
 
 @Injectable({
@@ -34,6 +35,9 @@ export class PaymentService {
     }
     if (query.search) {
       params = params.set('search', query.search);
+    }
+    if (query.status) {
+      params = params.set('status', query.status);
     }
     return this.http.get<PaymentsListResponseDto>(url, { params });
   }

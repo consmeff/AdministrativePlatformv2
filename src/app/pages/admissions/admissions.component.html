@@ -35,7 +35,10 @@
     </div>
 
     @if (selectedRows.length > 0) {
-      <section class="bulk-actions">
+      <section
+        class="bulk-actions"
+        *appHasPermission="permissions.MANAGE_APPLICANTS"
+      >
         <span class="selected-count"
           >{{ selectedRows.length }} Candidates selected</span
         >
@@ -138,6 +141,8 @@
             </td>
             <td>
               <app-table-row-actions
+                [showShortlistAction]="canManageApplicants"
+                [showComplianceAction]="canManageApplicants"
                 [shortlistTooltip]="getDecisionActionTooltip(rowData)"
                 [shortlistIconClass]="getDecisionActionIcon(rowData)"
                 [disableShortlist]="isGrantAdmissionActionDisabled(rowData)"

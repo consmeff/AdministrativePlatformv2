@@ -16,6 +16,11 @@ export class LecturerDashboardComponent {
   private readonly lecturerStateService = inject(LecturerStateService);
   private readonly portalContextService = inject(PortalContextService);
 
+  constructor() {
+    this.lecturerStateService.ensureProfileLoaded();
+    this.lecturerStateService.loadAssignedCourses();
+  }
+
   readonly lecturerProfile = this.lecturerStateService.lecturerProfile;
   readonly courses = this.lecturerStateService.courses;
   readonly dashboardMetrics = computed(() => {

@@ -1,0 +1,1245 @@
+{
+  ".github/workflows/ci.yml": {
+    "size": 541,
+    "mtime_ns": 1776008034582586900,
+    "word_count": 62,
+    "hashes": {
+      ".github/workflows/ci.yml": "79e04d5b5aa82ca95afe58cf53dac87703e668a739b323bc87a5227bbad5c2e5"
+    }
+  },
+  ".postcssrc.json": {
+    "size": 54,
+    "mtime_ns": 1776008034584704200,
+    "word_count": 7,
+    "hashes": {
+      ".postcssrc.json": "355776208c15d9005a20d4542278522c756084149edab43cc4d115f7491d9d09"
+    }
+  },
+  ".vscode/extensions.json": {
+    "size": 130,
+    "mtime_ns": 1774805993454038700,
+    "word_count": 10,
+    "hashes": {
+      ".vscode/extensions.json": "6e913ac03f9f547225ab22371ef7b8725d3a03e985d1a62a819718aabd8956fd"
+    }
+  },
+  ".vscode/launch.json": {
+    "size": 470,
+    "mtime_ns": 1774805993454545800,
+    "word_count": 41,
+    "hashes": {
+      ".vscode/launch.json": "1f07571a3f7711a286e3287729364d52cb5b19769c3ec0cd66347b2fad053e71"
+    }
+  },
+  ".vscode/tasks.json": {
+    "size": 938,
+    "mtime_ns": 1774805993454545800,
+    "word_count": 77,
+    "hashes": {
+      ".vscode/tasks.json": "7c9e1ff6ee4bc515de13dc99f55f5ca3dee8ca2d508b15e6d5676666d68b006d"
+    }
+  },
+  "README.md": {
+    "size": 1476,
+    "mtime_ns": 1774805993455555500,
+    "word_count": 206,
+    "hashes": {
+      "readme.md": "345e5101ca9ec2f646e14ecb08cd9b2fc2bc4c0353d09b7de7188a973a7b8c87"
+    }
+  },
+  "angular.json": {
+    "size": 3702,
+    "mtime_ns": 1784106758955027000,
+    "word_count": 200,
+    "hashes": {
+      "angular.json": "4991309bed045fa8ee41e5c7c25c38dc1e53cbab11fc7904920eae4442d7a9af"
+    }
+  },
+  "eslint.config.js": {
+    "size": 1257,
+    "mtime_ns": 1777824649816473100,
+    "word_count": 84
+  },
+  "package.json": {
+    "size": 1946,
+    "mtime_ns": 1782470134176724400,
+    "word_count": 145,
+    "hashes": {
+      "package.json": "56b69a9ce7899e607031bae14918fa1c3e81f0d2b6195aae033213cea0124614"
+    }
+  },
+  "public/assets/background.png": {
+    "size": 540205,
+    "mtime_ns": 1774805993460132900,
+    "word_count": 19473,
+    "hashes": {
+      "public/assets/background.png": "878764bce385e47288a3556a3f5df73cfd6e0c8fbdb33109ec8e90d403b0185a"
+    }
+  },
+  "public/assets/dashboard/Capa_1.png": {
+    "size": 1122,
+    "mtime_ns": 1774805993461156000,
+    "word_count": 51,
+    "hashes": {
+      "public/assets/dashboard/capa_1.png": "5922dd649648196cb8272c0b6615863490a0807744949d0984e3a5e12625b40a"
+    }
+  },
+  "public/assets/dashboard/Layer_1.png": {
+    "size": 947,
+    "mtime_ns": 1774805993462165400,
+    "word_count": 45,
+    "hashes": {
+      "public/assets/dashboard/layer_1.png": "8f504d5236f8d1a0434ee1db8efbd6a3003f6cd0537651d77ac9c06a8d1ec708"
+    }
+  },
+  "public/assets/dashboard/Layer_2.png": {
+    "size": 859,
+    "mtime_ns": 1774805993462165400,
+    "word_count": 48,
+    "hashes": {
+      "public/assets/dashboard/layer_2.png": "67283db1224632e7b276315164cb8eb8d54e6857aa94ebed9963580c64a1d00b"
+    }
+  },
+  "public/assets/dashboard/Layer_3.png": {
+    "size": 996,
+    "mtime_ns": 1774805993463175700,
+    "word_count": 50,
+    "hashes": {
+      "public/assets/dashboard/layer_3.png": "fde13e5c220011bed1c048d2d8b9d41753817897cdb0d8ae8f106f1f0a776711"
+    }
+  },
+  "public/assets/dashboard/arrow-right.png": {
+    "size": 232,
+    "mtime_ns": 1774805993463692600,
+    "word_count": 17,
+    "hashes": {
+      "public/assets/dashboard/arrow-right.png": "3ab8a41a20e0434c0540ed18a75bb62c584b7e44c9c9b116deb92b133299a759"
+    }
+  },
+  "public/assets/dashboard/export1.png": {
+    "size": 766,
+    "mtime_ns": 1774805993464199600,
+    "word_count": 38,
+    "hashes": {
+      "public/assets/dashboard/export1.png": "2d42cc90f800487d2432b553d8632aac88cecb4b8b8925e6d9e3ba3d5404c6e2"
+    }
+  },
+  "public/assets/dashboard/search.png": {
+    "size": 775,
+    "mtime_ns": 1774805993464199600,
+    "word_count": 29,
+    "hashes": {
+      "public/assets/dashboard/search.png": "d3fd6251bce1c4279f5d3de852a2cde61f4de44ee898aa5df7c8e1660cc348f6"
+    }
+  },
+  "public/assets/doc.png": {
+    "size": 496,
+    "mtime_ns": 1774805993464199600,
+    "word_count": 24,
+    "hashes": {
+      "public/assets/doc.png": "4b738a3f20b7a9ab380085cf317494a0d73174187f5cec326c6177a657d1ee64"
+    }
+  },
+  "public/assets/logo.png": {
+    "size": 25705,
+    "mtime_ns": 1774805993465257800,
+    "word_count": 1012,
+    "hashes": {
+      "public/assets/logo.png": "f58f6737fdc48ebbf922644a1683e10e4189402cb3360687ed1d981c60a8ab9a"
+    }
+  },
+  "public/assets/sblogo.png": {
+    "size": 8753,
+    "mtime_ns": 1774805993465257800,
+    "word_count": 356,
+    "hashes": {
+      "public/assets/sblogo.png": "d128e384733787e34301aa7a491af5592a9d00c7cf7eb2d18ef943aecb84ac2e"
+    }
+  },
+  "public/assets/statuslogo.png": {
+    "size": 5048,
+    "mtime_ns": 1774805993466829300,
+    "word_count": 187,
+    "hashes": {
+      "public/assets/statuslogo.png": "ec024fdf3e5e7a3b61fd64757310450c68a1a5faa3501a597b516cb669a4b366"
+    }
+  },
+  "src/app/app.component.html": {
+    "size": 332,
+    "mtime_ns": 1777824604009275800,
+    "word_count": 23,
+    "hashes": {
+      "src/app/app.component.html": "52d9a274780fb2812ef1ed80b3bf84ec447483f90db410360e0a43ec11701cbc"
+    }
+  },
+  "src/app/app.component.spec.ts": {
+    "size": 950,
+    "mtime_ns": 1777824652472079800,
+    "word_count": 84
+  },
+  "src/app/app.component.ts": {
+    "size": 1052,
+    "mtime_ns": 1777824604014819400,
+    "word_count": 97
+  },
+  "src/app/app.config.ts": {
+    "size": 1476,
+    "mtime_ns": 1777824652725300900,
+    "word_count": 123
+  },
+  "src/app/app.routes.ts": {
+    "size": 7965,
+    "mtime_ns": 1785432062829667300,
+    "word_count": 438
+  },
+  "src/app/auth/login/login.component.html": {
+    "size": 1724,
+    "mtime_ns": 1777824653042774600,
+    "word_count": 106,
+    "hashes": {
+      "src/app/auth/login/login.component.html": "eca9c59f387ebcc34d2cea8d9838a0a81860e349064dd8dce6f4d9ef89622cde"
+    }
+  },
+  "src/app/auth/login/login.component.spec.ts": {
+    "size": 581,
+    "mtime_ns": 1777824653137760500,
+    "word_count": 48
+  },
+  "src/app/auth/login/login.component.ts": {
+    "size": 2591,
+    "mtime_ns": 1781708064410736700,
+    "word_count": 231
+  },
+  "src/app/constants/application-status.constants.ts": {
+    "size": 4534,
+    "mtime_ns": 1778780622503939700,
+    "word_count": 324
+  },
+  "src/app/constants/application-status.types.ts": {
+    "size": 660,
+    "mtime_ns": 1778780998226209900,
+    "word_count": 69
+  },
+  "src/app/constants/application-status.utils.ts": {
+    "size": 3058,
+    "mtime_ns": 1779042714056928600,
+    "word_count": 225
+  },
+  "src/app/core/http.interceptor.ts": {
+    "size": 4634,
+    "mtime_ns": 1778594070670828000,
+    "word_count": 527
+  },
+  "src/app/layout/admin-layout/admin-layout.component.html": {
+    "size": 242,
+    "mtime_ns": 1777814062027669900,
+    "word_count": 13,
+    "hashes": {
+      "src/app/layout/admin-layout/admin-layout.component.html": "a7e2155bed1ae0f148ac7c87aad2037995a8f349805637094964108d9b0de258"
+    }
+  },
+  "src/app/layout/admin-layout/admin-layout.component.ts": {
+    "size": 501,
+    "mtime_ns": 1777133520382188100,
+    "word_count": 42
+  },
+  "src/app/model/auth.dto.ts": {
+    "size": 444,
+    "mtime_ns": 1777824653625422400,
+    "word_count": 46
+  },
+  "src/app/model/dashboard/admin-dashboard.dto.ts": {
+    "size": 626,
+    "mtime_ns": 1778352798406723800,
+    "word_count": 50
+  },
+  "src/app/model/dashboard/applicant.ts": {
+    "size": 4393,
+    "mtime_ns": 1785076468552330100,
+    "word_count": 458
+  },
+  "src/app/model/dashboard/information.dto.ts": {
+    "size": 98,
+    "mtime_ns": 1777824654263226300,
+    "word_count": 11
+  },
+  "src/app/model/page.dto.ts": {
+    "size": 245,
+    "mtime_ns": 1777824654285808000,
+    "word_count": 34
+  },
+  "src/app/pages/admissions/admissions.component.html": {
+    "size": 6591,
+    "mtime_ns": 1785432419500659300,
+    "word_count": 318
+  },
+  "src/app/pages/admissions/admissions.component.spec.ts": {
+    "size": 616,
+    "mtime_ns": 1777824655914549000,
+    "word_count": 48
+  },
+  "src/app/pages/admissions/admissions.component.ts": {
+    "size": 31387,
+    "mtime_ns": 1785432735105004100,
+    "word_count": 2579
+  },
+  "src/app/pages/admissions/change-programme-modal/change-programme-modal.component.html": {
+    "size": 1608,
+    "mtime_ns": 1778154010942737200,
+    "word_count": 97,
+    "hashes": {
+      "src/app/pages/admissions/change-programme-modal/change-programme-modal.component.html": "935b41049ec01a555d03dc28766eca2ba440ccfcf09ffee9bfd2afa6e83f8e9e"
+    }
+  },
+  "src/app/pages/admissions/change-programme-modal/change-programme-modal.component.ts": {
+    "size": 2107,
+    "mtime_ns": 1778154000668636600,
+    "word_count": 180
+  },
+  "src/app/pages/admissions/set-cutoff-modal/set-cutoff-modal.component.html": {
+    "size": 1869,
+    "mtime_ns": 1779111846520563600,
+    "word_count": 105,
+    "hashes": {
+      "src/app/pages/admissions/set-cutoff-modal/set-cutoff-modal.component.html": "f8f378fd6e6ab45f9458b5ba34688cee8cb1f44fe4f593f39fa0c4b9fee73d08"
+    }
+  },
+  "src/app/pages/admissions/set-cutoff-modal/set-cutoff-modal.component.ts": {
+    "size": 4293,
+    "mtime_ns": 1779111836912523500,
+    "word_count": 377
+  },
+  "src/app/pages/admissions/upload-flow/admissions-upload-flow.component.html": {
+    "size": 2286,
+    "mtime_ns": 1778596074113809400,
+    "word_count": 165,
+    "hashes": {
+      "src/app/pages/admissions/upload-flow/admissions-upload-flow.component.html": "b4d7f6cb71aa7927944a94ca2130dbbf6b5a1558ad450ae40e747d6826f6aa05"
+    }
+  },
+  "src/app/pages/admissions/upload-flow/admissions-upload-flow.component.ts": {
+    "size": 7048,
+    "mtime_ns": 1778765800931799300,
+    "word_count": 662
+  },
+  "src/app/pages/applicants/applicantdetail/applicantdetail.component.html": {
+    "size": 22232,
+    "mtime_ns": 1785432240001084500,
+    "word_count": 1175
+  },
+  "src/app/pages/applicants/applicantdetail/applicantdetail.component.spec.ts": {
+    "size": 651,
+    "mtime_ns": 1777824660294262200,
+    "word_count": 48
+  },
+  "src/app/pages/applicants/applicantdetail/applicantdetail.component.ts": {
+    "size": 25618,
+    "mtime_ns": 1785432230257666400,
+    "word_count": 2286
+  },
+  "src/app/pages/applicants/applicantlists/applicantlists.component.html": {
+    "size": 7553,
+    "mtime_ns": 1785861657574559400,
+    "word_count": 365
+  },
+  "src/app/pages/applicants/applicantlists/applicantlists.component.spec.ts": {
+    "size": 644,
+    "mtime_ns": 1777824662637107400,
+    "word_count": 48
+  },
+  "src/app/pages/applicants/applicantlists/applicantlists.component.ts": {
+    "size": 23010,
+    "mtime_ns": 1785861652703735000,
+    "word_count": 1861
+  },
+  "src/app/pages/applicants/applicantlists/export-modal/applicant-export-modal.component.html": {
+    "size": 2248,
+    "mtime_ns": 1777992269283650900,
+    "word_count": 122,
+    "hashes": {
+      "src/app/pages/applicants/applicantlists/export-modal/applicant-export-modal.component.html": "a546d4f7e82f4fb4ff381fff6f9a3935fb9567f002ade45476c38f3e195c6c5e"
+    }
+  },
+  "src/app/pages/applicants/applicantlists/export-modal/applicant-export-modal.component.ts": {
+    "size": 3661,
+    "mtime_ns": 1778780998226209900,
+    "word_count": 378
+  },
+  "src/app/pages/applicants/applicants.component.html": {
+    "size": 32,
+    "mtime_ns": 1777824662977466600,
+    "word_count": 1,
+    "hashes": {
+      "src/app/pages/applicants/applicants.component.html": "9de2af2a2ef564bd4d9350b7ff469d52a6ba3c5f5b08690dc7c5153a65f633e2"
+    }
+  },
+  "src/app/pages/applicants/applicants.component.spec.ts": {
+    "size": 616,
+    "mtime_ns": 1777824663410910500,
+    "word_count": 48
+  },
+  "src/app/pages/applicants/applicants.component.ts": {
+    "size": 352,
+    "mtime_ns": 1777824663556041500,
+    "word_count": 33
+  },
+  "src/app/pages/dashboard/dashboard.component.html": {
+    "size": 4112,
+    "mtime_ns": 1779093880537674700,
+    "word_count": 205,
+    "hashes": {
+      "src/app/pages/dashboard/dashboard.component.html": "abc1806375bbe228c5dacb35c8558adae7336406b0b3ff42b1f7cbbf83e25a90"
+    }
+  },
+  "src/app/pages/dashboard/dashboard.component.spec.ts": {
+    "size": 609,
+    "mtime_ns": 1777824663803151600,
+    "word_count": 48
+  },
+  "src/app/pages/dashboard/dashboard.component.ts": {
+    "size": 13158,
+    "mtime_ns": 1779093900871568900,
+    "word_count": 988
+  },
+  "src/app/pages/hod/courses/course-publication-history-modal.component.html": {
+    "size": 1543,
+    "mtime_ns": 1781820928901789900,
+    "word_count": 98,
+    "hashes": {
+      "src/app/pages/hod/courses/course-publication-history-modal.component.html": "1f89c87e5d0c21a8a94cb37c47e9d87a018ad28192f09ffc03fc59e22417f575"
+    }
+  },
+  "src/app/pages/hod/courses/course-publication-history-modal.component.ts": {
+    "size": 827,
+    "mtime_ns": 1781820916876094300,
+    "word_count": 68
+  },
+  "src/app/pages/hod/courses/hod-courses.component.html": {
+    "size": 1492,
+    "mtime_ns": 1781823003455939200,
+    "word_count": 98,
+    "hashes": {
+      "src/app/pages/hod/courses/hod-courses.component.html": "c0bccec48a6c57d9b6b016f7cb368cfb3a201c5e97b2948b3991fa5b1b1b1955"
+    }
+  },
+  "src/app/pages/hod/courses/hod-courses.component.ts": {
+    "size": 574,
+    "mtime_ns": 1781820609678431900,
+    "word_count": 52
+  },
+  "src/app/pages/hod/courses/setup/hod-course-setup.component.html": {
+    "size": 7127,
+    "mtime_ns": 1781823003563795800,
+    "word_count": 388,
+    "hashes": {
+      "src/app/pages/hod/courses/setup/hod-course-setup.component.html": "0c6f353b6cc5aa8c092434ab8f6ef4526fca308a82b82fdbf8ce663864330da7"
+    }
+  },
+  "src/app/pages/hod/courses/setup/hod-course-setup.component.ts": {
+    "size": 8274,
+    "mtime_ns": 1781823003672504300,
+    "word_count": 572
+  },
+  "src/app/pages/hod/hod-dashboard/hod-dashboard.component.html": {
+    "size": 830,
+    "mtime_ns": 1781707514189424700,
+    "word_count": 61,
+    "hashes": {
+      "src/app/pages/hod/hod-dashboard/hod-dashboard.component.html": "ded18fb49e2d66b94c609facb4257cbbef0248dc07e477e5525ded5b3cb09226"
+    }
+  },
+  "src/app/pages/hod/hod-dashboard/hod-dashboard.component.ts": {
+    "size": 1386,
+    "mtime_ns": 1784365152323175300,
+    "word_count": 102
+  },
+  "src/app/pages/hod/hod-module-placeholder/hod-module-placeholder.component.html": {
+    "size": 191,
+    "mtime_ns": 1781707651575717400,
+    "word_count": 14,
+    "hashes": {
+      "src/app/pages/hod/hod-module-placeholder/hod-module-placeholder.component.html": "2d05acc481c9ef545773b3ae3311f05d7d249aac06de54d712284824421f856a"
+    }
+  },
+  "src/app/pages/hod/hod-module-placeholder/hod-module-placeholder.component.ts": {
+    "size": 607,
+    "mtime_ns": 1781707638474249000,
+    "word_count": 53
+  },
+  "src/app/pages/hod/hod-overview/hod-overview.component.html": {
+    "size": 605,
+    "mtime_ns": 1781707608083924900,
+    "word_count": 48,
+    "hashes": {
+      "src/app/pages/hod/hod-overview/hod-overview.component.html": "13aeb6d92b24853ffa1f254d2647952115d68b7effc6258791f184deeb74369b"
+    }
+  },
+  "src/app/pages/hod/hod-overview/hod-overview.component.ts": {
+    "size": 1073,
+    "mtime_ns": 1784365218489007000,
+    "word_count": 78
+  },
+  "src/app/pages/hod/hod-profile/hod-profile.component.html": {
+    "size": 1159,
+    "mtime_ns": 1781707561032531400,
+    "word_count": 70,
+    "hashes": {
+      "src/app/pages/hod/hod-profile/hod-profile.component.html": "05043f6adc2c023711c066cbf11922c35bb1ef985caf59d5256e3bd45c5764b5"
+    }
+  },
+  "src/app/pages/hod/hod-profile/hod-profile.component.ts": {
+    "size": 563,
+    "mtime_ns": 1784365284245779200,
+    "word_count": 49
+  },
+  "src/app/pages/hod/hod-state.service.ts": {
+    "size": 31428,
+    "mtime_ns": 1785174629864710200,
+    "word_count": 2223
+  },
+  "src/app/pages/hod/hod.constants.ts": {
+    "size": 22623,
+    "mtime_ns": 1784213453362974800,
+    "word_count": 2165
+  },
+  "src/app/pages/hod/hod.types.ts": {
+    "size": 4948,
+    "mtime_ns": 1784366351910329200,
+    "word_count": 474
+  },
+  "src/app/pages/hod/lecturers/assign-courses/hod-assign-courses.component.html": {
+    "size": 4837,
+    "mtime_ns": 1784134127920087400,
+    "word_count": 274,
+    "hashes": {
+      "src/app/pages/hod/lecturers/assign-courses/hod-assign-courses.component.html": "a8ef77932d49787413e566808c3a546f88f7fe2e0cefb2abbee0727c4d909317"
+    }
+  },
+  "src/app/pages/hod/lecturers/assign-courses/hod-assign-courses.component.ts": {
+    "size": 7183,
+    "mtime_ns": 1784365619407628600,
+    "word_count": 529
+  },
+  "src/app/pages/hod/lecturers/hod-lecturers-api.types.ts": {
+    "size": 96,
+    "mtime_ns": 1784136860809001100,
+    "word_count": 9
+  },
+  "src/app/pages/hod/lecturers/hod-lecturers.component.html": {
+    "size": 1832,
+    "mtime_ns": 1781819862214744000,
+    "word_count": 106,
+    "hashes": {
+      "src/app/pages/hod/lecturers/hod-lecturers.component.html": "98be6ea646c0391f88acace3bd11737b008c65fdf4fa94b510243a441c6270da"
+    }
+  },
+  "src/app/pages/hod/lecturers/hod-lecturers.component.ts": {
+    "size": 2714,
+    "mtime_ns": 1784365551647255000,
+    "word_count": 205
+  },
+  "src/app/pages/hod/lecturers/hod-lecturers.service.ts": {
+    "size": 5188,
+    "mtime_ns": 1784136860933435000,
+    "word_count": 527
+  },
+  "src/app/pages/hod/lecturers/lecturer-assigned-courses-modal.component.html": {
+    "size": 1254,
+    "mtime_ns": 1781819777399264000,
+    "word_count": 88,
+    "hashes": {
+      "src/app/pages/hod/lecturers/lecturer-assigned-courses-modal.component.html": "61d75018116d376f766cd782f0791b6e45b5e8f66657f3543dd0080e10a94daa"
+    }
+  },
+  "src/app/pages/hod/lecturers/lecturer-assigned-courses-modal.component.ts": {
+    "size": 669,
+    "mtime_ns": 1781819765074712600,
+    "word_count": 61
+  },
+  "src/app/pages/hod/lecturers/lecturer-assignment-history-modal.component.html": {
+    "size": 1390,
+    "mtime_ns": 1781819815610940500,
+    "word_count": 85,
+    "hashes": {
+      "src/app/pages/hod/lecturers/lecturer-assignment-history-modal.component.html": "4de3956d90ff9e62eeef74517f860763d15c16083ff05994267bd0c3049a360d"
+    }
+  },
+  "src/app/pages/hod/lecturers/lecturer-assignment-history-modal.component.ts": {
+    "size": 823,
+    "mtime_ns": 1781819804719466200,
+    "word_count": 70
+  },
+  "src/app/pages/hod/result-review/hod-result-review-api.types.ts": {
+    "size": 245,
+    "mtime_ns": 1784136858661779400,
+    "word_count": 24
+  },
+  "src/app/pages/hod/result-review/hod-result-review.component.html": {
+    "size": 6604,
+    "mtime_ns": 1781819573905401200,
+    "word_count": 342,
+    "hashes": {
+      "src/app/pages/hod/result-review/hod-result-review.component.html": "f8a2e8c2e1d60eae679b6cef3abf7d9d568ea2432f0870b5a362c6ed9be93ead"
+    }
+  },
+  "src/app/pages/hod/result-review/hod-result-review.component.ts": {
+    "size": 4257,
+    "mtime_ns": 1784365421870128000,
+    "word_count": 309
+  },
+  "src/app/pages/hod/result-review/hod-result-review.service.ts": {
+    "size": 11853,
+    "mtime_ns": 1784210316317314200,
+    "word_count": 1045
+  },
+  "src/app/pages/hod/students-record/hod-students-record.component.html": {
+    "size": 3992,
+    "mtime_ns": 1781819574244383600,
+    "word_count": 226,
+    "hashes": {
+      "src/app/pages/hod/students-record/hod-students-record.component.html": "685a3770602881105ea17437cd68470ab99a78abd3a5902b25ce90b1a739fb8d"
+    }
+  },
+  "src/app/pages/hod/students-record/hod-students-record.component.ts": {
+    "size": 4189,
+    "mtime_ns": 1781820888257684200,
+    "word_count": 321
+  },
+  "src/app/pages/hod/students-record/student-record-details-drawer.component.html": {
+    "size": 6674,
+    "mtime_ns": 1781819574755647800,
+    "word_count": 351,
+    "hashes": {
+      "src/app/pages/hod/students-record/student-record-details-drawer.component.html": "c1297ab0253bae8a1eb6657ec700a43c8164cbdb104cff22526a00efee1176f0"
+    }
+  },
+  "src/app/pages/hod/students-record/student-record-details-drawer.component.ts": {
+    "size": 1501,
+    "mtime_ns": 1781819574846195100,
+    "word_count": 129
+  },
+  "src/app/pages/hod/verification/course-registration-review/course-registration-review-drawer.component.html": {
+    "size": 2725,
+    "mtime_ns": 1784214248158210500,
+    "word_count": 168,
+    "hashes": {
+      "src/app/pages/hod/verification/course-registration-review/course-registration-review-drawer.component.html": "e065affc187c9cd3cad4c38cff05fe6c7ce4c09e08be59bfa5f87ee5320cf164"
+    }
+  },
+  "src/app/pages/hod/verification/course-registration-review/course-registration-review-drawer.component.ts": {
+    "size": 1772,
+    "mtime_ns": 1784216092892446500,
+    "word_count": 165
+  },
+  "src/app/pages/hod/verification/course-registration-review/hod-course-registration-review-api.types.ts": {
+    "size": 423,
+    "mtime_ns": 1784216391996196900,
+    "word_count": 39
+  },
+  "src/app/pages/hod/verification/course-registration-review/hod-course-registration-review.component.html": {
+    "size": 5229,
+    "mtime_ns": 1784216394557515900,
+    "word_count": 260,
+    "hashes": {
+      "src/app/pages/hod/verification/course-registration-review/hod-course-registration-review.component.html": "d4ccd4d97022caff085a6199d1e660863fe7b4c56a7cd4275574ac60a8baab9c"
+    }
+  },
+  "src/app/pages/hod/verification/course-registration-review/hod-course-registration-review.component.ts": {
+    "size": 6257,
+    "mtime_ns": 1784365486571370200,
+    "word_count": 466
+  },
+  "src/app/pages/hod/verification/course-registration-review/hod-course-registration-review.service.ts": {
+    "size": 15728,
+    "mtime_ns": 1784216394679773000,
+    "word_count": 1252
+  },
+  "src/app/pages/hod/verification/document-verification/hod-document-verification-api.types.ts": {
+    "size": 1629,
+    "mtime_ns": 1783412841018848200,
+    "word_count": 211
+  },
+  "src/app/pages/hod/verification/document-verification/hod-document-verification.component.html": {
+    "size": 7066,
+    "mtime_ns": 1783412841094932800,
+    "word_count": 384,
+    "hashes": {
+      "src/app/pages/hod/verification/document-verification/hod-document-verification.component.html": "6b03493ea7fc1d3541da94def89a6866b75b5604fdb0d70f7093c2389fd5f657"
+    }
+  },
+  "src/app/pages/hod/verification/document-verification/hod-document-verification.component.ts": {
+    "size": 5418,
+    "mtime_ns": 1784365351444165400,
+    "word_count": 393
+  },
+  "src/app/pages/hod/verification/document-verification/hod-document-verification.service.ts": {
+    "size": 12868,
+    "mtime_ns": 1783412841260623300,
+    "word_count": 1105
+  },
+  "src/app/pages/lecturer/lecturer-course-assignment.service.ts": {
+    "size": 4565,
+    "mtime_ns": 1784115616404777500,
+    "word_count": 359
+  },
+  "src/app/pages/lecturer/lecturer-course-assignment.types.ts": {
+    "size": 1065,
+    "mtime_ns": 1784115604100418900,
+    "word_count": 116
+  },
+  "src/app/pages/lecturer/lecturer-course-details/lecturer-course-details.component.html": {
+    "size": 7604,
+    "mtime_ns": 1782469826349734700,
+    "word_count": 423,
+    "hashes": {
+      "src/app/pages/lecturer/lecturer-course-details/lecturer-course-details.component.html": "b923c92cbfe529d0c3119d2e26fbc7a03ddf9c229508a83a5d0f66ae60815ae5"
+    }
+  },
+  "src/app/pages/lecturer/lecturer-course-details/lecturer-course-details.component.ts": {
+    "size": 7138,
+    "mtime_ns": 1785174629866701800,
+    "word_count": 543
+  },
+  "src/app/pages/lecturer/lecturer-course-upload/lecturer-course-upload.component.html": {
+    "size": 3555,
+    "mtime_ns": 1782469826352728900,
+    "word_count": 231,
+    "hashes": {
+      "src/app/pages/lecturer/lecturer-course-upload/lecturer-course-upload.component.html": "197a188740ce733f24f1d22efb09eef2428f620173a1758428b8e900f7c078ac"
+    }
+  },
+  "src/app/pages/lecturer/lecturer-course-upload/lecturer-course-upload.component.ts": {
+    "size": 7529,
+    "mtime_ns": 1785174629867700700,
+    "word_count": 565
+  },
+  "src/app/pages/lecturer/lecturer-dashboard/lecturer-dashboard.component.html": {
+    "size": 1948,
+    "mtime_ns": 1781707977559295500,
+    "word_count": 124,
+    "hashes": {
+      "src/app/pages/lecturer/lecturer-dashboard/lecturer-dashboard.component.html": "8a1576c266fb2838a07b3628c4674c5fe7f5fe00eb500853c697d059064f1ddf"
+    }
+  },
+  "src/app/pages/lecturer/lecturer-dashboard/lecturer-dashboard.component.ts": {
+    "size": 1800,
+    "mtime_ns": 1785174629868696600,
+    "word_count": 144
+  },
+  "src/app/pages/lecturer/lecturer-my-courses/lecturer-my-courses.component.html": {
+    "size": 1467,
+    "mtime_ns": 1781707996226066900,
+    "word_count": 105,
+    "hashes": {
+      "src/app/pages/lecturer/lecturer-my-courses/lecturer-my-courses.component.html": "c2512d752c74c81652ef856b81d2b7862ee4a2779156a1c7afaa37a93be7459b"
+    }
+  },
+  "src/app/pages/lecturer/lecturer-my-courses/lecturer-my-courses.component.ts": {
+    "size": 984,
+    "mtime_ns": 1785174629869693700,
+    "word_count": 75
+  },
+  "src/app/pages/lecturer/lecturer-profile/lecturer-profile.component.html": {
+    "size": 1403,
+    "mtime_ns": 1781704072369958500,
+    "word_count": 80,
+    "hashes": {
+      "src/app/pages/lecturer/lecturer-profile/lecturer-profile.component.html": "3583251667f40cf743e7aa57c07455dfdab28136905f06e00e04a87e7915191b"
+    }
+  },
+  "src/app/pages/lecturer/lecturer-profile/lecturer-profile.component.ts": {
+    "size": 629,
+    "mtime_ns": 1785174629870690700,
+    "word_count": 49
+  },
+  "src/app/pages/lecturer/lecturer-results-api.types.ts": {
+    "size": 419,
+    "mtime_ns": 1782470153866954800,
+    "word_count": 40
+  },
+  "src/app/pages/lecturer/lecturer-results.service.ts": {
+    "size": 5773,
+    "mtime_ns": 1782556971160068700,
+    "word_count": 539
+  },
+  "src/app/pages/lecturer/lecturer-state.service.ts": {
+    "size": 12697,
+    "mtime_ns": 1785174629871687800,
+    "word_count": 939
+  },
+  "src/app/pages/lecturer/lecturer.constants.ts": {
+    "size": 4576,
+    "mtime_ns": 1782669779202489600,
+    "word_count": 465
+  },
+  "src/app/pages/lecturer/lecturer.types.ts": {
+    "size": 826,
+    "mtime_ns": 1782556971493277500,
+    "word_count": 80
+  },
+  "src/app/pages/payment-record/payment-record.component.html": {
+    "size": 3993,
+    "mtime_ns": 1785431212807901300,
+    "word_count": 218
+  },
+  "src/app/pages/payment-record/payment-record.component.ts": {
+    "size": 13693,
+    "mtime_ns": 1785861620788158600,
+    "word_count": 1124
+  },
+  "src/app/pages/payment-record/payment-record.constants.ts": {
+    "size": 149,
+    "mtime_ns": 1779112380357244700,
+    "word_count": 18
+  },
+  "src/app/pages/payment-record/payment-record.types.ts": {
+    "size": 1969,
+    "mtime_ns": 1779113491618333400,
+    "word_count": 218
+  },
+  "src/app/pages/payment-record/receipt-modal/payment-receipt-modal.component.html": {
+    "size": 2417,
+    "mtime_ns": 1778150589427169900,
+    "word_count": 135,
+    "hashes": {
+      "src/app/pages/payment-record/receipt-modal/payment-receipt-modal.component.html": "59bdabcc047058d5a81e17abc2ad9a2233b46cd63fdcc213432504c47afb214a"
+    }
+  },
+  "src/app/pages/payment-record/receipt-modal/payment-receipt-modal.component.ts": {
+    "size": 1503,
+    "mtime_ns": 1778148499748968900,
+    "word_count": 134
+  },
+  "src/app/services/application.service.spec.ts": {
+    "size": 382,
+    "mtime_ns": 1774805993493177800,
+    "word_count": 36
+  },
+  "src/app/services/application.service.ts": {
+    "size": 9098,
+    "mtime_ns": 1785861633463144000,
+    "word_count": 728
+  },
+  "src/app/services/auth.service.spec.ts": {
+    "size": 347,
+    "mtime_ns": 1774805993494186700,
+    "word_count": 36
+  },
+  "src/app/services/auth.service.ts": {
+    "size": 6602,
+    "mtime_ns": 1785432007299926000,
+    "word_count": 507
+  },
+  "src/app/services/busy-indicator.service.spec.ts": {
+    "size": 393,
+    "mtime_ns": 1774805993494694200,
+    "word_count": 36
+  },
+  "src/app/services/busy-indicator.service.ts": {
+    "size": 652,
+    "mtime_ns": 1785175386980879700,
+    "word_count": 60
+  },
+  "src/app/services/dashboardinformation.service.spec.ts": {
+    "size": 427,
+    "mtime_ns": 1774805993496210200,
+    "word_count": 36
+  },
+  "src/app/services/dashboardinformation.service.ts": {
+    "size": 761,
+    "mtime_ns": 1785175757315225400,
+    "word_count": 71
+  },
+  "src/app/services/jwtinterceptor.ts": {
+    "size": 2315,
+    "mtime_ns": 1782651840956266600,
+    "word_count": 224
+  },
+  "src/app/services/notification.service.ts": {
+    "size": 1333,
+    "mtime_ns": 1785174629874679400,
+    "word_count": 133
+  },
+  "src/app/services/payment.service.ts": {
+    "size": 1616,
+    "mtime_ns": 1785431195126539800,
+    "word_count": 142
+  },
+  "src/app/services/portal-context.service.ts": {
+    "size": 2708,
+    "mtime_ns": 1785432002147537400,
+    "word_count": 260
+  },
+  "src/app/services/session-state.service.ts": {
+    "size": 430,
+    "mtime_ns": 1785174629875678100,
+    "word_count": 46
+  },
+  "src/app/services/theme.service.ts": {
+    "size": 1527,
+    "mtime_ns": 1777131872113667400,
+    "word_count": 153
+  },
+  "src/app/services/widget.service.spec.ts": {
+    "size": 357,
+    "mtime_ns": 1774805993497219800,
+    "word_count": 36
+  },
+  "src/app/services/widget.service.ts": {
+    "size": 762,
+    "mtime_ns": 1785175839020749100,
+    "word_count": 71
+  },
+  "src/app/shared/share/share.module.ts": {
+    "size": 683,
+    "mtime_ns": 1777824664540638500,
+    "word_count": 63
+  },
+  "src/app/store/app.store.ts": {
+    "size": 673,
+    "mtime_ns": 1776008034631657200,
+    "word_count": 75
+  },
+  "src/app/widgets/action-note-modal/action-note-modal.component.html": {
+    "size": 2565,
+    "mtime_ns": 1777213076819724600,
+    "word_count": 145,
+    "hashes": {
+      "src/app/widgets/action-note-modal/action-note-modal.component.html": "536edbface48586a3e95c202f2214751ef5c44e4d4845376f838dc78ed721373"
+    }
+  },
+  "src/app/widgets/action-note-modal/action-note-modal.component.ts": {
+    "size": 2937,
+    "mtime_ns": 1777213076779395300,
+    "word_count": 277
+  },
+  "src/app/widgets/app-pagination/app-pagination.component.html": {
+    "size": 298,
+    "mtime_ns": 1778150625657308800,
+    "word_count": 13,
+    "hashes": {
+      "src/app/widgets/app-pagination/app-pagination.component.html": "efdf65117ad371292dd5e6905e2e91a34305c683698558c6ada4edc901cb4f47"
+    }
+  },
+  "src/app/widgets/app-pagination/app-pagination.component.ts": {
+    "size": 735,
+    "mtime_ns": 1778150614103630000,
+    "word_count": 78
+  },
+  "src/app/widgets/busy-indicator/busy-indicator.component.html": {
+    "size": 130,
+    "mtime_ns": 1777824665238679800,
+    "word_count": 7,
+    "hashes": {
+      "src/app/widgets/busy-indicator/busy-indicator.component.html": "f1abb12d3fe6ac69abb182269c207dd64e5308da7aa7c003cf9b30433ab20b77"
+    }
+  },
+  "src/app/widgets/busy-indicator/busy-indicator.component.spec.ts": {
+    "size": 638,
+    "mtime_ns": 1777824665337174300,
+    "word_count": 48
+  },
+  "src/app/widgets/busy-indicator/busy-indicator.component.ts": {
+    "size": 973,
+    "mtime_ns": 1776008034633183800,
+    "word_count": 97
+  },
+  "src/app/widgets/button/button.component.html": {
+    "size": 509,
+    "mtime_ns": 1781704073935076500,
+    "word_count": 39,
+    "hashes": {
+      "src/app/widgets/button/button.component.html": "d00ab0471cf0436f18c7aaa65e2b0cedcfcc368a2203e8a40681a220cad0c8ba"
+    }
+  },
+  "src/app/widgets/button/button.component.ts": {
+    "size": 1392,
+    "mtime_ns": 1781704073661232700,
+    "word_count": 160
+  },
+  "src/app/widgets/doughnut/doughnut.component.html": {
+    "size": 384,
+    "mtime_ns": 1777824666068550500,
+    "word_count": 28,
+    "hashes": {
+      "src/app/widgets/doughnut/doughnut.component.html": "da52fbc110f0d0d1eada1de385be6f220fecffe7be761e036ace7d7c6719ee8c"
+    }
+  },
+  "src/app/widgets/doughnut/doughnut.component.spec.ts": {
+    "size": 602,
+    "mtime_ns": 1777824666497979800,
+    "word_count": 48
+  },
+  "src/app/widgets/doughnut/doughnut.component.ts": {
+    "size": 3435,
+    "mtime_ns": 1778780785772193600,
+    "word_count": 283
+  },
+  "src/app/widgets/filter-select/filter-select.component.html": {
+    "size": 246,
+    "mtime_ns": 1781708162019160700,
+    "word_count": 11,
+    "hashes": {
+      "src/app/widgets/filter-select/filter-select.component.html": "3e2271e66ea0b6fa6012554389a5d7a65c4218488f95f186f779de9ab9c6e97d"
+    }
+  },
+  "src/app/widgets/filter-select/filter-select.component.ts": {
+    "size": 682,
+    "mtime_ns": 1781708423064813400,
+    "word_count": 73
+  },
+  "src/app/widgets/htmlicon/htmlicon.component.html": {
+    "size": 30,
+    "mtime_ns": 1777824667836300600,
+    "word_count": 2,
+    "hashes": {
+      "src/app/widgets/htmlicon/htmlicon.component.html": "45cef8b5e923a05f6228fa315086773206fa6271f3499ccb6cc7828f23e244ca"
+    }
+  },
+  "src/app/widgets/htmlicon/htmlicon.component.spec.ts": {
+    "size": 602,
+    "mtime_ns": 1777824668421420500,
+    "word_count": 48
+  },
+  "src/app/widgets/htmlicon/htmlicon.component.ts": {
+    "size": 321,
+    "mtime_ns": 1777824668513723600,
+    "word_count": 31
+  },
+  "src/app/widgets/metric-card/metric-card.component.html": {
+    "size": 795,
+    "mtime_ns": 1777819567355572000,
+    "word_count": 67,
+    "hashes": {
+      "src/app/widgets/metric-card/metric-card.component.html": "b4e6c5cb5b111bbbbb8a5bbf4d64539f82f35dcaa2707b37d2781eafcebecb9e"
+    }
+  },
+  "src/app/widgets/metric-card/metric-card.component.ts": {
+    "size": 710,
+    "mtime_ns": 1777817018991144900,
+    "word_count": 80
+  },
+  "src/app/widgets/reusable-table/reusable-table.component.html": {
+    "size": 944,
+    "mtime_ns": 1777109079246847900,
+    "word_count": 75,
+    "hashes": {
+      "src/app/widgets/reusable-table/reusable-table.component.html": "4ff8a282638712bb364137eb33ded7a877aa2e31509ef4632725137a66f71763"
+    }
+  },
+  "src/app/widgets/reusable-table/reusable-table.component.ts": {
+    "size": 1149,
+    "mtime_ns": 1777108999254554900,
+    "word_count": 119
+  },
+  "src/app/widgets/search-input/search-input.component.html": {
+    "size": 298,
+    "mtime_ns": 1777211613742888100,
+    "word_count": 18,
+    "hashes": {
+      "src/app/widgets/search-input/search-input.component.html": "c33f0160233e310d893cf0a0d70b58877c3db907c6add10a5eb274c8df050b5f"
+    }
+  },
+  "src/app/widgets/search-input/search-input.component.ts": {
+    "size": 518,
+    "mtime_ns": 1777211613743885700,
+    "word_count": 52
+  },
+  "src/app/widgets/sidebar/sidebar.component.html": {
+    "size": 3003,
+    "mtime_ns": 1781707387618212900,
+    "word_count": 162,
+    "hashes": {
+      "src/app/widgets/sidebar/sidebar.component.html": "4253b7271e06ba5c3e7df42a8480bd40c84f2cd5b2bf69f5c468c4131e89e654"
+    }
+  },
+  "src/app/widgets/sidebar/sidebar.component.spec.ts": {
+    "size": 595,
+    "mtime_ns": 1777824671136909900,
+    "word_count": 48
+  },
+  "src/app/widgets/sidebar/sidebar.component.ts": {
+    "size": 9476,
+    "mtime_ns": 1785432112118833400,
+    "word_count": 747
+  },
+  "src/app/widgets/status-indicator/status-indicator.component.html": {
+    "size": 231,
+    "mtime_ns": 1778780314258477400,
+    "word_count": 20,
+    "hashes": {
+      "src/app/widgets/status-indicator/status-indicator.component.html": "9ba98ebae1ded54cccef716b47d3536be4410ce2316899a9a99b353238f36a18"
+    }
+  },
+  "src/app/widgets/status-indicator/status-indicator.component.ts": {
+    "size": 608,
+    "mtime_ns": 1778780303895049900,
+    "word_count": 62
+  },
+  "src/app/widgets/table-row-actions/table-row-actions.component.html": {
+    "size": 1194,
+    "mtime_ns": 1785432144577189300,
+    "word_count": 64
+  },
+  "src/app/widgets/table-row-actions/table-row-actions.component.ts": {
+    "size": 1124,
+    "mtime_ns": 1785432139733346300,
+    "word_count": 110
+  },
+  "src/app/widgets/topbar/topbar.component.html": {
+    "size": 1128,
+    "mtime_ns": 1785432030940549200,
+    "word_count": 77
+  },
+  "src/app/widgets/topbar/topbar.component.spec.ts": {
+    "size": 588,
+    "mtime_ns": 1777824673429456600,
+    "word_count": 48
+  },
+  "src/app/widgets/topbar/topbar.component.ts": {
+    "size": 5769,
+    "mtime_ns": 1785432027277349100,
+    "word_count": 465
+  },
+  "src/app/widgets/update-file-modal/update-file-modal.component.html": {
+    "size": 2180,
+    "mtime_ns": 1777999848868263900,
+    "word_count": 132,
+    "hashes": {
+      "src/app/widgets/update-file-modal/update-file-modal.component.html": "515066b268f87a33f97d8fb59f71d0a1f4c781ea4adfe28ae05df9a8235d7484"
+    }
+  },
+  "src/app/widgets/update-file-modal/update-file-modal.component.ts": {
+    "size": 1959,
+    "mtime_ns": 1778065744160095100,
+    "word_count": 197
+  },
+  "src/assets/background.png": {
+    "size": 540205,
+    "mtime_ns": 1774805993513275700,
+    "word_count": 19473,
+    "hashes": {
+      "src/assets/background.png": "89755ee3bb8f195aca16384db9b5a332d18a6430ac9a2b4b4fa45ef938cc7581"
+    }
+  },
+  "src/assets/doc.png": {
+    "size": 496,
+    "mtime_ns": 1774805993514286500,
+    "word_count": 24,
+    "hashes": {
+      "src/assets/doc.png": "770fc21197622213c0375380a3de2a6855aeeca0095652f278b7a097a42af9aa"
+    }
+  },
+  "src/assets/logo.png": {
+    "size": 25705,
+    "mtime_ns": 1774805993514793700,
+    "word_count": 1012,
+    "hashes": {
+      "src/assets/logo.png": "fb30aeb7cfa8adbb271316185a57b0c6e5a60ab76537681ea6bf9209147352aa"
+    }
+  },
+  "src/assets/sblogo.png": {
+    "size": 8753,
+    "mtime_ns": 1774805993514793700,
+    "word_count": 356,
+    "hashes": {
+      "src/assets/sblogo.png": "34d3eb992b53d41fb232c4f8b490386477dffe519e1bc0cba356277cd976f3b8"
+    }
+  },
+  "src/assets/statuslogo.png": {
+    "size": 5048,
+    "mtime_ns": 1774805993515801900,
+    "word_count": 187,
+    "hashes": {
+      "src/assets/statuslogo.png": "70808c1f37ebf5111e82388094592535fa057a80310a286b5069ddced9db9c5c"
+    }
+  },
+  "src/environments/environment.development.ts": {
+    "size": 104,
+    "mtime_ns": 1779269278672706900,
+    "word_count": 10
+  },
+  "src/environments/environment.production.ts": {
+    "size": 105,
+    "mtime_ns": 1779266625993099900,
+    "word_count": 10
+  },
+  "src/environments/environment.ts": {
+    "size": 104,
+    "mtime_ns": 1779269278728325600,
+    "word_count": 10
+  },
+  "src/index.html": {
+    "size": 591,
+    "mtime_ns": 1777993647053247800,
+    "word_count": 31,
+    "hashes": {
+      "src/index.html": "b629213fd8d8f8dea4112e382014d3ee3c414ed228fd28ee910c8eb7bda45cf8"
+    }
+  },
+  "src/main.ts": {
+    "size": 251,
+    "mtime_ns": 1777824674882635200,
+    "word_count": 23
+  },
+  "tsconfig.app.json": {
+    "size": 408,
+    "mtime_ns": 1777824675213513700,
+    "word_count": 35,
+    "hashes": {
+      "tsconfig.app.json": "252ee3d488c608fdccce0813563a1e93e33a083bb28f18de9ec8b5c58d9555d5"
+    }
+  },
+  "tsconfig.json": {
+    "size": 915,
+    "mtime_ns": 1774805993519356800,
+    "word_count": 66,
+    "hashes": {
+      "tsconfig.json": "2ba555d333b7f0b7e677dadbfc764115ec6b8c0388dc4d03c2e8ad9d4c84f064"
+    }
+  },
+  "tsconfig.spec.json": {
+    "size": 410,
+    "mtime_ns": 1777824675602418300,
+    "word_count": 34,
+    "hashes": {
+      "tsconfig.spec.json": "5bf8fcb732c52723b3235c014f2cbee707592db4709f4e194b8a79ab1eeaf7ff"
+    }
+  },
+  ".claude/settings.json": {
+    "size": 59,
+    "mtime_ns": 1785433188969444600,
+    "word_count": 9,
+    "hashes": {
+      ".claude/settings.json": "064eb606ea19349b7d218ac816b4a47b5b84288627e3d2cbbc513d7c739f6e8f"
+    }
+  },
+  ".claude/settings.local.json": {
+    "size": 381,
+    "mtime_ns": 1785432851863593900,
+    "word_count": 27,
+    "hashes": {
+      ".claude/settings.local.json": "5f9db30b8f650042593419be755abc8c607975f74e141075547c9c80fb6c0934"
+    }
+  },
+  "src/app/constants/permissions.constants.ts": {
+    "size": 1530,
+    "mtime_ns": 1785431934492321800,
+    "word_count": 150
+  },
+  "src/app/directives/has-permission.directive.ts": {
+    "size": 1926,
+    "mtime_ns": 1785431953791648800,
+    "word_count": 173
+  },
+  "src/app/guards/permission.guard.ts": {
+    "size": 1321,
+    "mtime_ns": 1785431958867795600,
+    "word_count": 134
+  },
+  "src/app/services/permission.service.ts": {
+    "size": 2415,
+    "mtime_ns": 1785431943243341100,
+    "word_count": 197
+  }
+}

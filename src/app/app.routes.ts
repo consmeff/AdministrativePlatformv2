@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { permissionGuard } from './guards/permission.guard';
+import { APP_PERMISSIONS } from './constants/permissions.constants';
 
 export const routes: Routes = [
   {
@@ -172,6 +174,13 @@ export const routes: Routes = [
       },
       {
         path: 'admissions',
+        canActivate: [permissionGuard],
+        data: {
+          permissions: [
+            APP_PERMISSIONS.MANAGE_APPLICANTS,
+            APP_PERMISSIONS.VIEW_APPLICANTS,
+          ],
+        },
         loadComponent: () =>
           import('./pages/admissions/admissions.component').then(
             (m) => m.AdmissionsComponent,
@@ -179,6 +188,13 @@ export const routes: Routes = [
       },
       {
         path: 'payment-records',
+        canActivate: [permissionGuard],
+        data: {
+          permissions: [
+            APP_PERMISSIONS.MANAGE_FEES,
+            APP_PERMISSIONS.MANAGE_APPLICATION_FEES_MANUALLY,
+          ],
+        },
         loadComponent: () =>
           import('./pages/payment-record/payment-record.component').then(
             (m) => m.PaymentRecordComponent,
@@ -191,6 +207,14 @@ export const routes: Routes = [
       },
       {
         path: 'applicants',
+        canActivate: [permissionGuard],
+        data: {
+          permissions: [
+            APP_PERMISSIONS.VIEW_APPLICANTS,
+            APP_PERMISSIONS.VIEW_APPLICATIONS,
+            APP_PERMISSIONS.MANAGE_APPLICANTS,
+          ],
+        },
         loadComponent: () =>
           import('./pages/applicants/applicants.component').then(
             (m) => m.ApplicantsComponent,

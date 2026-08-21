@@ -40,6 +40,15 @@
       </div>
 
       <p-select
+        [options]="statusOptions"
+        [(ngModel)]="selectedStatus"
+        optionLabel="label"
+        class="filter-select"
+        placeholder="All Status"
+        (onChange)="onStatusChange()"
+      />
+
+      <p-select
         [options]="orderingOptions"
         [(ngModel)]="selectedOrdering"
         optionLabel="label"

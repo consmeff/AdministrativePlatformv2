@@ -53,6 +53,7 @@ export interface GetApplicantsQuery {
   payment_status?: string;
   application_no?: string;
   search?: string;
+  checked?: boolean;
 }
 
 export interface ExportApplicantsPayload {
@@ -129,6 +130,7 @@ export interface AdmissionAdminDashboardResponse {
 
 export interface ApplicationAdminDashboardResponse {
   total_applicants: number;
+  total_submitted?: number;
   total_pending: number;
   total_shortlisted: number;
   total_compliance_required: number;
@@ -188,6 +190,9 @@ export class ApplicationService {
     }
     if (query?.application_no) {
       params = params.set('application_no', query.application_no);
+    }
+    if (query?.checked !== undefined) {
+      params = params.set('checked', String(query.checked));
     }
     if (page_size) {
       params = params.set('page_size', page_size.toString());

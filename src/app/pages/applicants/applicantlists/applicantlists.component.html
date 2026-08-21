@@ -14,7 +14,10 @@
 
   @if (selectedApplicantIds.length > 0) {
     <ng-container>
-      <section class="bulk-actions">
+      <section
+        class="bulk-actions"
+        *appHasPermission="permissions.MANAGE_APPLICANTS"
+      >
         <span class="selected-count"
           >{{ selectedApplicantIds.length }} Candidates selected</span
         >
@@ -63,6 +66,13 @@
       (modelChange)="onStatusChange($event)"
     />
     <app-filter-select
+      [options]="checkedOptions"
+      [model]="selectedChecked"
+      optionLabel="label"
+      placeholder="Check Status"
+      (modelChange)="onCheckedChange($event)"
+    />
+    <app-filter-select
       [options]="orderingOptions"
       [model]="selectedOrdering"
       optionLabel="label"
@@ -80,6 +90,7 @@
       Export List
     </app-button>
     <app-button
+      *appHasPermission="permissions.MANAGE_APPLICANTS"
       variant="muted"
       [outline]="true"
       [fullWidth]="true"
@@ -154,7 +165,9 @@
           <td>
             <div class="action-buttons">
               <app-table-row-actions
-                [showCheckedAction]="true"
+                [showCheckedAction]="canManageApplicants"
+                [showShortlistAction]="canManageApplicants"
+                [showComplianceAction]="canManageApplicants"
                 [disableChecked]="row.disable_checked"
                 [disableCompliance]="row.disable_compliance"
                 [disableShortlist]="row.disable_shortlist"

@@ -18,7 +18,10 @@
 
 .filters-row {
   display: grid;
-  grid-template-columns: minmax(290px, 1fr) minmax(220px, 320px);
+  grid-template-columns:
+    minmax(290px, 1fr)
+    minmax(180px, 240px)
+    minmax(220px, 320px);
   gap: 10px;
   margin-bottom: 12px;
 }

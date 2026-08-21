@@ -1,0 +1,17 @@
+{
+  "nodes": [
+    {
+      "id": "src_app_pages_hod_students_record_student_record_details_drawer_component",
+      "label": "Student Record Details Drawer",
+      "file_type": "code",
+      "source_file": "src/app/pages/hod/students-record/student-record-details-drawer.component.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [],
+  "hyperedges": []
+}

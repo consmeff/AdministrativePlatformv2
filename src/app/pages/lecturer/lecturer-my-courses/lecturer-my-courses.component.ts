@@ -15,6 +15,11 @@ export class LecturerMyCoursesComponent {
   private readonly lecturerStateService = inject(LecturerStateService);
   private readonly portalContextService = inject(PortalContextService);
 
+  constructor() {
+    this.lecturerStateService.ensureProfileLoaded();
+    this.lecturerStateService.loadAssignedCourses();
+  }
+
   readonly courses = this.lecturerStateService.courses;
 
   get roleBasePath(): string {
