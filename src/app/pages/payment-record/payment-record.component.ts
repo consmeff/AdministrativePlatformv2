@@ -184,8 +184,30 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
   }
 
   downloadReceipt(transaction: TransactionRow): void {
-    this.notification.warn(
-      `Download receipt is not yet wired for ${transaction.referenceNo}.`,
+    const refId = transaction.referenceNo;
+    this.busyService.show();
+    this.subscriptions.add(
+      this.paymentService
+        .downloadPaymentReceipt(refId)
+        .pipe(finalize(() => this.busyService.hide()))
+        .subscribe({
+          next: (response) => {
+            const blob = response.body;
+            if (!blob) {
+              this.notification.error('Receipt download failed.');
+              return;
+            }
+
+            const filename =
+              this.extractDownloadFilename(
+                response.headers.get('content-disposition'),
+              ) ?? `receipt-${refId}${this.getReceiptExtension(blob.type)}`;
+            this.downloadBlob(blob, filename);
+          },
+          error: () => {
+            this.notification.error('Unable to download receipt.');
+          },
+        }),
     );
   }
 
@@ -452,5 +474,48 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(
       date.getDate(),
     ).padStart(2, '0')}`;
+  }
+
+  private extractDownloadFilename(
+    contentDisposition: string | null,
+  ): string | null {
+    if (!contentDisposition) {
+      return null;
+    }
+
+    const utf8Match = contentDisposition.match(/filename\*=UTF-8''([^;]+)/i);
+    if (utf8Match?.[1]) {
+      return decodeURIComponent(utf8Match[1]);
+    }
+
+    const standardMatch = contentDisposition.match(/filename="?([^";]+)"?/i);
+    return standardMatch?.[1] ?? null;
+  }
+
+  private getReceiptExtension(contentType: string): string {
+    if (contentType.includes('pdf')) {
+      return '.pdf';
+    }
+    if (contentType.includes('png')) {
+      return '.png';
+    }
+    if (contentType.includes('jpeg')) {
+      return '.jpg';
+    }
+    if (contentType.includes('html')) {
+      return '.html';
+    }
+    return '.pdf';
+  }
+
+  private downloadBlob(blob: Blob, filename: string): void {
+    const objectUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = objectUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(objectUrl);
   }
 }
