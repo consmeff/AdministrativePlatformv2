@@ -1,5 +1,11 @@
 {
   "permissions": {
     "allow": ["Bash(npx ng *)"]
-  }
+  },
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://agentrouter.org",
+    "ANTHROPIC_AUTH_TOKEN": "sk-YqCb1EmXOG0LHDexLxSL7HuyqCo7BuRz076Q4BP9l6LKl0LR",
+    "ANTHROPIC_MODEL": "claude-opus-4-8"
+  },
+  "model": "claude-opus-4-8"
 }
