@@ -1,0 +1,104 @@
+<section class="expenses-page">
+  <div class="row g-3">
+    @for (card of summaryCards(); track card.title) {
+      <div class="col-12 col-sm-6 col-lg-3">
+        <app-metric-card
+          [title]="card.title"
+          [value]="card.value"
+          [subtext]="card.subtext"
+        />
+      </div>
+    }
+  </div>
+
+  <hr class="section-divider" />
+
+  <section class="list-section">
+    <div class="list-head">
+      <h3 class="title-small">Expense History</h3>
+      <app-button
+        *appHasPermission="createPermission"
+        variant="primary"
+        iconClass="bi bi-plus-lg"
+        (buttonClick)="openForm()"
+      >
+        Record Expense
+      </app-button>
+    </div>
+
+    <div class="filters-row">
+      <app-search-input
+        placeholder="Search by title or description"
+        [model]="searchTerm()"
+        (modelChange)="onSearchChange($event)"
+      />
+      <p-select
+        [options]="categoryOptions"
+        [(ngModel)]="selectedCategory"
+        optionLabel="label"
+        optionValue="value"
+        class="filter-select"
+        (onChange)="onCategoryChange()"
+      />
+    </div>
+
+    <p-table
+      [value]="expenses()"
+      [loading]="loading()"
+      [tableStyle]="{ 'min-width': '56rem' }"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Date</th>
+          <th>Title</th>
+          <th>Category</th>
+          <th>Recorded By</th>
+          <th class="text-end">Amount</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-row>
+        <tr>
+          <td>{{ formatDisplayDate(row.expense_date) }}</td>
+          <td>
+            <div class="cell-primary">{{ row.title }}</div>
+            @if (row.description) {
+              <div class="cell-secondary description">
+                {{ row.description }}
+              </div>
+            }
+          </td>
+          <td>
+            <span class="type-pill">{{ row.category }}</span>
+          </td>
+          <td>{{ row.recorded_by || "—" }}</td>
+          <td class="amount-cell text-end">{{ formatNaira(row.amount) }}</td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5" class="empty-cell">
+            {{ loading() ? "Loading…" : "No expenses match these filters." }}
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <app-pagination
+      [visible]="totalRecords() > pageSize"
+      [first]="first()"
+      [rows]="pageSize"
+      [totalRecords]="totalRecords()"
+      [rowsPerPageOptions]="[pageSize]"
+      (pageChange)="onPageChange($event)"
+    />
+  </section>
+</section>
+
+<app-expense-form-modal
+  [visible]="formVisible()"
+  [loading]="saving()"
+  (closed)="closeForm()"
+  (saved)="saveExpense($event)"
+/>

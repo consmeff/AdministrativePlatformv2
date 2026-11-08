@@ -28,7 +28,30 @@ export const APP_PERMISSIONS = {
   RESET_USER_PASSWORD: 'Reset user password',
   UPDATE_USERS: 'Update users',
   VIEW_USERS: 'View users',
+  // Proposed for the Board/Provost portals — not yet issued by the backend.
+  // Rename here if the backend settles on different strings.
+  VIEW_PAYMENTS: 'View payments',
+  VIEW_EXPENSES: 'View expenses',
+  CREATE_EXPENSES: 'Create expenses',
 } as const;
+
+/** Any of these unlocks the read-only income history. */
+export const INCOME_VIEW_PERMISSIONS: AppPermission[] = [
+  APP_PERMISSIONS.VIEW_PAYMENTS,
+  APP_PERMISSIONS.MANAGE_FEES,
+  APP_PERMISSIONS.MANAGE_APPLICATION_FEES_MANUALLY,
+];
+
+export const EXPENSE_VIEW_PERMISSIONS: AppPermission[] = [
+  APP_PERMISSIONS.VIEW_EXPENSES,
+  APP_PERMISSIONS.CREATE_EXPENSES,
+];
+
+export const STAFF_VIEW_PERMISSIONS: AppPermission[] = [
+  APP_PERMISSIONS.VIEW_USERS,
+  APP_PERMISSIONS.CREATE_USERS,
+  APP_PERMISSIONS.UPDATE_USERS,
+];
 
 export type AppPermission =
   (typeof APP_PERMISSIONS)[keyof typeof APP_PERMISSIONS];
