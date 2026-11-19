@@ -72,6 +72,14 @@ export class TopbarComponent implements OnDestroy {
   }
 
   get currentUserRole(): string {
+    if (this.portalContextService.isProvostContext()) {
+      return 'Provost';
+    }
+
+    if (this.portalContextService.isBoardContext()) {
+      return 'Board Member';
+    }
+
     if (this.portalContextService.isHodContext()) {
       return 'Head of Department';
     }
@@ -83,9 +91,14 @@ export class TopbarComponent implements OnDestroy {
     return this.dashinfo.role || 'Academic Officer';
   }
 
-  /** Staff on a department portal who also administer applicants. */
+  /**
+   * Staff on a department portal who also administer applicants. Board and
+   * provost never switch: the provost menu already includes the admin flow.
+   */
   get canSwitchToAdminPortal(): boolean {
+    const homeRole = this.portalContextService.getHomeRole();
     return (
+      (homeRole === 'hod' || homeRole === 'lecturer') &&
       !this.portalContextService.isAdminContext() &&
       this.permissionService.has(APP_PERMISSIONS.MANAGE_APPLICANTS)
     );
@@ -114,6 +127,19 @@ export class TopbarComponent implements OnDestroy {
   }
 
   private resolveModuleName(url: string): string {
+    const executivePage = url.match(
+      /^\/pages\/(?:board|provost)\/(income|expenses|staff)/,
+    )?.[1];
+    if (executivePage === 'income') {
+      return 'Income History';
+    }
+    if (executivePage === 'expenses') {
+      return 'Expenses';
+    }
+    if (executivePage === 'staff') {
+      return 'Staff Management';
+    }
+
     if (url.includes('/pages/hod/verification/course-reg')) {
       return 'Course Registration Review';
     }

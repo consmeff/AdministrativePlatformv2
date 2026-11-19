@@ -1,6 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import {
   AppPermission,
+  defaultPermissionsForUserType,
   normalizePermission,
 } from '../constants/permissions.constants';
 import { SessionStateService } from './session-state.service';
@@ -31,8 +32,18 @@ export class PermissionService {
     this.sessionStateService.registerResetHandler(() => this.clear());
   }
 
-  setFromLogin(permissions?: string[] | null, roles?: string[] | null): void {
-    const grantedPermissions = permissions ?? [];
+  setFromLogin(
+    permissions?: string[] | null,
+    roles?: string[] | null,
+    userType?: string | null,
+  ): void {
+    const issuedPermissions = permissions ?? [];
+    // Only fall back when the backend issued nothing, so real permissions
+    // always win once the API starts sending them.
+    const grantedPermissions =
+      issuedPermissions.length > 0
+        ? issuedPermissions
+        : defaultPermissionsForUserType(userType);
     const grantedRoles = roles ?? [];
 
     sessionStorage.setItem(

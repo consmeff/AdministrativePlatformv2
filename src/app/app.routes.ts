@@ -1,6 +1,45 @@
 import { Routes } from '@angular/router';
 import { permissionGuard } from './guards/permission.guard';
-import { APP_PERMISSIONS } from './constants/permissions.constants';
+import {
+  APP_PERMISSIONS,
+  EXPENSE_VIEW_PERMISSIONS,
+  INCOME_VIEW_PERMISSIONS,
+  STAFF_VIEW_PERMISSIONS,
+} from './constants/permissions.constants';
+
+/** Pages the Board and Provost portals both have. */
+function executiveRoutes(): Routes {
+  return [
+    { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+    {
+      path: 'dashboard',
+      loadComponent: () =>
+        import('./pages/executive/executive-dashboard/executive-dashboard.component').then(
+          (m) => m.ExecutiveDashboardComponent,
+        ),
+    },
+    {
+      // Read-only income history: the payment records page has no
+      // mutating actions, only view and receipt download.
+      path: 'income',
+      canActivate: [permissionGuard],
+      data: { permissions: INCOME_VIEW_PERMISSIONS },
+      loadComponent: () =>
+        import('./pages/payment-record/payment-record.component').then(
+          (m) => m.PaymentRecordComponent,
+        ),
+    },
+    {
+      path: 'expenses',
+      canActivate: [permissionGuard],
+      data: { permissions: EXPENSE_VIEW_PERMISSIONS },
+      loadComponent: () =>
+        import('./pages/executive/expenses/expenses.component').then(
+          (m) => m.ExpensesComponent,
+        ),
+    },
+  ];
+}
 
 export const routes: Routes = [
   {
@@ -161,6 +200,27 @@ export const routes: Routes = [
             loadComponent: () =>
               import('./pages/lecturer/lecturer-profile/lecturer-profile.component').then(
                 (m) => m.LecturerProfileComponent,
+              ),
+          },
+        ],
+      },
+      {
+        path: 'board',
+        children: executiveRoutes(),
+      },
+      {
+        // The provost also uses the admin pages (/pages/applicants, …);
+        // the sidebar keeps them in the provost menu.
+        path: 'provost',
+        children: [
+          ...executiveRoutes(),
+          {
+            path: 'staff',
+            canActivate: [permissionGuard],
+            data: { permissions: STAFF_VIEW_PERMISSIONS },
+            loadComponent: () =>
+              import('./pages/executive/staff/staff-management.component').then(
+                (m) => m.StaffManagementComponent,
               ),
           },
         ],

@@ -1,0 +1,68 @@
+<section class="executive-dashboard">
+  <div class="row g-3">
+    @for (card of cards(); track card.title) {
+      <div class="col-12 col-sm-6 col-xl-3">
+        <app-metric-card
+          [title]="card.title"
+          [value]="loading() ? '…' : card.value"
+          [subtext]="card.subtext"
+        />
+      </div>
+    }
+  </div>
+
+  <div class="panels" [class.single]="!canViewExpenses">
+    <article class="panel">
+      <header class="panel-head">
+        <h3 class="title-small">Students by Programme</h3>
+      </header>
+      @if (programmeBreakdown().length) {
+        <ul class="breakdown-list">
+          @for (row of programmeBreakdown(); track row.programme) {
+            <li>
+              <span>{{ row.programme }}</span>
+              <strong>{{ row.count.toLocaleString() }}</strong>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="empty-copy">
+          {{ loading() ? "Loading…" : "No programme breakdown available." }}
+        </p>
+      }
+    </article>
+
+    @if (canViewExpenses) {
+      <article class="panel">
+        <header class="panel-head">
+          <h3 class="title-small">Recent Expenses</h3>
+          <a class="panel-link" [routerLink]="basePath + '/expenses'">
+            View all <i class="bi bi-arrow-right"></i>
+          </a>
+        </header>
+        @if (recentExpenses().length) {
+          <ul class="expense-list">
+            @for (expense of recentExpenses(); track expense.id) {
+              <li>
+                <div>
+                  <div class="cell-primary">{{ expense.title }}</div>
+                  <div class="cell-secondary">
+                    {{ expense.category }} ·
+                    {{ formatDisplayDate(expense.expense_date) }}
+                  </div>
+                </div>
+                <strong class="amount">{{
+                  formatNaira(expense.amount)
+                }}</strong>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="empty-copy">
+            {{ loading() ? "Loading…" : "No expenses recorded yet." }}
+          </p>
+        }
+      </article>
+    }
+  </div>
+</section>

@@ -1,10 +1,23 @@
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 
-export type AcademicPortalRole = 'admin' | 'lecturer' | 'hod';
+export type AcademicPortalRole =
+  | 'admin'
+  | 'lecturer'
+  | 'hod'
+  | 'board'
+  | 'provost';
 
 const USER_TYPE_STORAGE_KEY = 'USER_TYPE';
 const ACTIVE_PORTAL_STORAGE_KEY = 'ACTIVE_PORTAL';
+
+/** Portals that live under their own `/pages/<role>` prefix. */
+const PREFIXED_PORTALS: Exclude<AcademicPortalRole, 'admin'>[] = [
+  'hod',
+  'lecturer',
+  'board',
+  'provost',
+];
 
 @Injectable({
   providedIn: 'root',
@@ -18,16 +31,7 @@ export class PortalContextService {
 
   getRoleBasePath(): string {
     const role = this.getCurrentRole();
-
-    if (role === 'hod') {
-      return '/pages/hod';
-    }
-
-    if (role === 'lecturer') {
-      return '/pages/lecturer';
-    }
-
-    return '/pages';
+    return role === 'admin' ? '/pages' : `/pages/${role}`;
   }
 
   isLecturerContext(url = this.router.url): boolean {
@@ -38,6 +42,18 @@ export class PortalContextService {
     return this.resolveRole(url) === 'hod';
   }
 
+  isBoardContext(url = this.router.url): boolean {
+    return this.resolveRole(url) === 'board';
+  }
+
+  /**
+   * True on the provost's own pages and on the shared admin pages a provost
+   * opens, since the provost portal includes the admin flow.
+   */
+  isProvostContext(url = this.router.url): boolean {
+    return this.resolveRole(url) === 'provost';
+  }
+
   isAdminContext(url = this.router.url): boolean {
     return this.resolveRole(url) === 'admin';
   }
@@ -46,6 +62,16 @@ export class PortalContextService {
   getHomeRole(): AcademicPortalRole {
     const storedUserType =
       sessionStorage.getItem(USER_TYPE_STORAGE_KEY)?.toLowerCase() ?? '';
+
+    // Provost is checked before board so a "Provost (Board)" style label
+    // still resolves to the more capable portal.
+    if (storedUserType.includes('provost')) {
+      return 'provost';
+    }
+
+    if (storedUserType.includes('board')) {
+      return 'board';
+    }
 
     if (storedUserType.includes('hod')) {
       return 'hod';
@@ -63,15 +89,7 @@ export class PortalContextService {
   }
 
   getDashboardRoute(role: AcademicPortalRole): string {
-    if (role === 'hod') {
-      return '/pages/hod/dashboard';
-    }
-
-    if (role === 'lecturer') {
-      return '/pages/lecturer/dashboard';
-    }
-
-    return '/pages/dashboard';
+    return role === 'admin' ? '/pages/dashboard' : `/pages/${role}/dashboard`;
   }
 
   /**
@@ -94,12 +112,12 @@ export class PortalContextService {
   }
 
   private resolveRole(url: string): AcademicPortalRole {
-    if (url.startsWith('/pages/hod')) {
-      return 'hod';
-    }
+    const prefixed = PREFIXED_PORTALS.find((role) =>
+      new RegExp(`^/pages/${role}(?:[/?#]|$)`).test(url),
+    );
 
-    if (url.startsWith('/pages/lecturer')) {
-      return 'lecturer';
+    if (prefixed) {
+      return prefixed;
     }
 
     if (sessionStorage.getItem(ACTIVE_PORTAL_STORAGE_KEY) === 'admin') {

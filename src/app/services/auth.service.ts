@@ -200,7 +200,11 @@ export class AuthService {
     this.loggedUser = username;
     this.storeTokens(tokens);
     this.storeRole(tokens.user_type);
-    this.permissionService.setFromLogin(tokens.permissions, tokens.roles);
+    this.permissionService.setFromLogin(
+      tokens.permissions,
+      tokens.roles,
+      tokens.user_type,
+    );
     this.portalContextService.resetPortalOverride();
     if (tokens.application_no) {
       this.storeAppNo(tokens.application_no);
