@@ -56,6 +56,41 @@ export const STAFF_VIEW_PERMISSIONS: AppPermission[] = [
 export type AppPermission =
   (typeof APP_PERMISSIONS)[keyof typeof APP_PERMISSIONS];
 
+/**
+ * Read-only access granted to executive users when the backend sends an
+ * empty `permissions` list (it does not issue any for Board/Provost yet).
+ * Write access (creating expenses, managing staff or applicants) is left to
+ * the backend. Remove once the login payload carries real permissions.
+ */
+const BOARD_DEFAULT_PERMISSIONS: AppPermission[] = [
+  APP_PERMISSIONS.VIEW_PAYMENTS,
+  APP_PERMISSIONS.VIEW_EXPENSES,
+];
+
+const PROVOST_DEFAULT_PERMISSIONS: AppPermission[] = [
+  ...BOARD_DEFAULT_PERMISSIONS,
+  APP_PERMISSIONS.VIEW_USERS,
+  APP_PERMISSIONS.VIEW_APPLICANTS,
+  APP_PERMISSIONS.VIEW_APPLICATIONS,
+];
+
+/**
+ * Fallback permissions for a `user_type`. Matching mirrors
+ * PortalContextService: provost is checked before board.
+ */
+export function defaultPermissionsForUserType(
+  userType: string | null | undefined,
+): AppPermission[] {
+  const normalized = userType?.toLowerCase() ?? '';
+  if (normalized.includes('provost')) {
+    return [...PROVOST_DEFAULT_PERMISSIONS];
+  }
+  if (normalized.includes('board')) {
+    return [...BOARD_DEFAULT_PERMISSIONS];
+  }
+  return [];
+}
+
 export const APP_PERMISSION_LIST: AppPermission[] =
   Object.values(APP_PERMISSIONS);
 
