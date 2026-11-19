@@ -13,4 +13,11 @@ export class SearchInputComponent {
   @Input() placeholder = 'Search';
   @Input() model = '';
   @Output() modelChange = new EventEmitter<string>();
+  @Output() searchRequested = new EventEmitter<string>();
+
+  triggerSearch(): void {
+    const value = this.model ?? '';
+    this.modelChange.emit(value);
+    this.searchRequested.emit(value);
+  }
 }

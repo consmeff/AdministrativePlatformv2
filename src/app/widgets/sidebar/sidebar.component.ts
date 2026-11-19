@@ -9,6 +9,9 @@ import { PermissionService } from '../../services/permission.service';
 import {
   APP_PERMISSIONS,
   AppPermission,
+  EXPENSE_VIEW_PERMISSIONS,
+  INCOME_VIEW_PERMISSIONS,
+  STAFF_VIEW_PERMISSIONS,
 } from '../../constants/permissions.constants';
 
 interface SidebarSubMenuItem {
@@ -30,6 +33,75 @@ interface SidebarMenuItem {
 interface SidebarMenuSection {
   title: string | null;
   items: SidebarMenuItem[];
+}
+
+const APPLICATIONS_MENU_ITEM: SidebarMenuItem = {
+  label: 'Applications',
+  iconClass: 'bi bi-people',
+  route: '/pages/applicants',
+  permissions: [
+    APP_PERMISSIONS.VIEW_APPLICANTS,
+    APP_PERMISSIONS.VIEW_APPLICATIONS,
+    APP_PERMISSIONS.MANAGE_APPLICANTS,
+  ],
+  children: [
+    {
+      label: 'OND',
+      route: '/pages/applicants',
+      queryParams: { programme: 'ond' },
+    },
+    {
+      label: 'HND',
+      route: '/pages/applicants',
+      queryParams: { programme: 'hnd' },
+    },
+  ],
+};
+
+const ADMISSIONS_MENU_ITEM: SidebarMenuItem = {
+  label: 'Admissions',
+  iconClass: 'bi bi-card-list',
+  route: '/pages/admissions',
+  permissions: [
+    APP_PERMISSIONS.MANAGE_APPLICANTS,
+    APP_PERMISSIONS.VIEW_APPLICANTS,
+  ],
+  children: [
+    {
+      label: 'OND',
+      route: '/pages/admissions',
+      queryParams: { programme: 'ond' },
+    },
+    {
+      label: 'HND',
+      route: '/pages/admissions',
+      queryParams: { programme: 'hnd' },
+    },
+  ],
+};
+
+/** Dashboard, income and expenses — shared by the Board and Provost menus. */
+function executiveMenuItems(basePath: string): SidebarMenuItem[] {
+  return [
+    {
+      label: 'Dashboard',
+      iconClass: 'bi bi-house',
+      route: `${basePath}/dashboard`,
+      exact: true,
+    },
+    {
+      label: 'Income History',
+      iconClass: 'bi bi-graph-up-arrow',
+      route: `${basePath}/income`,
+      permissions: INCOME_VIEW_PERMISSIONS,
+    },
+    {
+      label: 'Expenses',
+      iconClass: 'bi bi-receipt',
+      route: `${basePath}/expenses`,
+      permissions: EXPENSE_VIEW_PERMISSIONS,
+    },
+  ];
 }
 
 @Component({
@@ -57,49 +129,8 @@ export class SidebarComponent {
           route: '/pages/dashboard',
           exact: true,
         },
-        {
-          label: 'Applications',
-          iconClass: 'bi bi-people',
-          route: '/pages/applicants',
-          permissions: [
-            APP_PERMISSIONS.VIEW_APPLICANTS,
-            APP_PERMISSIONS.VIEW_APPLICATIONS,
-            APP_PERMISSIONS.MANAGE_APPLICANTS,
-          ],
-          children: [
-            {
-              label: 'OND',
-              route: '/pages/applicants',
-              queryParams: { programme: 'ond' },
-            },
-            {
-              label: 'HND',
-              route: '/pages/applicants',
-              queryParams: { programme: 'hnd' },
-            },
-          ],
-        },
-        {
-          label: 'Admissions',
-          iconClass: 'bi bi-card-list',
-          route: '/pages/admissions',
-          permissions: [
-            APP_PERMISSIONS.MANAGE_APPLICANTS,
-            APP_PERMISSIONS.VIEW_APPLICANTS,
-          ],
-          children: [
-            {
-              label: 'OND',
-              route: '/pages/admissions',
-              queryParams: { programme: 'ond' },
-            },
-            {
-              label: 'HND',
-              route: '/pages/admissions',
-              queryParams: { programme: 'hnd' },
-            },
-          ],
-        },
+        APPLICATIONS_MENU_ITEM,
+        ADMISSIONS_MENU_ITEM,
         {
           label: 'Payment Records',
           iconClass: 'bi bi-wallet2',
@@ -108,6 +139,39 @@ export class SidebarComponent {
             APP_PERMISSIONS.MANAGE_FEES,
             APP_PERMISSIONS.MANAGE_APPLICATION_FEES_MANUALLY,
           ],
+        },
+      ],
+    },
+  ];
+  readonly boardMenuSections: SidebarMenuSection[] = [
+    { title: 'Board', items: executiveMenuItems('/pages/board') },
+  ];
+  readonly provostMenuSections: SidebarMenuSection[] = [
+    { title: 'Overview', items: executiveMenuItems('/pages/provost') },
+    {
+      // The admin flow. Payment Records is left out because Income History
+      // above is the same page.
+      title: 'Administration',
+      items: [
+        {
+          label: 'Admin Dashboard',
+          iconClass: 'bi bi-speedometer2',
+          route: '/pages/dashboard',
+          exact: true,
+          permissions: APPLICATIONS_MENU_ITEM.permissions,
+        },
+        APPLICATIONS_MENU_ITEM,
+        ADMISSIONS_MENU_ITEM,
+      ],
+    },
+    {
+      title: 'Staff',
+      items: [
+        {
+          label: 'Staff Management',
+          iconClass: 'bi bi-person-badge',
+          route: '/pages/provost/staff',
+          permissions: STAFF_VIEW_PERMISSIONS,
         },
       ],
     },
@@ -263,6 +327,14 @@ export class SidebarComponent {
   }
 
   get activeMenuSections(): SidebarMenuSection[] {
+    if (this.portalContextService.isProvostContext()) {
+      return this.applyPermissions(this.provostMenuSections);
+    }
+
+    if (this.portalContextService.isBoardContext()) {
+      return this.applyPermissions(this.boardMenuSections);
+    }
+
     if (this.portalContextService.isHodContext()) {
       return this.applyPermissions(this.hodMenuSections);
     }

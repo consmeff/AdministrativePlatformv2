@@ -5,8 +5,14 @@
     [placeholder]="placeholder"
     [ngModel]="model"
     (ngModelChange)="modelChange.emit($event)"
+    (keyup.enter)="triggerSearch()"
   />
-  <button type="button" class="search-btn" aria-label="Search">
+  <button
+    type="button"
+    class="search-btn"
+    aria-label="Search"
+    (click)="triggerSearch()"
+  >
     <i class="bi bi-search"></i>
   </button>
 </div>

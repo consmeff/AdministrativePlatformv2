@@ -1,0 +1,74 @@
+.expenses-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.section-divider {
+  border: 0;
+  border-top: 1px solid #edf2fb;
+  margin: 2px 0;
+}
+
+.list-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+
+  h3 {
+    margin: 0;
+  }
+}
+
+.filters-row {
+  display: grid;
+  grid-template-columns: minmax(260px, 420px) minmax(180px, 240px);
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.cell-primary {
+  color: #1a2f59;
+  font-weight: 600;
+}
+
+.cell-secondary {
+  color: #8fa0c0;
+  font-size: 13px;
+}
+
+.description {
+  max-width: 360px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.type-pill {
+  display: inline-flex;
+  border-radius: 8px;
+  padding: 4px 8px;
+  background: #f2f6fd;
+  color: #445e86;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.amount-cell {
+  font-weight: 700;
+  color: #14295e;
+}
+
+.empty-cell {
+  text-align: center;
+  color: #8fa0c0;
+  padding: 28px 0;
+}
+
+@media (max-width: 768px) {
+  .filters-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

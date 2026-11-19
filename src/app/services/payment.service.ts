@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import {
@@ -50,5 +50,13 @@ export class PaymentService {
   getPaymentByRefId(refId: string): Observable<PaymentDetailDto> {
     const url = `${this.apiRoot}/api/v1/payments/payments/${encodeURIComponent(refId)}`;
     return this.http.get<PaymentDetailDto>(url);
+  }
+
+  downloadPaymentReceipt(refId: string): Observable<HttpResponse<Blob>> {
+    const url = `${this.apiRoot}/api/v1/payments/payments/${encodeURIComponent(refId)}/receipt`;
+    return this.http.get(url, {
+      observe: 'response',
+      responseType: 'blob',
+    });
   }
 }

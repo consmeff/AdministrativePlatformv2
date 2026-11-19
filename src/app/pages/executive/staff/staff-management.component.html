@@ -1,0 +1,193 @@
+<section class="staff-page">
+  <div class="list-head">
+    <div>
+      <h3 class="title-small">Staff</h3>
+      <p class="body-small subtitle">
+        {{ totalRecords().toLocaleString() }} staff members
+      </p>
+    </div>
+    <app-button
+      *appHasPermission="permissions.create"
+      variant="primary"
+      iconClass="bi bi-person-plus"
+      (buttonClick)="openCreate()"
+    >
+      Add Staff
+    </app-button>
+  </div>
+
+  <div class="filters-row">
+    <app-search-input
+      placeholder="Search by name, email or staff ID"
+      [model]="searchTerm()"
+      (modelChange)="onSearchChange($event)"
+    />
+    <p-select
+      [options]="staffTypeOptions"
+      [(ngModel)]="selectedStaffType"
+      optionLabel="label"
+      optionValue="value"
+      class="filter-select"
+      (onChange)="onFilterChange()"
+    />
+    <p-select
+      [options]="statusOptions"
+      [(ngModel)]="selectedStatus"
+      optionLabel="label"
+      optionValue="value"
+      class="filter-select"
+      (onChange)="onFilterChange()"
+    />
+  </div>
+
+  <p-table
+    [value]="staff()"
+    [loading]="loading()"
+    [tableStyle]="{ 'min-width': '60rem' }"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Name</th>
+        <th>Contact</th>
+        <th>Role</th>
+        <th>Joined</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-row>
+      <tr>
+        <td>
+          <div class="cell-primary">{{ fullName(row) }}</div>
+          <div class="cell-secondary">{{ row.staff_id || "—" }}</div>
+        </td>
+        <td>
+          <div>{{ row.email }}</div>
+          <div class="cell-secondary">{{ row.phone_number || "—" }}</div>
+        </td>
+        <td>
+          <span class="type-pill">{{ row.staff_type }}</span>
+        </td>
+        <td>{{ formatDisplayDate(row.date_joined) }}</td>
+        <td>
+          <app-status-indicator
+            [dot]="true"
+            [tone]="row.is_active ? 'approved' : 'neutral'"
+            [text]="row.is_active ? 'Active' : 'Inactive'"
+          />
+        </td>
+        <td>
+          <div class="action-buttons">
+            <button
+              *appHasPermission="permissions.update"
+              type="button"
+              class="icon-btn"
+              title="Edit"
+              [attr.aria-label]="'Edit ' + fullName(row)"
+              (click)="openEdit(row)"
+            >
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button
+              *appHasPermission="permissions.activate"
+              type="button"
+              class="icon-btn"
+              [class.danger]="row.is_active"
+              [title]="row.is_active ? 'Deactivate' : 'Activate'"
+              [attr.aria-label]="
+                (row.is_active ? 'Deactivate ' : 'Activate ') + fullName(row)
+              "
+              (click)="askToggleStatus(row)"
+            >
+              <i
+                class="bi"
+                [class.bi-person-dash]="row.is_active"
+                [class.bi-person-check]="!row.is_active"
+              ></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="6" class="empty-cell">
+          {{ loading() ? "Loading…" : "No staff match these filters." }}
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <app-pagination
+    [visible]="totalRecords() > pageSize"
+    [first]="first()"
+    [rows]="pageSize"
+    [totalRecords]="totalRecords()"
+    [rowsPerPageOptions]="[pageSize]"
+    (pageChange)="onPageChange($event)"
+  />
+</section>
+
+<app-staff-form-modal
+  [visible]="formVisible()"
+  [loading]="saving()"
+  [staff]="editingStaff()"
+  (closed)="closeForm()"
+  (saved)="saveStaff($event)"
+/>
+
+<p-dialog
+  [visible]="statusTarget() !== null"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!statusSaving()"
+  styleClass="app-modal-shell confirm-shell"
+  (onHide)="cancelToggleStatus()"
+>
+  <ng-template pTemplate="header">
+    <h2 class="title-small app-modal-title">
+      {{ statusTarget()?.is_active ? "Deactivate" : "Activate" }} staff?
+    </h2>
+  </ng-template>
+
+  @if (statusTarget(); as target) {
+    <p class="body-small confirm-copy">
+      @if (target.is_active) {
+        <strong>{{ fullName(target) }}</strong> will no longer be able to sign
+        in until reactivated.
+      } @else {
+        <strong>{{ fullName(target) }}</strong> will be able to sign in again.
+      }
+    </p>
+  }
+
+  <ng-template pTemplate="footer">
+    <div class="app-modal-actions">
+      <app-button
+        variant="outline"
+        [disabled]="statusSaving()"
+        [fullWidth]="true"
+        (buttonClick)="cancelToggleStatus()"
+      >
+        Cancel
+      </app-button>
+      <app-button
+        [variant]="statusTarget()?.is_active ? 'danger' : 'primary'"
+        [disabled]="statusSaving()"
+        [fullWidth]="true"
+        (buttonClick)="confirmToggleStatus()"
+      >
+        {{
+          statusSaving()
+            ? "Saving…"
+            : statusTarget()?.is_active
+              ? "Deactivate"
+              : "Activate"
+        }}
+      </app-button>
+    </div>
+  </ng-template>
+</p-dialog>

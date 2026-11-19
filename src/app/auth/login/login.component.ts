@@ -6,6 +6,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NotificationsService } from 'angular2-notifications';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { PortalContextService } from '../../services/portal-context.service';
 
 @Component({
   selector: 'app-login',
@@ -21,6 +22,7 @@ export class LoginComponent implements OnInit {
   private readonly alertService = inject(NotificationsService);
   private readonly router = inject(Router);
   private readonly spinner = inject(NgxSpinnerService);
+  private readonly portalContextService = inject(PortalContextService);
 
   ngOnInit(): void {
     this.loginForm = new FormGroup({
@@ -69,16 +71,6 @@ export class LoginComponent implements OnInit {
   }
 
   private resolvePostLoginRoute(): string {
-    const userType = sessionStorage.getItem('USER_TYPE')?.toLowerCase();
-
-    if (userType?.includes('hod')) {
-      return '/pages/hod/dashboard';
-    }
-
-    if (userType?.includes('lecturer')) {
-      return '/pages/lecturer/dashboard';
-    }
-
-    return '/pages/dashboard';
+    return this.portalContextService.getHomeDashboardRoute();
   }
 }
