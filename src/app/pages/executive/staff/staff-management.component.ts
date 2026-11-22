@@ -18,6 +18,7 @@ import {
 import { APP_PERMISSIONS } from '../../../constants/permissions.constants';
 import { HasPermissionDirective } from '../../../directives/has-permission.directive';
 import { NotificationService } from '../../../services/notification.service';
+import { PortalContextService } from '../../../services/portal-context.service';
 import { AppPaginationComponent } from '../../../widgets/app-pagination/app-pagination.component';
 import { ButtonComponent } from '../../../widgets/button/button.component';
 import { SearchInputComponent } from '../../../widgets/search-input/search-input.component';
@@ -62,6 +63,12 @@ export class StaffManagementComponent {
     update: APP_PERMISSIONS.UPDATE_USERS,
     activate: APP_PERMISSIONS.ACTIVATE_USER_ACCOUNT,
   };
+  /**
+   * Staff accounts are managed by Admins; everyone else (e.g. the Provost)
+   * gets a read-only list, whatever permissions the backend issues.
+   */
+  readonly canManageStaff =
+    inject(PortalContextService).getHomeRole() === 'admin';
   readonly pageSize = PAGE_SIZE;
   readonly staffTypeOptions = [
     { label: 'All Roles', value: '' },

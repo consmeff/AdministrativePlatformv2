@@ -1,0 +1,91 @@
+<section class="students-page">
+  <div class="list-head">
+    <h3 class="title-small">Students</h3>
+    <p class="body-small subtitle">
+      {{ totalRecords().toLocaleString() }} students · school fees for the
+      current session
+    </p>
+  </div>
+
+  <div class="filters-row">
+    <app-search-input
+      placeholder="Search by name, matric no. or department"
+      [model]="searchTerm()"
+      (modelChange)="onSearchChange($event)"
+    />
+    <p-select
+      [options]="feeStatusOptions"
+      [(ngModel)]="selectedFeeStatus"
+      optionLabel="label"
+      optionValue="value"
+      class="filter-select"
+      (onChange)="onFilterChange()"
+    />
+  </div>
+
+  <p-table
+    [value]="students()"
+    [loading]="loading()"
+    [tableStyle]="{ 'min-width': '72rem' }"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Student</th>
+        <th>Department</th>
+        <th>Level</th>
+        <th class="amount-head">School Fee</th>
+        <th class="amount-head">Paid</th>
+        <th class="amount-head">Balance</th>
+        <th>Fee Status</th>
+        <th>Last Payment</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-row>
+      <tr>
+        <td>
+          <div class="cell-primary">{{ row.full_name }}</div>
+          <div class="cell-secondary">{{ row.matric_no || "—" }}</div>
+        </td>
+        <td>{{ departmentLine(row) }}</td>
+        <td>{{ labelOf(row.level) || "—" }}</td>
+        <td class="amount-cell">{{ formatNaira(row.school_fee_total) }}</td>
+        <td class="amount-cell">{{ formatNaira(row.school_fee_paid) }}</td>
+        <td class="amount-cell balance">
+          {{ formatNaira(row.school_fee_balance) }}
+        </td>
+        <td>
+          <app-status-indicator
+            [dot]="true"
+            [tone]="schoolFeeTone(row.school_fee_status)"
+            [text]="row.school_fee_status"
+          />
+        </td>
+        <td>{{ formatDisplayDate(row.last_payment_date) }}</td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="8" class="empty-cell">
+          @if (loading()) {
+            Loading…
+          } @else if (loadFailed()) {
+            Student records could not be loaded. Try again shortly.
+          } @else {
+            No students match these filters.
+          }
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <app-pagination
+    [visible]="totalRecords() > pageSize"
+    [first]="first()"
+    [rows]="pageSize"
+    [totalRecords]="totalRecords()"
+    [rowsPerPageOptions]="[pageSize]"
+    (pageChange)="onPageChange($event)"
+  />
+</section>

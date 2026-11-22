@@ -128,8 +128,11 @@ export class TopbarComponent implements OnDestroy {
 
   private resolveModuleName(url: string): string {
     const executivePage = url.match(
-      /^\/pages\/(?:board|provost)\/(income|expenses|staff)/,
+      /^\/pages\/(?:board|provost)\/(income|expenses|staff|students)/,
     )?.[1];
+    if (executivePage === 'students') {
+      return 'Students';
+    }
     if (executivePage === 'income') {
       return 'Income History';
     }

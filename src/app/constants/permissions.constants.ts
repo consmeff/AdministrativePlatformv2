@@ -33,7 +33,18 @@ export const APP_PERMISSIONS = {
   VIEW_PAYMENTS: 'View payments',
   VIEW_EXPENSES: 'View expenses',
   CREATE_EXPENSES: 'Create expenses',
+  VIEW_STUDENTS: 'View students',
 } as const;
+
+/** The student list with each student's school-fee position. */
+/**
+ * Any of these unlocks the student fee list. View payments counts too, because
+ * the list is school-fee data and the backend does not issue View students yet.
+ */
+export const STUDENT_VIEW_PERMISSIONS: AppPermission[] = [
+  APP_PERMISSIONS.VIEW_STUDENTS,
+  APP_PERMISSIONS.VIEW_PAYMENTS,
+];
 
 /** Any of these unlocks the read-only income history. */
 export const INCOME_VIEW_PERMISSIONS: AppPermission[] = [
@@ -65,6 +76,7 @@ export type AppPermission =
 const BOARD_DEFAULT_PERMISSIONS: AppPermission[] = [
   APP_PERMISSIONS.VIEW_PAYMENTS,
   APP_PERMISSIONS.VIEW_EXPENSES,
+  APP_PERMISSIONS.VIEW_STUDENTS,
 ];
 
 const PROVOST_DEFAULT_PERMISSIONS: AppPermission[] = [

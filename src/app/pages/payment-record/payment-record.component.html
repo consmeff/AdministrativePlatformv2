@@ -40,6 +40,14 @@
       </div>
 
       <p-select
+        [options]="paymentTypeOptions"
+        [(ngModel)]="selectedPaymentType"
+        optionLabel="label"
+        class="filter-select"
+        (onChange)="onPaymentTypeChange()"
+      />
+
+      <p-select
         [options]="statusOptions"
         [(ngModel)]="selectedStatus"
         optionLabel="label"

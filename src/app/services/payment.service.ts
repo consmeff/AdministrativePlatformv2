@@ -13,6 +13,8 @@ export interface GetPaymentsQuery {
   page?: number;
   search?: string;
   status?: string;
+  /** The type's display name, e.g. "Tuition Fee". */
+  payment_type?: string;
 }
 
 @Injectable({
@@ -38,6 +40,9 @@ export class PaymentService {
     }
     if (query.status) {
       params = params.set('status', query.status);
+    }
+    if (query.payment_type) {
+      params = params.set('payment_type', query.payment_type);
     }
     return this.http.get<PaymentsListResponseDto>(url, { params });
   }

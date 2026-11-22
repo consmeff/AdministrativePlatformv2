@@ -24,6 +24,43 @@ export interface StudentSummaryDto {
   by_programme?: { programme: string; count: number }[];
 }
 
+export type SchoolFeeStatus = 'Paid' | 'Part Paid' | 'Unpaid';
+
+/** GET /api/v1/students → each item of `data`. Fees are for the current session. */
+/** The API may send a related record ({ id, name }) where a plain label is expected. */
+export interface NamedRef {
+  id?: number | string;
+  name?: string | null;
+  title?: string | null;
+  code?: string | null;
+}
+
+export type LabelOrRef = string | number | NamedRef | null | undefined;
+
+export interface StudentDto {
+  id: number;
+  matric_no: string | null;
+  full_name: string;
+  email: string | null;
+  department: LabelOrRef;
+  programme: LabelOrRef;
+  level: LabelOrRef;
+  session: string | null;
+  school_fee_total: number | string;
+  school_fee_paid: number | string;
+  school_fee_balance: number | string;
+  school_fee_status: SchoolFeeStatus;
+  last_payment_date: string | null;
+}
+
+export interface StudentListQuery {
+  page?: number;
+  search?: string;
+  department?: string;
+  level?: string;
+  school_fee_status?: SchoolFeeStatus;
+}
+
 /* ---------- Expenses ---------- */
 
 export interface ExpenseDto {

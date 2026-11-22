@@ -6,14 +6,16 @@
         {{ totalRecords().toLocaleString() }} staff members
       </p>
     </div>
-    <app-button
-      *appHasPermission="permissions.create"
-      variant="primary"
-      iconClass="bi bi-person-plus"
-      (buttonClick)="openCreate()"
-    >
-      Add Staff
-    </app-button>
+    @if (canManageStaff) {
+      <app-button
+        *appHasPermission="permissions.create"
+        variant="primary"
+        iconClass="bi bi-person-plus"
+        (buttonClick)="openCreate()"
+      >
+        Add Staff
+      </app-button>
+    }
   </div>
 
   <div class="filters-row">
@@ -52,7 +54,9 @@
         <th>Role</th>
         <th>Joined</th>
         <th>Status</th>
-        <th>Actions</th>
+        @if (canManageStaff) {
+          <th>Actions</th>
+        }
       </tr>
     </ng-template>
 
@@ -77,43 +81,45 @@
             [text]="row.is_active ? 'Active' : 'Inactive'"
           />
         </td>
-        <td>
-          <div class="action-buttons">
-            <button
-              *appHasPermission="permissions.update"
-              type="button"
-              class="icon-btn"
-              title="Edit"
-              [attr.aria-label]="'Edit ' + fullName(row)"
-              (click)="openEdit(row)"
-            >
-              <i class="bi bi-pencil"></i>
-            </button>
-            <button
-              *appHasPermission="permissions.activate"
-              type="button"
-              class="icon-btn"
-              [class.danger]="row.is_active"
-              [title]="row.is_active ? 'Deactivate' : 'Activate'"
-              [attr.aria-label]="
-                (row.is_active ? 'Deactivate ' : 'Activate ') + fullName(row)
-              "
-              (click)="askToggleStatus(row)"
-            >
-              <i
-                class="bi"
-                [class.bi-person-dash]="row.is_active"
-                [class.bi-person-check]="!row.is_active"
-              ></i>
-            </button>
-          </div>
-        </td>
+        @if (canManageStaff) {
+          <td>
+            <div class="action-buttons">
+              <button
+                *appHasPermission="permissions.update"
+                type="button"
+                class="icon-btn"
+                title="Edit"
+                [attr.aria-label]="'Edit ' + fullName(row)"
+                (click)="openEdit(row)"
+              >
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button
+                *appHasPermission="permissions.activate"
+                type="button"
+                class="icon-btn"
+                [class.danger]="row.is_active"
+                [title]="row.is_active ? 'Deactivate' : 'Activate'"
+                [attr.aria-label]="
+                  (row.is_active ? 'Deactivate ' : 'Activate ') + fullName(row)
+                "
+                (click)="askToggleStatus(row)"
+              >
+                <i
+                  class="bi"
+                  [class.bi-person-dash]="row.is_active"
+                  [class.bi-person-check]="!row.is_active"
+                ></i>
+              </button>
+            </div>
+          </td>
+        }
       </tr>
     </ng-template>
 
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="6" class="empty-cell">
+        <td [attr.colspan]="canManageStaff ? 6 : 5" class="empty-cell">
           {{ loading() ? "Loading…" : "No staff match these filters." }}
         </td>
       </tr>
