@@ -11,6 +11,8 @@ import {
   StaffDto,
   StaffListQuery,
   StaffPayload,
+  StudentDto,
+  StudentListQuery,
   StudentSummaryDto,
 } from './executive-api.types';
 
@@ -28,6 +30,15 @@ export class ExecutiveApiService {
 
   getStudentSummary(): Observable<StudentSummaryDto> {
     return this.http.get<StudentSummaryDto>(`${this.apiRoot}/students/summary`);
+  }
+
+  getStudents(
+    query: StudentListQuery = {},
+  ): Observable<PaginatedResponseDto<StudentDto>> {
+    return this.http.get<PaginatedResponseDto<StudentDto>>(
+      `${this.apiRoot}/students`,
+      { params: toParams(query) },
+    );
   }
 
   getExpenses(

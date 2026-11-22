@@ -35,7 +35,10 @@ import {
   PaymentType,
   TransactionRow,
 } from './payment-record.types';
-import { PAYMENT_BREAKDOWN_CARD_ORDER } from './payment-record.constants';
+import {
+  ALL_PAYMENT_TYPES,
+  PAYMENT_BREAKDOWN_CARD_ORDER,
+} from './payment-record.constants';
 
 @Component({
   selector: 'app-payment-record',
@@ -74,6 +77,13 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
     { label: 'Failed', value: 'failed' },
   ];
   selectedStatus: FilterOption = this.statusOptions[0];
+
+  /**
+   * The known types up front, plus any other type the dashboard breakdown
+   * reports, so a new fee type is filterable without a code change.
+   */
+  paymentTypeOptions: FilterOption[] = this.buildPaymentTypeOptions([]);
+  selectedPaymentType: FilterOption = this.paymentTypeOptions[0];
 
   readonly orderingOptions: FilterOption[] = [
     { label: 'Newest First', value: '-created_at' },
@@ -140,6 +150,11 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
   }
 
   onOrderingChange(): void {
+    this.first = 0;
+    this.subscriptions.add(this.fetchPayments().subscribe());
+  }
+
+  onPaymentTypeChange(): void {
     this.first = 0;
     this.subscriptions.add(this.fetchPayments().subscribe());
   }
@@ -254,6 +269,10 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
           this.selectedStatus.value === 'all'
             ? undefined
             : this.toTitleCase(this.selectedStatus.value),
+        payment_type:
+          this.selectedPaymentType.value === ALL_PAYMENT_TYPES
+            ? undefined
+            : this.selectedPaymentType.value,
         // ordering: this.selectedOrdering.value || undefined,
       })
       .pipe(
@@ -281,6 +300,14 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
     return this.paymentService.getPaymentDashboard().pipe(
       tap((paymentDashboard) => {
         this.summaryCards = this.mapSummaryCards(paymentDashboard);
+        this.paymentTypeOptions = this.buildPaymentTypeOptions(
+          Object.keys(paymentDashboard.payment_breakdown ?? {}),
+        );
+        // Keep the user's choice if it is still offered.
+        this.selectedPaymentType =
+          this.paymentTypeOptions.find(
+            (option) => option.value === this.selectedPaymentType.value,
+          ) ?? this.paymentTypeOptions[0];
       }),
       catchError(() => {
         this.summaryCards = this.buildDefaultSummaryCards();
@@ -398,6 +425,20 @@ export class PaymentRecordComponent implements OnInit, OnDestroy {
         value: this.formatAmount(0),
         subtext: '',
       })),
+    ];
+  }
+
+  private buildPaymentTypeOptions(reportedTypes: string[]): FilterOption[] {
+    const types = [
+      ...PAYMENT_BREAKDOWN_CARD_ORDER,
+      ...reportedTypes.filter(
+        (type) =>
+          !PAYMENT_BREAKDOWN_CARD_ORDER.some((knownType) => knownType === type),
+      ),
+    ];
+    return [
+      { label: 'All Payment Types', value: ALL_PAYMENT_TYPES },
+      ...types.map((type) => ({ label: type, value: type })),
     ];
   }
 

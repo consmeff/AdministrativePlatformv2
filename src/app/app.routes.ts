@@ -5,6 +5,7 @@ import {
   EXPENSE_VIEW_PERMISSIONS,
   INCOME_VIEW_PERMISSIONS,
   STAFF_VIEW_PERMISSIONS,
+  STUDENT_VIEW_PERMISSIONS,
 } from './constants/permissions.constants';
 
 /** Pages the Board and Provost portals both have. */
@@ -36,6 +37,15 @@ function executiveRoutes(): Routes {
       loadComponent: () =>
         import('./pages/executive/expenses/expenses.component').then(
           (m) => m.ExpensesComponent,
+        ),
+    },
+    {
+      path: 'students',
+      canActivate: [permissionGuard],
+      data: { permissions: STUDENT_VIEW_PERMISSIONS },
+      loadComponent: () =>
+        import('./pages/executive/students/student-list.component').then(
+          (m) => m.StudentListComponent,
         ),
     },
   ];
