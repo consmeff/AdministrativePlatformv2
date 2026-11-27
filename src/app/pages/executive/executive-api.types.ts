@@ -24,33 +24,45 @@ export interface StudentSummaryDto {
   by_programme?: { programme: string; count: number }[];
 }
 
+/** Seen so far: 'Paid' and 'Unpaid'. The part-paid wording is not confirmed. */
 export type SchoolFeeStatus = 'Paid' | 'Part Paid' | 'Unpaid';
 
-/** GET /api/v1/students → each item of `data`. Fees are for the current session. */
-/** The API may send a related record ({ id, name }) where a plain label is expected. */
+/** A related record as the students API nests it. */
 export interface NamedRef {
-  id?: number | string;
-  name?: string | null;
-  title?: string | null;
+  id: number;
+  name: string;
   code?: string | null;
 }
 
-export type LabelOrRef = string | number | NamedRef | null | undefined;
+export interface StudentSchoolFeeDto {
+  fee_id: number;
+  amount: number | string;
+  amount_paid: number | string;
+  balance: number | string;
+  status: string;
+  is_paid: boolean;
+}
 
+/** GET /api/v1/students → each item of `data`. */
 export interface StudentDto {
   id: number;
-  matric_no: string | null;
-  full_name: string;
+  matriculation_number: string | null;
+  first_name: string;
+  last_name: string;
+  other_names: string | null;
   email: string | null;
-  department: LabelOrRef;
-  programme: LabelOrRef;
-  level: LabelOrRef;
-  session: string | null;
-  school_fee_total: number | string;
-  school_fee_paid: number | string;
-  school_fee_balance: number | string;
-  school_fee_status: SchoolFeeStatus;
-  last_payment_date: string | null;
+  phone_number: string | null;
+  alt_phone_number?: string | null;
+  /** A JSON string: {"file_url", "file_name", "file_size", "file_type"}. */
+  passport_photo?: string | null;
+  level: NamedRef | null;
+  semester: NamedRef | null;
+  session: NamedRef | string | null;
+  department: NamedRef | null;
+  program: NamedRef | null;
+  school_fee: StudentSchoolFeeDto | null;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface StudentListQuery {
