@@ -12,6 +12,7 @@ import {
   EXPENSE_VIEW_PERMISSIONS,
   INCOME_VIEW_PERMISSIONS,
   STAFF_VIEW_PERMISSIONS,
+  STUDENT_VIEW_PERMISSIONS,
 } from '../../constants/permissions.constants';
 
 interface SidebarSubMenuItem {
@@ -100,6 +101,12 @@ function executiveMenuItems(basePath: string): SidebarMenuItem[] {
       iconClass: 'bi bi-receipt',
       route: `${basePath}/expenses`,
       permissions: EXPENSE_VIEW_PERMISSIONS,
+    },
+    {
+      label: 'Students',
+      iconClass: 'bi bi-mortarboard',
+      route: `${basePath}/students`,
+      permissions: STUDENT_VIEW_PERMISSIONS,
     },
   ];
 }

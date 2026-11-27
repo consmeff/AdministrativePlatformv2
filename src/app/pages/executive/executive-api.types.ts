@@ -24,6 +24,55 @@ export interface StudentSummaryDto {
   by_programme?: { programme: string; count: number }[];
 }
 
+/** Seen so far: 'Paid' and 'Unpaid'. The part-paid wording is not confirmed. */
+export type SchoolFeeStatus = 'Paid' | 'Part Paid' | 'Unpaid';
+
+/** A related record as the students API nests it. */
+export interface NamedRef {
+  id: number;
+  name: string;
+  code?: string | null;
+}
+
+export interface StudentSchoolFeeDto {
+  fee_id: number;
+  amount: number | string;
+  amount_paid: number | string;
+  balance: number | string;
+  status: string;
+  is_paid: boolean;
+}
+
+/** GET /api/v1/students → each item of `data`. */
+export interface StudentDto {
+  id: number;
+  matriculation_number: string | null;
+  first_name: string;
+  last_name: string;
+  other_names: string | null;
+  email: string | null;
+  phone_number: string | null;
+  alt_phone_number?: string | null;
+  /** A JSON string: {"file_url", "file_name", "file_size", "file_type"}. */
+  passport_photo?: string | null;
+  level: NamedRef | null;
+  semester: NamedRef | null;
+  session: NamedRef | string | null;
+  department: NamedRef | null;
+  program: NamedRef | null;
+  school_fee: StudentSchoolFeeDto | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface StudentListQuery {
+  page?: number;
+  search?: string;
+  department?: string;
+  level?: string;
+  school_fee_status?: SchoolFeeStatus;
+}
+
 /* ---------- Expenses ---------- */
 
 export interface ExpenseDto {

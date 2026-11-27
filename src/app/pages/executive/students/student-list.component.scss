@@ -1,0 +1,64 @@
+.students-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.list-head {
+  h3 {
+    margin: 0;
+  }
+}
+
+.subtitle {
+  margin: 4px 0 0;
+  color: #8fa0c0;
+}
+
+.filters-row {
+  display: grid;
+  grid-template-columns: minmax(260px, 420px) minmax(160px, 220px);
+  gap: 10px;
+}
+
+.cell-primary {
+  color: #1a2f59;
+  font-weight: 600;
+}
+
+.cell-secondary {
+  color: #8fa0c0;
+  font-size: 13px;
+}
+
+.amount-head,
+.amount-cell {
+  text-align: right;
+}
+
+.amount-cell {
+  font-weight: 600;
+  color: #1a2f59;
+  white-space: nowrap;
+}
+
+.balance {
+  color: var(--app-danger);
+}
+
+.muted {
+  color: #8fa0c0;
+  font-weight: 400;
+}
+
+.empty-cell {
+  text-align: center;
+  color: #8fa0c0;
+  padding: 28px 0;
+}
+
+@media (max-width: 768px) {
+  .filters-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
