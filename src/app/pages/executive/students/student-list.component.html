@@ -2,8 +2,7 @@
   <div class="list-head">
     <h3 class="title-small">Students</h3>
     <p class="body-small subtitle">
-      {{ totalRecords().toLocaleString() }} students · school fees for the
-      current session
+      {{ totalRecords().toLocaleString() }} students · school fees
     </p>
   </div>
 
@@ -26,7 +25,7 @@
   <p-table
     [value]="students()"
     [loading]="loading()"
-    [tableStyle]="{ 'min-width': '72rem' }"
+    [tableStyle]="{ 'min-width': '64rem' }"
   >
     <ng-template pTemplate="header">
       <tr>
@@ -37,37 +36,43 @@
         <th class="amount-head">Paid</th>
         <th class="amount-head">Balance</th>
         <th>Fee Status</th>
-        <th>Last Payment</th>
       </tr>
     </ng-template>
 
     <ng-template pTemplate="body" let-row>
       <tr>
         <td>
-          <div class="cell-primary">{{ row.full_name }}</div>
-          <div class="cell-secondary">{{ row.matric_no || "—" }}</div>
+          <div class="cell-primary">{{ fullName(row) }}</div>
+          <div class="cell-secondary">
+            {{ row.matriculation_number || "—" }}
+          </div>
         </td>
         <td>{{ departmentLine(row) }}</td>
-        <td>{{ labelOf(row.level) || "—" }}</td>
-        <td class="amount-cell">{{ formatNaira(row.school_fee_total) }}</td>
-        <td class="amount-cell">{{ formatNaira(row.school_fee_paid) }}</td>
-        <td class="amount-cell balance">
-          {{ formatNaira(row.school_fee_balance) }}
-        </td>
+        <td>{{ row.level?.name || "—" }}</td>
+        @if (row.school_fee; as fee) {
+          <td class="amount-cell">{{ formatNaira(fee.amount) }}</td>
+          <td class="amount-cell">{{ formatNaira(fee.amount_paid) }}</td>
+          <td class="amount-cell" [class.balance]="!fee.is_paid">
+            {{ formatNaira(fee.balance) }}
+          </td>
+        } @else {
+          <td class="amount-cell muted">—</td>
+          <td class="amount-cell muted">—</td>
+          <td class="amount-cell muted">—</td>
+        }
         <td>
           <app-status-indicator
             [dot]="true"
-            [tone]="schoolFeeTone(row.school_fee_status)"
-            [text]="row.school_fee_status"
+            [tone]="schoolFeeTone(feeStatusText(row))"
+            [text]="feeStatusText(row)"
           />
         </td>
-        <td>{{ formatDisplayDate(row.last_payment_date) }}</td>
       </tr>
     </ng-template>
 
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="8" class="empty-cell">
+        <td colspan="7" class="empty-cell">
           @if (loading()) {
             Loading…
           } @else if (loadFailed()) {
@@ -81,11 +86,11 @@
   </p-table>
 
   <app-pagination
-    [visible]="totalRecords() > pageSize"
+    [visible]="totalRecords() > pageSize()"
     [first]="first()"
-    [rows]="pageSize"
+    [rows]="pageSize()"
     [totalRecords]="totalRecords()"
-    [rowsPerPageOptions]="[pageSize]"
+    [rowsPerPageOptions]="[pageSize()]"
     (pageChange)="onPageChange($event)"
   />
 </section>

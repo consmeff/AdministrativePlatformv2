@@ -19,19 +19,21 @@ import { SearchInputComponent } from '../../../widgets/search-input/search-input
 import { StatusIndicatorComponent } from '../../../widgets/status-indicator/status-indicator.component';
 import { ExecutiveApiService } from '../executive-api.service';
 import { StudentDto } from '../executive-api.types';
-import { formatDisplayDate, formatNaira } from '../executive.utils';
+import { formatNaira } from '../executive.utils';
 import {
   SCHOOL_FEE_FILTER_OPTIONS,
   SchoolFeeFilter,
-  labelOf,
+  schoolFeeStatusText,
   schoolFeeTone,
   studentDepartmentLine,
+  studentFullName,
 } from './student-list.utils';
 
-const PAGE_SIZE = 10;
+/** The backend's page size so far. Replaced by `page_size` from each response. */
+const DEFAULT_PAGE_SIZE = 100;
 const SEARCH_DEBOUNCE_MS = 400;
 
-/** Every student with their school-fee position for the current session. Read-only. */
+/** Every student with their school-fee position. Read-only. */
 @Component({
   selector: 'app-student-list',
   standalone: true,
@@ -53,7 +55,7 @@ export class StudentListComponent {
   private readonly reload$ = new Subject<void>();
   private readonly search$ = new Subject<string>();
 
-  readonly pageSize = PAGE_SIZE;
+  readonly pageSize = signal(DEFAULT_PAGE_SIZE);
   readonly feeStatusOptions = SCHOOL_FEE_FILTER_OPTIONS;
 
   readonly students = signal<StudentDto[]>([]);
@@ -65,10 +67,10 @@ export class StudentListComponent {
   selectedFeeStatus: SchoolFeeFilter = 'all';
 
   readonly formatNaira = formatNaira;
-  readonly formatDisplayDate = formatDisplayDate;
   readonly schoolFeeTone = schoolFeeTone;
   readonly departmentLine = studentDepartmentLine;
-  readonly labelOf = labelOf;
+  readonly fullName = studentFullName;
+  readonly feeStatusText = schoolFeeStatusText;
 
   constructor() {
     this.reload$
@@ -78,7 +80,7 @@ export class StudentListComponent {
           this.loadFailed.set(false);
           return this.api
             .getStudents({
-              page: Math.floor(this.first() / PAGE_SIZE) + 1,
+              page: Math.floor(this.first() / this.pageSize()) + 1,
               search: this.searchTerm().trim(),
               school_fee_status:
                 this.selectedFeeStatus === 'all'
@@ -98,6 +100,9 @@ export class StudentListComponent {
       .subscribe((page) => {
         this.students.set(page?.data ?? []);
         this.totalRecords.set(page?.total ?? 0);
+        if (page?.page_size) {
+          this.pageSize.set(page.page_size);
+        }
       });
 
     this.search$

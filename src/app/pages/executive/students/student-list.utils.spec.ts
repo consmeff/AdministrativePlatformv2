@@ -1,57 +1,71 @@
 import { StudentDto } from '../executive-api.types';
 import {
-  labelOf,
+  schoolFeeStatusText,
   schoolFeeTone,
   studentDepartmentLine,
+  studentFullName,
 } from './student-list.utils';
 
 describe('student list utils', () => {
+  // Trimmed from a real GET /api/v1/students item.
   const student: StudentDto = {
-    id: 1,
-    matric_no: 'CONSMMEFS/NSG/2025/0017',
-    full_name: 'Yakub Ajibade',
-    email: null,
-    department: 'Nursing',
-    programme: 'General Nursing',
-    level: '200',
-    session: '2025/26',
-    school_fee_total: '350000.00',
-    school_fee_paid: '150000.00',
-    school_fee_balance: '200000.00',
-    school_fee_status: 'Part Paid',
-    last_payment_date: '2026-11-01',
+    id: 1895,
+    matriculation_number: 'CONSMMEFS/ENT-2026/0026',
+    first_name: 'Yakub',
+    last_name: 'Ajibade',
+    other_names: 'Adebare',
+    email: 'student@example.com',
+    phone_number: '+2348000000000',
+    level: { id: 2, name: '100 Level' },
+    semester: { id: 1, name: '1st Semester' },
+    session: null,
+    department: { id: 1, name: 'NURSING', code: 'NRS' },
+    program: { id: 1, name: 'Ordinary National Diploma', code: 'OND' },
+    school_fee: {
+      fee_id: 4,
+      amount: 1000000.0,
+      amount_paid: 0.0,
+      balance: 1000000.0,
+      status: 'Unpaid',
+      is_paid: false,
+    },
   };
 
-  it('colours each school-fee status', () => {
-    expect(schoolFeeTone('Paid')).toBe('approved');
-    expect(schoolFeeTone('Part Paid')).toBe('pending');
-    expect(schoolFeeTone('Unpaid')).toBe('rejected');
+  it('builds the full name and skips an empty middle name', () => {
+    expect(studentFullName(student)).toBe('Yakub Adebare Ajibade');
+    expect(studentFullName({ ...student, other_names: '' })).toBe(
+      'Yakub Ajibade',
+    );
   });
 
-  it('shows an unknown status as neutral, not as paid', () => {
-    expect(schoolFeeTone('Waived')).toBe('neutral');
-  });
-
-  it('joins department and programme, skipping missing parts', () => {
-    expect(studentDepartmentLine(student)).toBe('Nursing · General Nursing');
-    expect(studentDepartmentLine({ ...student, programme: null })).toBe(
-      'Nursing',
+  it('shows the department with the programme code', () => {
+    expect(studentDepartmentLine(student)).toBe('NURSING · OND');
+    expect(studentDepartmentLine({ ...student, program: null })).toBe(
+      'NURSING',
     );
     expect(
-      studentDepartmentLine({ ...student, department: ' ', programme: null }),
+      studentDepartmentLine({ ...student, department: null, program: null }),
     ).toBe('—');
   });
 
-  it('reads the name when the API sends a related record instead of a label', () => {
+  it('reads the fee status, falling back to is_paid, then to "No fee set"', () => {
+    expect(schoolFeeStatusText(student)).toBe('Unpaid');
     expect(
-      studentDepartmentLine({
+      schoolFeeStatusText({
         ...student,
-        department: { id: 4, name: 'Nursing' },
-        programme: { id: 9, title: 'General Nursing' },
+        school_fee: { ...student.school_fee!, status: '', is_paid: true },
       }),
-    ).toBe('Nursing · General Nursing');
-    expect(labelOf({ id: 2, code: '200' })).toBe('200');
-    expect(labelOf(200)).toBe('200');
-    expect(labelOf(null)).toBe('');
+    ).toBe('Paid');
+    expect(schoolFeeStatusText({ ...student, school_fee: null })).toBe(
+      'No fee set',
+    );
+  });
+
+  it('colours each fee status, whatever the part-paid wording', () => {
+    expect(schoolFeeTone('Paid')).toBe('approved');
+    expect(schoolFeeTone('Unpaid')).toBe('rejected');
+    expect(schoolFeeTone('Part Paid')).toBe('pending');
+    expect(schoolFeeTone('Partially Paid')).toBe('pending');
+    expect(schoolFeeTone('No fee set')).toBe('neutral');
   });
 });
